@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 
 import java.awt.*;
 import java.util.Hashtable;
@@ -8,7 +7,7 @@ import java.awt.event.ComponentEvent;
 
 public class Frame extends JFrame {
     private JSlider slider;
-     // Task A UI
+    // Task A UI
     private JButton startBtn;
     private JButton stopBtn;
     private Label infoLabel;
@@ -20,13 +19,17 @@ public class Frame extends JFrame {
     private JButton startThr2;
     private JButton stopThr2;
 
-    //Thread Managing
+    // Thread Managing
 
-    private final ThreadManager ManagertaskA = new ThreadManager();
-    private final ThreadManager ManagertaskB = new ThreadManager();
-    private final ThreadRunnableManager TRManager = new ThreadRunnableManager();
+    private int semaphore = 0;
 
-    public Frame(){
+    private MyThread[] threads = new MyThread[2];
+
+    // private final ThreadManager ManagertaskA = new ThreadManager();
+    // private final ThreadManager ManagertaskB = new ThreadManager();
+    // private final ThreadRunnableManager TRManager = new ThreadRunnableManager();
+
+    public Frame() {
         setSize(650, 450);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -38,17 +41,47 @@ public class Frame extends JFrame {
         setVisible(true);
     }
 
-    private void setTaskA(){
+    private void setTaskA() {
         setSlider();
         setInteractable();
     }
 
-    private void setTaskB(){
-        JPanel Bpanel = new JPanel(new GridLayout(2,2));
+    private void setTaskB() {
+        JPanel Bpanel = new JPanel(new GridLayout(2, 2));
         startThr1 = new JButton("Start Thread1");
         startThr2 = new JButton("Start Thread2");
         stopThr1 = new JButton("Stop Thread1");
         stopThr2 = new JButton("Stop Thread2");
+        startThr1.addActionListener(event -> {
+            if (semaphore == 1) {
+                JOptionPane.showMessageDialog(this, "Slider is occupied by Thread2");
+                return;
+            } else {
+                semaphore++;
+            }
+            launchThread(0, 10);
+            stopThr2.setEnabled(false);
+        });
+        startThr2.addActionListener(event -> {
+            if (semaphore == 1) {
+                JOptionPane.showMessageDialog(this, "Slider is occupied by Thread1");
+                return;
+            } else {
+                semaphore++;
+            }
+            launchThread(0, 10);
+            stopThr1.setEnabled(false);
+        });
+        stopThr2.addActionListener(event -> {
+            semaphore--;
+            stopThread(1);
+            stopThr1.setEnabled(true);
+        });
+        stopThr1.addActionListener(event -> {
+            semaphore--;
+            stopThread(0);
+            stopThr2.setEnabled(true);
+        });
         Bpanel.add(startThr1);
         Bpanel.add(startThr2);
         Bpanel.add(stopThr1);
@@ -56,14 +89,14 @@ public class Frame extends JFrame {
         add(Bpanel, BorderLayout.SOUTH);
     }
 
-    private void setSlider(){
+    private void setSlider() {
         JPanel sliderPanel = new JPanel(new GridBagLayout());
         slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
         slider.setBorder(BorderFactory.createEmptyBorder(40, 0, 0, 0));
         slider.setMajorTickSpacing(10);
         slider.setPaintTicks(true);
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-        for(int i = 0; i <= 100; i+= 10){
+        for (int i = 0; i <= 100; i += 10) {
             labelTable.put(i, new JLabel(String.valueOf(i)));
         }
         slider.setLabelTable(labelTable);
@@ -72,13 +105,24 @@ public class Frame extends JFrame {
         add(sliderPanel, BorderLayout.NORTH);
     }
 
-    private void setInteractable(){
+    private void setInteractable() {
         JPanel interactPanel = new JPanel(new GridBagLayout());
-        
+
         SpinnerNumberModel spinMod1 = new SpinnerNumberModel(1, 1, 10, 1);
         priorThr1 = new JSpinner(spinMod1);
+        priorThr1.addChangeListener(event -> {
+            if (threads[0] != null) {
+                threads[0].setPriority((int) priorThr1.getValue());
+            }
+        });
         SpinnerNumberModel spinMod2 = new SpinnerNumberModel(1, 1, 10, 1);
         priorThr2 = new JSpinner(spinMod2);
+        priorThr2.addChangeListener(event -> {
+            if (threads[1] != null) {
+                threads[1].setPriority((int) priorThr2.getValue());
+            }
+        });
+
         priorThr1.setSize(100, 60);
         priorThr2.setSize(100, 60);
 
@@ -104,15 +148,59 @@ public class Frame extends JFrame {
 
         startBtn = new JButton("Start");
         startBtn.setSize(200, 40);
+        startBtn.addActionListener(event -> {
+            if (!areWorking()) {
+                launchAll();
+            }
+        });
         interactPanel.add(startBtn, grid);
-        
+
         grid.gridx = 0;
         grid.gridy = 3;
         stopBtn = new JButton("Stop");
+        stopBtn.addActionListener(event -> {
+            stopAll();
+        });
         startBtn.setSize(200, 40);
         interactPanel.add(stopBtn, grid);
 
-
         add(interactPanel, BorderLayout.CENTER);
+    }
+
+    void launchThread(int threadID, int val) {
+        threads[threadID] = new MyThread(slider, val);
+        threads[threadID].start();
+    }
+
+    void stopThread(int threadID) {
+        threads[threadID].interrupt();
+    }
+
+    void stopAll() {
+        stopThread(0);
+        stopThread(1);
+        startThr1.setEnabled(true);
+        startThr2.setEnabled(true);
+        stopThr1.setEnabled(true);
+        stopThr2.setEnabled(true);
+    }
+
+    void launchAll() {
+        launchThread(0, 10);
+        launchThread(1, 90);
+
+        startThr1.setEnabled(false);
+        startThr2.setEnabled(false);
+        stopThr1.setEnabled(false);
+        stopThr2.setEnabled(false);
+    }
+
+    boolean areWorking() {
+        for (MyThread thr : threads) {
+            if (thr != null && thr.isAlive()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
