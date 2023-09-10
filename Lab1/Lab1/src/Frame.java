@@ -20,6 +20,12 @@ public class Frame extends JFrame {
     private JButton startThr2;
     private JButton stopThr2;
 
+    //Thread Managing
+
+    private final ThreadManager ManagertaskA = new ThreadManager();
+    private final ThreadManager ManagertaskB = new ThreadManager();
+    private final ThreadRunnableManager TRManager = new ThreadRunnableManager();
+
     public Frame(){
         setSize(650, 450);
         setResizable(false);
