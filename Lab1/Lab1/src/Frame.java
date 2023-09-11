@@ -34,6 +34,8 @@ public class Frame extends JFrame {
         setTaskB();
         threads[0] = new MyThread(slider, 10, "Thread1");
         threads[1] = new MyThread(slider, 90, "Thread2");
+        threads[0].setPriority((int)priorThr1.getValue());
+        threads[1].setPriority((int)priorThr2.getValue());
         threads[0].setLabel(infoLabel);
         threads[1].setLabel(infoLabel);
         setVisible(true);
@@ -187,6 +189,12 @@ public class Frame extends JFrame {
     void launchThread(int threadID, int val) {
         threads[threadID] = new MyThread(slider, val, "Thread" + String.valueOf(threadID+1));
         threads[threadID].setLabel(infoLabel);
+        if(threadID == 0){
+            threads[threadID].setPriority((int)priorThr1.getValue());
+        }
+        else{
+            threads[threadID].setPriority((int)priorThr2.getValue());
+        }
         threads[threadID].start();
     }
 
