@@ -2,8 +2,6 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.util.Hashtable;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 public class Frame extends JFrame {
     private JSlider slider;
@@ -21,13 +19,10 @@ public class Frame extends JFrame {
 
     // Thread Managing
 
-    private int semaphore = 0;
+    private int semaphore = 1;
 
     private MyThread[] threads = new MyThread[2];
 
-    // private final ThreadManager ManagertaskA = new ThreadManager();
-    // private final ThreadManager ManagertaskB = new ThreadManager();
-    // private final ThreadRunnableManager TRManager = new ThreadRunnableManager();
 
     public Frame() {
         setSize(650, 450);
@@ -37,13 +32,21 @@ public class Frame extends JFrame {
 
         setTaskA();
         setTaskB();
-
+        threads[0] = new MyThread(slider, 10, "Thread1");
+        threads[1] = new MyThread(slider, 90, "Thread2");
+        threads[0].setLabel(infoLabel);
+        threads[1].setLabel(infoLabel);
         setVisible(true);
     }
 
     private void setTaskA() {
         setSlider();
         setInteractable();
+    }
+
+    private void switchTaskA(boolean b){
+        startBtn.setEnabled(b);
+        stopBtn.setEnabled(b);
     }
 
     private void setTaskB() {
@@ -53,34 +56,47 @@ public class Frame extends JFrame {
         stopThr1 = new JButton("Stop Thread1");
         stopThr2 = new JButton("Stop Thread2");
         startThr1.addActionListener(event -> {
-            if (semaphore == 1) {
+            if (!lockSemaphore()) {
                 JOptionPane.showMessageDialog(this, "Slider is occupied by Thread2");
                 return;
-            } else {
-                semaphore++;
             }
             launchThread(0, 10);
+            threads[0].setPriority(Thread.MIN_PRIORITY);
+            // infoLabel.setText("Thread1 is controlling the Slider now!");
+            switchTaskA(false);
             stopThr2.setEnabled(false);
+            startThr1.setEnabled(false);
+
         });
         startThr2.addActionListener(event -> {
-            if (semaphore == 1) {
+            if (!lockSemaphore()) {
                 JOptionPane.showMessageDialog(this, "Slider is occupied by Thread1");
                 return;
-            } else {
-                semaphore++;
             }
-            launchThread(0, 10);
+            launchThread(1, 90);
+            threads[1].setPriority(Thread.MAX_PRIORITY);
+ //           infoLabel.setText("Thread2 is controlling the Slider now!");
+            switchTaskA(false);
             stopThr1.setEnabled(false);
+            startThr2.setEnabled(false);
+
         });
         stopThr2.addActionListener(event -> {
-            semaphore--;
+            freeSemaphore();
             stopThread(1);
             stopThr1.setEnabled(true);
+            startThr2.setEnabled(true);
+            infoLabel.setText("Slider isn't controlled");
+            switchTaskA(true);
         });
         stopThr1.addActionListener(event -> {
-            semaphore--;
+            freeSemaphore();
             stopThread(0);
             stopThr2.setEnabled(true);
+            startThr1.setEnabled(true);
+            infoLabel.setText("Slider isn't controlled");
+            switchTaskA(true);
+
         });
         Bpanel.add(startThr1);
         Bpanel.add(startThr2);
@@ -160,6 +176,7 @@ public class Frame extends JFrame {
         stopBtn = new JButton("Stop");
         stopBtn.addActionListener(event -> {
             stopAll();
+            infoLabel.setText("Slider isn't controlled");
         });
         startBtn.setSize(200, 40);
         interactPanel.add(stopBtn, grid);
@@ -168,7 +185,8 @@ public class Frame extends JFrame {
     }
 
     void launchThread(int threadID, int val) {
-        threads[threadID] = new MyThread(slider, val);
+        threads[threadID] = new MyThread(slider, val, "Thread" + String.valueOf(threadID+1));
+        threads[threadID].setLabel(infoLabel);
         threads[threadID].start();
     }
 
@@ -202,5 +220,21 @@ public class Frame extends JFrame {
             }
         }
         return false;
+    }
+
+    synchronized boolean lockSemaphore() {
+        if (semaphore == 0) {
+            return false;
+        }
+        semaphore--;
+        return true;
+    }
+
+    synchronized void freeSemaphore() {
+        if (semaphore < 1) {
+            semaphore++;
+        } else {
+            throw new RuntimeException("Semaphore cannot be freed");
+        }
     }
 }

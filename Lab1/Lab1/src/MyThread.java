@@ -1,12 +1,20 @@
+import java.awt.Label;
+
 import javax.swing.JSlider;
 
 public class MyThread extends Thread{
     private JSlider slider;
+    private Label infoLabel;
     private int targetVal;
 
-    MyThread(JSlider obj, int val){
+    MyThread(JSlider obj, int val, String threadName){
         slider = obj;
         targetVal = val;
+        setName(threadName);
+    }
+
+    public void setLabel(Label label){
+        infoLabel = label;
     }
 
     @Override
@@ -14,14 +22,14 @@ public class MyThread extends Thread{
         while(!interrupted()) {
             synchronized(slider){
                 int prevValue = slider.getValue();
-
+                infoLabel.setText(getName() + " is in control of Slider now!");
                 if (prevValue < targetVal) {
                     slider.setValue(prevValue + 1);
                 }else if (prevValue > targetVal) {
                     slider.setValue(prevValue - 1);
                 }
                 try {
-                    sleep(10);
+                    sleep(100);
                 } catch (InterruptedException exception) {
                     return;
                 }
