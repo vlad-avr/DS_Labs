@@ -22,14 +22,14 @@ public class MyThread extends Thread{
         while(!interrupted()) {
             synchronized(slider){
                 int prevValue = slider.getValue();
-                infoLabel.setText(getName() + " is in control of Slider now!");
+                infoLabel.setText(getName() + " controls Slider!");
                 if (prevValue < targetVal) {
                     slider.setValue(prevValue + 1);
                 }else if (prevValue > targetVal) {
                     slider.setValue(prevValue - 1);
                 }
                 try {
-                    sleep(100);
+                    sleep(50);
                 } catch (InterruptedException exception) {
                     return;
                 }

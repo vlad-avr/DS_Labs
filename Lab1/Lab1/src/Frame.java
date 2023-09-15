@@ -186,6 +186,8 @@ public class Frame extends JFrame {
         add(interactPanel, BorderLayout.CENTER);
     }
 
+    //Threads management section
+
     void launchThread(int threadID, int val) {
         threads[threadID] = new MyThread(slider, val, "Thread" + String.valueOf(threadID+1));
         threads[threadID].setLabel(infoLabel);
@@ -229,6 +231,8 @@ public class Frame extends JFrame {
         }
         return false;
     }
+
+    //Semaphore management section
 
     synchronized boolean lockSemaphore() {
         if (semaphore == 0) {
