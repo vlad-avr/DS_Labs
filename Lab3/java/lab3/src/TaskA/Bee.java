@@ -1,11 +1,14 @@
 package TaskA;
 
+import java.security.SecureRandom;
+
 public class Bee implements Runnable{
     private HoneyPot pot;
     private Winnie winnie;
     private Integer wait_time = 600;
     private final String name;
 
+    private SecureRandom rnd = new SecureRandom();
     public Bee(HoneyPot pot, Winnie winnie, String name){
         this.pot = pot;
         this.winnie = winnie;
@@ -16,7 +19,7 @@ public class Bee implements Runnable{
     public void run(){
         while(true){
             try{
-                Thread.sleep(wait_time);
+                Thread.sleep(rnd.nextInt(wait_time) + 100);
             }catch(Exception exception){
                 System.out.println("\n Bees cannot sleep! At least this one couldn`t!\n");
             }

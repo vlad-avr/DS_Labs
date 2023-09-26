@@ -9,7 +9,7 @@ public class HoneyPot {
     }
 
     public synchronized void fill_pot(String bee_name){
-        while(!is_full()){
+        while(is_full()){
             try{
                 wait();
             }catch(InterruptedException exception){
@@ -17,7 +17,7 @@ public class HoneyPot {
             }
         }
         cur_honey++;
-        System.out.println("\n" + bee_name + " has brought 1 point of honey to the Pot, it`s now " + cur_honey + "\\" + max_honey + "full\n");
+        System.out.println("\n" + bee_name + " has brought 1 point of honey to the Pot, it`s now " + cur_honey + "\\" + max_honey + " full\n");
     }
 
     public synchronized void empty_pot(){
