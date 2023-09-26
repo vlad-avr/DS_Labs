@@ -49,7 +49,7 @@ public class BeeSearch {
         //Setting Winnie position on the map
         SecureRandom rand = new SecureRandom();
         int row = rand.nextInt(forest_size);
-        int column = rand.nextInt(1);
+        int column = rand.nextInt(forest_size);
         forest_map.get(row).set(column, true);
         System.out.println("WP last spotted at (" + row + " , " + column + ") part of the forest");
         System.out.println("Suspect photo:\n                                     ....                          \r\n" + //
