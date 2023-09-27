@@ -14,12 +14,10 @@ type Semaphore struct {
 }
 
 func (s *Semaphore) acquire() {
-	//print("\n Semaphore acquired\n")
 	s.sem <- struct{}{}
 }
 
 func (s *Semaphore) release() {
-	//print("\n Semaphore released\n")
 	<-s.sem
 }
 
@@ -34,7 +32,6 @@ func put_part(smoker *Smoker, table chan string, counter chan int, semaphore *Se
 	time.Sleep(time.Second)
 	semaphore.acquire()
 	i := <-counter
-	//print("\n", i)
 	if i == 2 {
 		part1 := <-table
 		part2 := <-table
