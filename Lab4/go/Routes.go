@@ -6,30 +6,6 @@ import (
 	"time"
 )
 
-// type Map struct {
-// 	routes [][]int
-// 	size   int
-// }
-
-// func (m *Map) init(N int) {
-// 	seed := rand.NewSource(time.Now().Unix())
-// 	rnd := rand.New(seed)
-// 	m.size = N
-// 	for i := 0; i < N; i++ {
-// 		for j := 0; j < N; j++ {
-// 			m.routes[i][j] = rnd.Intn(100) + 1
-// 		}
-// 	}
-// }
-
-// func (m *Map) print_map() {
-// 	for i := 0; i < m.size; i++ {
-// 		for j := 0; j < m.size; j++ {
-// 			println("\t", m.routes[i][j])
-// 		}
-// 	}
-// }
-
 type Semaphore struct {
 	cur_concurrency int
 	max_concurrency int
@@ -113,14 +89,32 @@ func shuffle_routes(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand)
 }
 
 func shuffle_cities(routes chan [][]int, size *int, sem Semaphore, rnd rand.Rand) {
-	for {
-		time.Sleep(time.Millisecond * time.Duration(rnd.Intn(3000)+1000))
-		for !sem.is_empty() {
-			continue
+	time.Sleep(time.Millisecond * time.Duration(rnd.Intn(3000)+1000))
+	for !sem.is_empty() {
+		continue
+	}
+	sem.write_lock()
+	route := <-routes
+	if *size >= 3 {
+		new_route := make([][]int, *size+1)
+		for i := 0; i < *size+1; i++ {
+			new_route[i] = make([]int, *size+1)
 		}
-		sem.write_lock()
-		route := <-routes
-		if *size >= 3 {
+		for i := 0; i < *size; i++ {
+			for j := i; j < *size; j++ {
+				new_route[i][j] = route[i][j]
+				new_route[j][i] = route[j][i]
+			}
+		}
+		*size++
+		for i := 0; i < *size; i++ {
+			new_route[i][*size] = rnd.Intn(10)
+			new_route[*size][i] = new_route[i][*size]
+		}
+		routes <- new_route
+	} else {
+		flip := rnd.Intn(2)
+		if flip == 0 {
 			new_route := make([][]int, *size+1)
 			for i := 0; i < *size+1; i++ {
 				new_route[i] = make([]int, *size+1)
@@ -138,49 +132,29 @@ func shuffle_cities(routes chan [][]int, size *int, sem Semaphore, rnd rand.Rand
 			}
 			routes <- new_route
 		} else {
-			flip := rnd.Intn(2)
-			if flip == 0 {
-				new_route := make([][]int, *size+1)
-				for i := 0; i < *size+1; i++ {
-					new_route[i] = make([]int, *size+1)
-				}
-				for i := 0; i < *size; i++ {
-					for j := i; j < *size; j++ {
+			deleted_city := rnd.Intn(*size)
+			new_route := make([][]int, *size-1)
+			for i := 0; i < *size-1; i++ {
+				new_route[i] = make([]int, *size-1)
+			}
+			for i := 0; i < *size; i++ {
+				for j := i; j < *size; j++ {
+					if i < deleted_city {
 						new_route[i][j] = route[i][j]
 						new_route[j][i] = route[j][i]
+					} else if i > deleted_city {
+						new_route[i-1][j-1] = route[i][j]
+						new_route[j-1][i-1] = route[j][i]
+					} else {
+						continue
 					}
 				}
-				*size++
-				for i := 0; i < *size; i++ {
-					new_route[i][*size] = rnd.Intn(10)
-					new_route[*size][i] = new_route[i][*size]
-				}
-				routes <- new_route
-			} else {
-				deleted_city := rnd.Intn(*size)
-				new_route := make([][]int, *size-1)
-				for i := 0; i < *size-1; i++ {
-					new_route[i] = make([]int, *size-1)
-				}
-				for i := 0; i < *size; i++ {
-					for j := i; j < *size; j++ {
-						if i < deleted_city {
-							new_route[i][j] = route[i][j]
-							new_route[j][i] = route[j][i]
-						} else if i > deleted_city {
-							new_route[i-1][j-1] = route[i][j]
-							new_route[j-1][i-1] = route[j][i]
-						} else {
-							continue
-						}
-					}
-				}
-				*size--
-				routes <- new_route
 			}
+			*size--
+			routes <- new_route
 		}
-		sem.release_write_lock()
 	}
+	sem.release_write_lock()
 }
 
 type Item struct {
@@ -226,15 +200,15 @@ func (piq *PriorityQueue) Update(item *Item, value int, priority int) {
 
 func calculate_path(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand) {
 
+	//print("zdzd")
 	time.Sleep(time.Millisecond * time.Duration(rnd.Intn(1000)+500))
 	for sem.is_full() {
-		continue
 	}
 	sem.read_lock()
 	route := <-routes
 	start := rnd.Intn(size)
 	end := rnd.Intn(size)
-	for start == end {
+	for start == end || route[start][end] == 0 {
 		end = rnd.Intn(size)
 	}
 	print("\nFiding cheapest path from ", start, " to ", end)
@@ -247,7 +221,7 @@ func calculate_path(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand)
 	}
 	for len(piq) != 0 {
 		v := heap.Pop(&piq).(*Item)
-		for i := 0; i < v.value; i++ {
+		for i := 0; i < size; i++ {
 			if route[v.value][i] != 0 {
 				if dist[i] > dist[v.value]+route[v.value][i] {
 					dist[i] = dist[v.value] + route[v.value][i]
@@ -257,15 +231,16 @@ func calculate_path(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand)
 		}
 	}
 	print("\n The cheapest route from ", start, " to ", end, " is ", dist[end])
-	sem.release_write_lock()
+	sem.release_read_lock()
+
 }
 
 func print_routes(routes *[][]int, size int) {
 	print("\n{")
 	for i := 0; i < size; i++ {
 		print("\n{")
-		for j := i; j < size; j++ {
-			print(" {", i, "-", (*routes)[i][j], "-> ", j, "} ")
+		for j := 0; j < size; j++ {
+			print(" {", i, " <-", (*routes)[i][j], "-> ", j, "} ")
 		}
 		print("}")
 	}
@@ -283,7 +258,7 @@ func main() {
 	seed := rand.NewSource(time.Now().Unix())
 	rnd := rand.New(seed)
 	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
+		for j := i + 1; j < size; j++ {
 			cur_routes[i][j] = rnd.Intn(10)
 			cur_routes[j][i] = cur_routes[i][j]
 		}
@@ -291,9 +266,9 @@ func main() {
 	print_routes(&cur_routes, size)
 	routes <- cur_routes
 	for {
-		// go shuffle_prices(routes, size, sem, *rnd)
-		// go shuffle_routes(routes, size, sem, *rnd)
-		// go shuffle_cities(routes, &size, sem, *rnd)
+		go shuffle_prices(routes, size, sem, *rnd)
+		go shuffle_routes(routes, size, sem, *rnd)
+		go shuffle_cities(routes, &size, sem, *rnd)
 		go calculate_path(routes, size, sem, *rnd)
 		go calculate_path(routes, size, sem, *rnd)
 	}
