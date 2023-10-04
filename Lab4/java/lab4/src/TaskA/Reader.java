@@ -2,23 +2,12 @@ package TaskA;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.SecureRandom;
 
-public class Reader extends Thread {
-    private final int lock_cap;
-    private final int max_wait_time;
-    private FileLocker locker;
-    private Manager manager;
-    private final SecureRandom rnd = new SecureRandom();
-
+public class Reader extends Worker {
     public Reader(int lock_cap, int max_wait_time, FileLocker locker, Manager manager) {
-        this.lock_cap = lock_cap;
-        this.max_wait_time = max_wait_time;
-        this.locker = locker;
-        this.manager = manager;
+        super(lock_cap, max_wait_time, locker, manager);
     }
 
     @Override
