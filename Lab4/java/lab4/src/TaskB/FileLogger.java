@@ -51,16 +51,17 @@ public class FileLogger extends Thread {
         File file = new File(file_path);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            writer.write("\n\n");
             for (int i = 0; i < garden.garden_map.length; i++) {
                 for (int j = 0; j < garden.garden_map[i].length; j++) {
                     if (garden.garden_map[i][j] == 0) {
-                        writer.write("\tdehydrated");
+                        writer.write(String.format("%20s","dehydrated"));
                     } else if (garden.garden_map[i][j] == 1) {
-                        writer.write("\tgrowing");
+                        writer.write(String.format("%20s","growing"));
                     } else if (garden.garden_map[i][j] == 2) {
-                        writer.write("\tblooming");
+                        writer.write(String.format("%20s","blooming"));
                     } else {
-                        writer.write("\tUnknown");
+                        writer.write(String.format("%20s","unknown"));
                     }
                 }
                 writer.write("\n");

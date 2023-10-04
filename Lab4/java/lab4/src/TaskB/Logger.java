@@ -37,16 +37,17 @@ public class Logger extends Thread{
     }
 
     private void log(){
+        System.out.println("\n");
         for(int i = 0; i < garden.garden_map.length; i++){
             for(int j = 0; j < garden.garden_map[i].length; j++){
                 if(garden.garden_map[i][j] == 0){
-                    System.out.println("\tdehydrated");
+                    System.out.print(String.format("%20s","dehydrated"));
                 }else if(garden.garden_map[i][j] == 1){
-                    System.out.println("\tgrowing");
+                    System.out.print(String.format("%20s","growing"));
                 }else if(garden.garden_map[i][j] == 2){
-                    System.out.println("\tblooming");
+                    System.out.print(String.format("%20s","blooming"));
                 }else{
-                    System.out.println("\tUnknown");
+                    System.out.print(String.format("%20s","unknown"));
                 }
             }
             System.out.println("\n");
