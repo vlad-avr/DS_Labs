@@ -53,4 +53,18 @@ public class Manager {
     public File get_file(){
         return new File(file_path);
     }
+
+    public void remove_number_from_list(int number){
+        for(int i = 0; i < number_list.size(); i++){
+            if(number_list.get(i) == number){
+                number_list.remove(i);
+                return;
+            }
+        }
+        System.out.println("\nNumber " + number + " is not present in databse!");
+    }
+
+    public void add_number_to_list(int number){
+        number_list.add(number);
+    }
 }
