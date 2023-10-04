@@ -2,9 +2,9 @@ package TaskB;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Gardener extends EntityThread{
+public class FileLogger extends EntityThread{
     
-    public Gardener(ReentrantReadWriteLock lock){
+    public FileLogger(ReentrantReadWriteLock lock){
         super(lock);
     }
 }

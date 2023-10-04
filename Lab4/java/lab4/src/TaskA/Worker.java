@@ -2,7 +2,7 @@ package TaskA;
 
 import java.security.SecureRandom;
 
-public class Worker extends Thread{
+public abstract class Worker extends Thread{
     protected final int lock_cap;
     protected final int max_wait_time;
     protected FileLocker locker;
