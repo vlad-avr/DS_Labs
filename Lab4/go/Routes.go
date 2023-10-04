@@ -83,6 +83,7 @@ func shuffle_prices(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand)
 		route[j][i] = route[i][j]
 		print("\nChanged price of (", i, " , ", j, ") route to ", route[i][j])
 		routes <- route
+		sem.release_write_lock()
 	}
 }
 
@@ -96,14 +97,99 @@ func shuffle_routes(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand)
 		route := <-routes
 		i := rnd.Intn(size)
 		j := rnd.Intn(size)
+		if route[i][j] == 0 {
+			route[i][j] = rnd.Intn(10) + 1
+			route[j][i] = route[i][j]
+			print("\nAdded route from ", i, " to ", j, " with price ", route[i][j])
+		} else {
+			route[i][j] = 0
+			route[j][i] = 0
+			print("\nRemoved route from ", i, " to ", j)
+		}
+		routes <- route
+		sem.release_write_lock()
+	}
+}
+
+func shuffle_cities(routes chan [][]int, size *int, sem Semaphore, rnd rand.Rand) {
+	for {
+		time.Sleep(time.Millisecond * time.Duration(rnd.Intn(3000)+1000))
+		for !sem.is_empty() {
+			continue
+		}
+		sem.write_lock()
+		route := <-routes
+		if *size >= 3 {
+			new_route := make([][]int, *size+1)
+			for i := 0; i < *size+1; i++ {
+				new_route[i] = make([]int, *size+1)
+			}
+			for i := 0; i < *size; i++ {
+				for j := i; j < *size; j++ {
+					new_route[i][j] = route[i][j]
+					new_route[j][i] = route[j][i]
+				}
+			}
+			*size++
+			for i := 0; i < *size; i++ {
+				new_route[i][*size] = rnd.Intn(10)
+				new_route[*size][i] = new_route[i][*size]
+			}
+			routes <- new_route
+		} else {
+			flip := rnd.Intn(2)
+			if flip == 0 {
+				new_route := make([][]int, *size+1)
+				for i := 0; i < *size+1; i++ {
+					new_route[i] = make([]int, *size+1)
+				}
+				for i := 0; i < *size; i++ {
+					for j := i; j < *size; j++ {
+						new_route[i][j] = route[i][j]
+						new_route[j][i] = route[j][i]
+					}
+				}
+				*size++
+				for i := 0; i < *size; i++ {
+					new_route[i][*size] = rnd.Intn(10)
+					new_route[*size][i] = new_route[i][*size]
+				}
+				routes <- new_route
+			} else {
+				deleted_city := rnd.Intn(*size)
+				new_route := make([][]int, *size-1)
+				for i := 0; i < *size-1; i++ {
+					new_route[i] = make([]int, *size-1)
+				}
+				for i := 0; i < *size; i++ {
+					for j := i; j < *size; j++ {
+						if i < deleted_city {
+							new_route[i][j] = route[i][j]
+							new_route[j][i] = route[j][i]
+						} else if i > deleted_city {
+							new_route[i-1][j-1] = route[i][j]
+							new_route[j-1][i-1] = route[j][i]
+						} else {
+							continue
+						}
+					}
+				}
+				*size--
+				routes <- new_route
+			}
+		}
+		sem.release_write_lock()
 	}
 }
 
 func main() {
 	routes := make(chan [][]int, 1)
 	sem := Semaphore{0, 2}
-	cur_routes := <-routes
 	size := 5
+	cur_routes := make([][]int, size)
+	for i := 0; i < size; i++ {
+		cur_routes[i] = make([]int, size)
+	}
 	seed := rand.NewSource(time.Now().Unix())
 	rnd := rand.New(seed)
 	for i := 0; i < size; i++ {
@@ -114,4 +200,6 @@ func main() {
 	}
 	routes <- cur_routes
 	go shuffle_prices(routes, size, sem, *rnd)
+	go shuffle_routes(routes, size, sem, *rnd)
+	go shuffle_cities(routes, &size, sem, *rnd)
 }
