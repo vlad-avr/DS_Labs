@@ -270,6 +270,5 @@ func main() {
 		go shuffle_routes(routes, size, sem, *rnd)
 		go shuffle_cities(routes, &size, sem, *rnd)
 		go calculate_path(routes, size, sem, *rnd)
-		go calculate_path(routes, size, sem, *rnd)
 	}
 }
