@@ -14,9 +14,13 @@ public class Manager {
             "Mark" };
     private List<Integer> number_list = new ArrayList<>();
     private final SecureRandom rnd = new SecureRandom();
+    private final int reader_count;
+    private final int writer_count;
 
-    public Manager(int N) {
+    public Manager(int N, int readers, int writers) {
         init_db(N);
+        reader_count = readers;
+        writer_count = writers;
     }
 
     private void init_db(int N) {
