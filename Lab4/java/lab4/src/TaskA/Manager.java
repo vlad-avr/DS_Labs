@@ -39,4 +39,18 @@ public class Manager {
             System.out.println(exception.getMessage());
         }
     }
+
+    public String get_rand_name(){
+        int i = rnd.nextInt(names_list.length);
+        return names_list[i];
+    }
+
+    public int get_rand_number(){
+        int i = rnd.nextInt(number_list.size());
+        return number_list.get(i);
+    }
+
+    public File get_file(){
+        return new File(file_path);
+    }
 }

@@ -27,10 +27,9 @@ public class FileLocker {
         return false;
     }
 
-    public void acquire_lock(int thread_lock_cap){
+    public void acquire_lock(int thread_lock_cap) throws Exception{
         if(lock + thread_lock_cap > max_lock_cap){
-            System.out.println("\n ERROR: Max lock capacity has been exceeded!");
-            return;
+            throw new Exception("\n ERROR: Max lock capacity has been exceeded!");
         }
         lock += thread_lock_cap;
     }
