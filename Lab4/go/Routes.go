@@ -225,40 +225,39 @@ func (piq *PriorityQueue) Update(item *Item, value int, priority int) {
 }
 
 func calculate_path(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand) {
-	for {
-		time.Sleep(time.Millisecond * time.Duration(rnd.Intn(1000)+500))
-		for sem.is_full() {
-			continue
-		}
-		sem.write_lock()
-		route := <-routes
-		start := rnd.Intn(size)
-		end := rnd.Intn(size)
-		for start == end {
-			end = rnd.Intn(size)
-		}
-		print("\nFiding cheapest path from ", start, " to ", end)
-		piq := make(PriorityQueue, 0)
-		heap.Push(&piq, &Item{value: start, priority: 0})
-		dist := make([]int, size)
-		dist[start] = 0
-		for i := 1; i < size; i++ {
-			dist[i] = 1000000
-		}
-		for len(piq) != 0 {
-			v := heap.Pop(&piq).(*Item)
-			for i := 0; i < v.value; i++ {
-				if route[v.value][i] != 0 {
-					if dist[i] > dist[v.value]+route[v.value][i] {
-						dist[i] = dist[v.value] + route[v.value][i]
-						heap.Push(&piq, &Item{value: i, priority: dist[i]})
-					}
+
+	time.Sleep(time.Millisecond * time.Duration(rnd.Intn(1000)+500))
+	for sem.is_full() {
+		continue
+	}
+	sem.read_lock()
+	route := <-routes
+	start := rnd.Intn(size)
+	end := rnd.Intn(size)
+	for start == end {
+		end = rnd.Intn(size)
+	}
+	print("\nFiding cheapest path from ", start, " to ", end)
+	piq := make(PriorityQueue, 0)
+	heap.Push(&piq, &Item{value: start, priority: 0})
+	dist := make([]int, size)
+	dist[start] = 0
+	for i := 1; i < size; i++ {
+		dist[i] = 1000000
+	}
+	for len(piq) != 0 {
+		v := heap.Pop(&piq).(*Item)
+		for i := 0; i < v.value; i++ {
+			if route[v.value][i] != 0 {
+				if dist[i] > dist[v.value]+route[v.value][i] {
+					dist[i] = dist[v.value] + route[v.value][i]
+					heap.Push(&piq, &Item{value: i, priority: dist[i]})
 				}
 			}
 		}
-		print("\n The cheapest route from ", start, " to ", end, " is ", dist[end])
-		sem.release_write_lock()
 	}
+	print("\n The cheapest route from ", start, " to ", end, " is ", dist[end])
+	sem.release_write_lock()
 }
 
 func print_routes(routes *[][]int, size int) {
@@ -289,11 +288,13 @@ func main() {
 			cur_routes[j][i] = cur_routes[i][j]
 		}
 	}
-	print(cur_routes)
+	print_routes(&cur_routes, size)
 	routes <- cur_routes
-	go shuffle_prices(routes, size, sem, *rnd)
-	go shuffle_routes(routes, size, sem, *rnd)
-	go shuffle_cities(routes, &size, sem, *rnd)
-	go calculate_path(routes, size, sem, *rnd)
-	go calculate_path(routes, size, sem, *rnd)
+	for {
+		// go shuffle_prices(routes, size, sem, *rnd)
+		// go shuffle_routes(routes, size, sem, *rnd)
+		// go shuffle_cities(routes, &size, sem, *rnd)
+		go calculate_path(routes, size, sem, *rnd)
+		go calculate_path(routes, size, sem, *rnd)
+	}
 }
