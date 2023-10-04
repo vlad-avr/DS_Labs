@@ -15,7 +15,7 @@ public class Entry {
     public Entry(String parse_str) {
         this.name = parse_str.substring(0, parse_str.indexOf(" "));
         try {
-            this.number = Integer.parseInt(parse_str.substring(parse_str.lastIndexOf(" "), parse_str.indexOf("\n")));
+            this.number = Integer.parseInt(parse_str.substring(parse_str.lastIndexOf(" ") + 1, parse_str.length()));
         } catch (NumberFormatException exception) {
             this.number = 0;
             System.out.println(exception.getMessage());

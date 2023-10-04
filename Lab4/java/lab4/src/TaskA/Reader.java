@@ -38,38 +38,44 @@ public class Reader extends Worker {
     }
 
     private void find_by_name(String name, File file) {
+        System.out.println("\n" + getName() + " looking for people with name " + name);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
+            boolean is_found = false;
             while((line = reader.readLine()) != null){
                 Entry entry = new Entry(line);
                 if(entry.name.equals(name)){
-                    System.out.println("\n" + getName() + " has found what he was looking for : " + entry.toString());
-                    reader.close();
-                    return;
+                    System.out.println("\n" + getName() + " has found : " + entry.toString());
+                    is_found = true;
                 }
             }
+            if(!is_found){
+                System.out.println("\n" + getName() + " didn`t find people with name " + name);
+            }
             reader.close();
-            System.out.println("\n" + getName() + " didn`t find person with name " + name);
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
         }
     }
 
     private void find_by_number(int number, File file) {
+        System.out.println("\n" + getName() + " looking for people with number " + number);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
+            boolean is_found = false;
             while((line = reader.readLine()) != null){
                 Entry entry = new Entry(line);
                 if(entry.number == number){
-                    System.out.println("\n" + getName() + " has found what he was looking for : " + entry.toString());
-                    reader.close();
-                    return;
+                    System.out.println("\n" + getName() + " has found : " + entry.toString());
+                    is_found = true;
                 }
             }
+            if(!is_found){
+                System.out.println("\n" + getName() + " didn`t find people with number " + number);
+            }
             reader.close();
-            System.out.println("\n" + getName() + " didn`t find person whose number is " + number);
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
         }

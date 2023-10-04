@@ -16,11 +16,26 @@ public class Manager {
     private final SecureRandom rnd = new SecureRandom();
     private final int reader_count;
     private final int writer_count;
+    private FileLocker locker;
 
     public Manager(int N, int readers, int writers) {
         init_db(N);
         reader_count = readers;
         writer_count = writers;
+        locker = new FileLocker(readers + writers);
+    }
+
+    public void start() {
+        for (int i = 0; i < reader_count; i++) {
+            Reader reader = new Reader(1, 800, locker, this);
+            reader.setName("Reader " + i);
+            reader.start();
+        }
+        for (int i = 0; i < writer_count; i++) {
+            Writer writer = new Writer(reader_count + writer_count, 1600, locker, this);
+            writer.setName("Writer " + i);
+            writer.start();
+        }
     }
 
     private void init_db(int N) {
@@ -40,23 +55,28 @@ public class Manager {
         }
     }
 
-    public String get_rand_name(){
+    public String get_rand_name() {
         int i = rnd.nextInt(names_list.length);
         return names_list[i];
     }
 
-    public int get_rand_number(){
-        int i = rnd.nextInt(number_list.size());
+    public int get_rand_number() {
+        int i = 0;
+        try {
+            i = rnd.nextInt(number_list.size());
+        } catch (IllegalArgumentException exception) {
+            return 0;
+        }
         return number_list.get(i);
     }
 
-    public File get_file(){
+    public File get_file() {
         return new File(file_path);
     }
 
-    public void remove_number_from_list(int number){
-        for(int i = 0; i < number_list.size(); i++){
-            if(number_list.get(i) == number){
+    public void remove_number_from_list(int number) {
+        for (int i = 0; i < number_list.size(); i++) {
+            if (number_list.get(i) == number) {
                 number_list.remove(i);
                 return;
             }
@@ -64,7 +84,7 @@ public class Manager {
         System.out.println("\nNumber " + number + " is not present in databse!");
     }
 
-    public void add_number_to_list(int number){
+    public void add_number_to_list(int number) {
         number_list.add(number);
     }
 }

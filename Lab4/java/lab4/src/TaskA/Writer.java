@@ -18,11 +18,11 @@ public class Writer extends Worker {
     public void run() {
         while (true) {
             try {
-                sleep(rnd.nextInt(max_wait_time) + 100);
+                sleep(rnd.nextInt(max_wait_time) + 200);
             } catch (InterruptedException exception) {
                 System.out.println(exception.getMessage());
             }
-            int flip = rnd.nextInt(4);
+            int flip = rnd.nextInt(3);
             while (!locker.is_free()) {
                 continue;
             }
@@ -43,6 +43,7 @@ public class Writer extends Worker {
 
     private void delete_entry(int number, File file) {
         List<Entry> list = new ArrayList<>();
+        System.out.println("\n" + getName() + " is trying to delete a person with number " + number);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
@@ -51,8 +52,7 @@ public class Writer extends Worker {
                 if (entry.number != number) {
                     list.add(entry);
                 } else {
-                    System.out.println("\nPerson with " + number + " number was found and deleted from the database by "
-                            + getName());
+                    System.out.println("\n" + getName() + " has found and deleted " + entry.toString());
                     manager.remove_number_from_list(number);
                 }
             }
@@ -71,8 +71,9 @@ public class Writer extends Worker {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
             Entry entry = new Entry(manager.get_rand_name(), rnd.nextInt(1000) + 1);
-            System.out.println("\n Adding to the databse : " + entry.toString());
+            System.out.println("\n" + getName() + " added to the databse person : " + entry.toString());
             writer.write(entry.toString());
+            manager.add_number_to_list(entry.number);
             writer.close();
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
