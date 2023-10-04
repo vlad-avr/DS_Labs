@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"math/rand"
 	"time"
 )
@@ -182,6 +183,96 @@ func shuffle_cities(routes chan [][]int, size *int, sem Semaphore, rnd rand.Rand
 	}
 }
 
+type Item struct {
+	value    int
+	priority int
+	index    int
+}
+
+type PriorityQueue []*Item
+
+func (piq PriorityQueue) Len() int {
+	return len(piq)
+}
+func (piq PriorityQueue) Less(i, j int) bool {
+
+	return piq[i].priority > piq[j].priority
+}
+func (piq PriorityQueue) Swap(i, j int) {
+	piq[i], piq[j] = piq[j], piq[i]
+	piq[i].index = i
+	piq[j].index = j
+}
+func (piq *PriorityQueue) Push(x interface{}) {
+	n := len(*piq)
+	item := x.(*Item)
+	item.index = n
+	*piq = append(*piq, item)
+}
+func (piq *PriorityQueue) Pop() interface{} {
+	old := *piq
+	n := len(old)
+	item := old[n-1]
+	item.index = -1
+	*piq = old[0 : n-1]
+	return item
+}
+
+func (piq *PriorityQueue) Update(item *Item, value int, priority int) {
+	item.value = value
+	item.priority = priority
+	heap.Fix(piq, item.index)
+}
+
+func calculate_path(routes chan [][]int, size int, sem Semaphore, rnd rand.Rand) {
+	for {
+		time.Sleep(time.Millisecond * time.Duration(rnd.Intn(1000)+500))
+		for sem.is_full() {
+			continue
+		}
+		sem.write_lock()
+		route := <-routes
+		start := rnd.Intn(size)
+		end := rnd.Intn(size)
+		for start == end {
+			end = rnd.Intn(size)
+		}
+		print("\nFiding cheapest path from ", start, " to ", end)
+		piq := make(PriorityQueue, 0)
+		heap.Push(&piq, &Item{value: start, priority: 0})
+		dist := make([]int, size)
+		dist[start] = 0
+		for i := 1; i < size; i++ {
+			dist[i] = 1000000
+		}
+		for len(piq) != 0 {
+			v := heap.Pop(&piq).(*Item)
+			for i := 0; i < v.value; i++ {
+				if route[v.value][i] != 0 {
+					if dist[i] > dist[v.value]+route[v.value][i] {
+						dist[i] = dist[v.value] + route[v.value][i]
+						heap.Push(&piq, &Item{value: i, priority: dist[i]})
+					}
+				}
+			}
+		}
+		print("\n The cheapest route from ", start, " to ", end, " is ", dist[end])
+		sem.release_write_lock()
+	}
+}
+
+func print_routes(routes *[][]int, size int) {
+	print("\n{")
+	for i := 0; i < size; i++ {
+		print("\n{")
+		for j := i; j < size; j++ {
+			print(" {", i, "-", (*routes)[i][j], "-> ", j, "} ")
+		}
+		print("}")
+	}
+	print("}")
+}
+
 func main() {
 	routes := make(chan [][]int, 1)
 	sem := Semaphore{0, 2}
@@ -198,8 +289,11 @@ func main() {
 			cur_routes[j][i] = cur_routes[i][j]
 		}
 	}
+	print(cur_routes)
 	routes <- cur_routes
 	go shuffle_prices(routes, size, sem, *rnd)
 	go shuffle_routes(routes, size, sem, *rnd)
 	go shuffle_cities(routes, &size, sem, *rnd)
+	go calculate_path(routes, size, sem, *rnd)
+	go calculate_path(routes, size, sem, *rnd)
 }
