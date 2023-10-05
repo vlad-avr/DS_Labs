@@ -111,8 +111,8 @@ func shuffle_cities(sem Semaphore, rnd rand.Rand) {
 			}
 			size++
 			for i := 0; i < size; i++ {
-				new_route[i][size] = rnd.Intn(10)
-				new_route[size][i] = new_route[i][size]
+				new_route[i][size-1] = rnd.Intn(10)
+				new_route[size-1][i] = new_route[i][size-1]
 			}
 			routes = new_route
 			print("\n Added 1 city, number of cities : ", size)
@@ -132,8 +132,8 @@ func shuffle_cities(sem Semaphore, rnd rand.Rand) {
 				}
 				size++
 				for i := 0; i < size; i++ {
-					new_route[i][size] = rnd.Intn(10)
-					new_route[size][i] = new_route[i][size]
+					new_route[i][size-1] = rnd.Intn(10)
+					new_route[size-1][i] = new_route[i][size-1]
 				}
 				routes = new_route
 				print("\n Added 1 city, number of cities : ", size)
