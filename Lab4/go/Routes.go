@@ -9,6 +9,7 @@ import (
 
 var routes [][]int
 var size int
+var max_cost int
 
 type Semaphore struct {
 	cur_concurrency int
@@ -59,7 +60,7 @@ func shuffle_prices(sem Semaphore, rnd rand.Rand) {
 		for i == j {
 			j = rnd.Intn(size)
 		}
-		routes[i][j] = rnd.Intn(10) + 1
+		routes[i][j] = rnd.Intn(max_cost) + 1
 		routes[j][i] = routes[i][j]
 		print("\nChanged price of (", i, " , ", j, ") route to ", routes[i][j])
 		print_routes(&routes, size)
@@ -76,8 +77,11 @@ func shuffle_routes(sem Semaphore, rnd rand.Rand) {
 		sem.write_lock()
 		i := rnd.Intn(size)
 		j := rnd.Intn(size)
+		for i == j {
+			j = rnd.Intn(size)
+		}
 		if routes[i][j] == 0 {
-			routes[i][j] = rnd.Intn(10) + 1
+			routes[i][j] = rnd.Intn(max_cost) + 1
 			routes[j][i] = routes[i][j]
 			print("\nAdded route from ", i, " to ", j, " with price ", routes[i][j])
 		} else {
@@ -111,7 +115,12 @@ func shuffle_cities(sem Semaphore, rnd rand.Rand) {
 			}
 			size++
 			for i := 0; i < size; i++ {
-				new_route[i][size-1] = rnd.Intn(10)
+				flip := rnd.Intn(2)
+				if flip == 0 {
+					new_route[i][size-1] = rnd.Intn(max_cost) + 1
+				} else {
+					new_route[i][size-1] = 0
+				}
 				new_route[size-1][i] = new_route[i][size-1]
 			}
 			routes = new_route
@@ -132,7 +141,11 @@ func shuffle_cities(sem Semaphore, rnd rand.Rand) {
 				}
 				size++
 				for i := 0; i < size; i++ {
-					new_route[i][size-1] = rnd.Intn(10)
+					if flip == 0 {
+						new_route[i][size-1] = rnd.Intn(max_cost) + 1
+					} else {
+						new_route[i][size-1] = 0
+					}
 					new_route[size-1][i] = new_route[i][size-1]
 				}
 				routes = new_route
@@ -267,6 +280,7 @@ func main() {
 	var wg sync.WaitGroup
 	sem := Semaphore{0, 2}
 	size = 5
+	max_cost = 50
 	routes = make([][]int, size)
 	for i := 0; i < size; i++ {
 		routes[i] = make([]int, size)
@@ -279,7 +293,7 @@ func main() {
 			if flip == 0 {
 				routes[i][j] = 0
 			} else {
-				routes[i][j] = rnd.Intn(10) + 1
+				routes[i][j] = rnd.Intn(max_cost) + 1
 			}
 			routes[j][i] = routes[i][j]
 		}
