@@ -181,7 +181,7 @@ func (piq PriorityQueue) Len() int {
 }
 func (piq PriorityQueue) Less(i, j int) bool {
 
-	return piq[i].priority > piq[j].priority
+	return piq[i].priority < piq[j].priority
 }
 func (piq PriorityQueue) Swap(i, j int) {
 	piq[i], piq[j] = piq[j], piq[i]
@@ -210,7 +210,6 @@ func (piq *PriorityQueue) Update(item *Item, value int, priority int) {
 }
 
 func calculate_path(sem Semaphore, rnd rand.Rand) {
-	//print("zdzd")
 	for {
 		time.Sleep(time.Millisecond * time.Duration(rnd.Intn(1000)+500))
 		for sem.is_full() {
@@ -227,8 +226,10 @@ func calculate_path(sem Semaphore, rnd rand.Rand) {
 		heap.Push(&piq, &Item{value: start, priority: 0})
 		dist := make([]int, size)
 		dist[start] = 0
-		for i := 1; i < size; i++ {
-			dist[i] = 1000000
+		for i := 0; i < size; i++ {
+			if i != start {
+				dist[i] = 1000000
+			}
 		}
 		for len(piq) != 0 {
 			v := heap.Pop(&piq).(*Item)
@@ -241,7 +242,11 @@ func calculate_path(sem Semaphore, rnd rand.Rand) {
 				}
 			}
 		}
-		print("\n The cheapest route from ", start, " to ", end, " is ", dist[end])
+		if dist[end] == 1000000 {
+			print("\n The route from ", start, " to ", end, " does not exist ")
+		} else {
+			print("\n The cheapest route from ", start, " to ", end, " is ", dist[end])
+		}
 		sem.release_read_lock()
 	}
 }
@@ -270,7 +275,12 @@ func main() {
 	rnd := rand.New(seed)
 	for i := 0; i < size; i++ {
 		for j := i + 1; j < size; j++ {
-			routes[i][j] = rnd.Intn(10)
+			flip := rnd.Intn(2)
+			if flip == 0 {
+				routes[i][j] = 0
+			} else {
+				routes[i][j] = rnd.Intn(10) + 1
+			}
 			routes[j][i] = routes[i][j]
 		}
 	}
