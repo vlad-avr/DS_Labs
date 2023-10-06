@@ -1,140 +1,70 @@
 
 
-             growing             growing            blooming             growing            blooming
              growing             growing            blooming             growing             growing
-             growing             growing            blooming            blooming             growing
-             growing             growing            blooming             growing            blooming
-             growing             growing             growing             growing             growing
-
-
-            blooming            blooming          dehydrated            blooming          dehydrated
-             growing          dehydrated             growing          dehydrated          dehydrated
-             growing            blooming             growing          dehydrated             growing
-          dehydrated            blooming            blooming             growing            blooming
-          dehydrated          dehydrated          dehydrated             growing            blooming
-
-
             blooming            blooming             growing             growing             growing
-            blooming             growing             growing            blooming            blooming
-             growing            blooming             growing            blooming             growing
-            blooming             growing             growing            blooming             growing
-             growing            blooming             growing             growing             growing
-
-
-            blooming          dehydrated             growing            blooming          dehydrated
-             growing             growing            blooming          dehydrated            blooming
-             growing             growing             growing          dehydrated          dehydrated
-          dehydrated             growing             growing          dehydrated            blooming
-            blooming          dehydrated            blooming             growing          dehydrated
-
-
-             growing             growing             growing             growing             growing
-            blooming             growing            blooming            blooming            blooming
-             growing             growing            blooming             growing            blooming
-            blooming             growing             growing             growing             growing
-             growing            blooming            blooming             growing             growing
-
-
-          dehydrated          dehydrated             growing          dehydrated             growing
-          dehydrated          dehydrated          dehydrated          dehydrated            blooming
-          dehydrated          dehydrated             growing            blooming             growing
-          dehydrated            blooming          dehydrated            blooming          dehydrated
-            blooming             growing            blooming            blooming            blooming
-
-
-          dehydrated          dehydrated          dehydrated          dehydrated             growing
-            blooming            blooming            blooming             growing             growing
-          dehydrated            blooming          dehydrated            blooming             growing
-          dehydrated          dehydrated            blooming            blooming             growing
-            blooming          dehydrated            blooming          dehydrated          dehydrated
-
-
-            blooming             growing            blooming             growing             growing
-             growing            blooming             growing            blooming             growing
-             growing            blooming             growing             growing            blooming
-             growing             growing             growing             growing             growing
-            blooming             growing             growing             growing             growing
-
-
-             growing            blooming             growing            blooming             growing
-             growing            blooming            blooming            blooming             growing
-             growing            blooming            blooming             growing             growing
-            blooming             growing             growing             growing             growing
-             growing             growing             growing             growing             growing
-
-
-            blooming             growing            blooming             growing             growing
-             growing             growing            blooming            blooming             growing
              growing             growing            blooming            blooming            blooming
-            blooming             growing            blooming             growing             growing
-            blooming             growing            blooming             growing             growing
-
-
-             growing             growing             growing            blooming             growing
-             growing            blooming             growing            blooming             growing
-            blooming             growing             growing             growing            blooming
-             growing            blooming            blooming             growing             growing
-            blooming             growing             growing             growing             growing
-
-
-             growing             growing            blooming             growing             growing
-            blooming             growing             growing             growing             growing
-            blooming             growing             growing             growing             growing
-            blooming            blooming             growing             growing             growing
-             growing             growing            blooming             growing             growing
-
-
-            blooming            blooming             growing            blooming             growing
-             growing            blooming             growing             growing             growing
-            blooming             growing            blooming             growing             growing
-             growing             growing             growing             growing             growing
-             growing             growing             growing            blooming             growing
-
-
-             growing            blooming             growing             growing             growing
-             growing            blooming            blooming            blooming            blooming
-            blooming             growing             growing            blooming             growing
-            blooming             growing             growing             growing             growing
-             growing             growing             growing            blooming             growing
-
-
-             growing             growing            blooming            blooming             growing
-             growing             growing             growing             growing             growing
-             growing            blooming            blooming             growing             growing
-             growing             growing             growing            blooming             growing
-             growing             growing             growing             growing             growing
-
-
-             growing             growing             growing             growing             growing
-             growing            blooming             growing            blooming             growing
              growing             growing             growing             growing            blooming
-             growing             growing            blooming            blooming            blooming
              growing             growing             growing             growing             growing
 
 
-             growing            blooming            blooming             growing             growing
-             growing             growing             growing             growing             growing
-             growing            blooming             growing            blooming             growing
-             growing             growing             growing             growing            blooming
-             growing             growing             growing            blooming             growing
-
-
-            blooming             growing          dehydrated             growing             growing
-          dehydrated             growing          dehydrated            blooming             growing
-          dehydrated          dehydrated            blooming            blooming            blooming
-            blooming          dehydrated          dehydrated             growing          dehydrated
-            blooming            blooming             growing            blooming            blooming
-
-
-             growing             growing            blooming             growing            blooming
-            blooming            blooming             growing            blooming             growing
-             growing             growing             growing             growing             growing
-             growing            blooming            blooming             growing             growing
+            blooming          dehydrated          dehydrated            blooming          dehydrated
+             growing            blooming             growing            blooming          dehydrated
+             growing            blooming          dehydrated            blooming          dehydrated
              growing             growing             growing            blooming            blooming
+             growing             growing            blooming             growing          dehydrated
 
 
-             growing             growing            blooming          dehydrated            blooming
-             growing          dehydrated          dehydrated             growing          dehydrated
-          dehydrated          dehydrated             growing             growing          dehydrated
-            blooming            blooming          dehydrated            blooming             growing
-             growing          dehydrated            blooming          dehydrated             growing
+          dehydrated             growing            blooming          dehydrated          dehydrated
+            blooming            blooming          dehydrated             growing            blooming
+            blooming            blooming          dehydrated          dehydrated          dehydrated
+          dehydrated          dehydrated             growing            blooming             growing
+          dehydrated            blooming             growing          dehydrated            blooming
+
+
+            blooming            blooming             growing             growing             growing
+            blooming          dehydrated            blooming             growing          dehydrated
+            blooming            blooming             growing          dehydrated          dehydrated
+            blooming          dehydrated             growing          dehydrated             growing
+            blooming             growing             growing          dehydrated            blooming
+
+
+             growing            blooming             growing            blooming            blooming
+            blooming            blooming            blooming            blooming             growing
+            blooming             growing            blooming             growing             growing
+             growing             growing            blooming             growing             growing
+             growing            blooming            blooming             growing            blooming
+
+
+             growing            blooming            blooming            blooming             growing
+            blooming            blooming             growing             growing            blooming
+            blooming             growing             growing            blooming            blooming
+             growing             growing            blooming             growing            blooming
+             growing             growing             growing             growing             growing
+
+
+          dehydrated            blooming             growing            blooming            blooming
+          dehydrated            blooming            blooming            blooming            blooming
+          dehydrated             growing             growing          dehydrated             growing
+          dehydrated            blooming            blooming          dehydrated          dehydrated
+          dehydrated          dehydrated            blooming            blooming          dehydrated
+
+
+             growing            blooming            blooming            blooming             growing
+             growing          dehydrated          dehydrated            blooming          dehydrated
+             growing             growing             growing             growing          dehydrated
+          dehydrated            blooming            blooming             growing          dehydrated
+            blooming          dehydrated          dehydrated          dehydrated            blooming
+
+
+            blooming            blooming             growing            blooming            blooming
+            blooming             growing             growing            blooming             growing
+             growing             growing             growing            blooming            blooming
+             growing             growing            blooming             growing             growing
+            blooming            blooming             growing             growing             growing
+
+
+            blooming             growing            blooming          dehydrated            blooming
+            blooming          dehydrated          dehydrated          dehydrated             growing
+          dehydrated             growing          dehydrated          dehydrated          dehydrated
+            blooming          dehydrated            blooming          dehydrated            blooming
+            blooming            blooming             growing             growing            blooming

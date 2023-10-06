@@ -101,7 +101,7 @@ func shuffle_cities(sem Semaphore, rnd rand.Rand) {
 			continue
 		}
 		sem.write_lock()
-		if size >= 3 {
+		if size <= 3 {
 
 			new_route := make([][]int, size+1)
 			for i := 0; i < size+1; i++ {
