@@ -157,16 +157,38 @@ func shuffle_cities(sem Semaphore, rnd rand.Rand) {
 				for i := 0; i < size-1; i++ {
 					new_route[i] = make([]int, size-1)
 				}
+				// for i := 0; i < deleted_city; i++ {
+				// 	for j := i; j < deleted_city; j++ {
+				// 		new_route[i][j] = routes[i][j]
+				// 		new_route[j][i] = routes[j][i]
+				// 	}
+				// 	for j := deleted_city; j < size-1; j++ {
+				// 		new_route[i][j] = routes[i][j+1]
+				// 		new_route[j][i] = routes[j+1][i]
+				// 	}
+				// }
+				// for i := deleted_city; i < size-1; i++ {
+				// 	for j := i; j < size-1; j++ {
+				// 		new_route[i][j] = routes[i+1][j+1]
+				// 		new_route[j][i] = routes[j+1][i+1]
+				// 	}
+				// }
 				for i := 0; i < size; i++ {
-					for j := i; j < size; j++ {
-						if i < deleted_city {
-							new_route[i][j] = routes[i][j]
-							new_route[j][i] = routes[j][i]
-						} else if i > deleted_city {
-							new_route[i-1][j-1] = routes[i][j]
-							new_route[j-1][i-1] = routes[j][i]
-						} else {
-							continue
+					if i < deleted_city {
+						for j := 0; j < size; j++ {
+							if j < deleted_city {
+								new_route[i][j] = routes[i][j]
+							} else if j > deleted_city {
+								new_route[i][j-1] = routes[i][j]
+							}
+						}
+					} else if i > deleted_city {
+						for j := 0; j < size; j++ {
+							if j < deleted_city {
+								new_route[i-1][j] = routes[i][j]
+							} else if j > deleted_city {
+								new_route[i-1][j-1] = routes[i][j]
+							}
 						}
 					}
 				}
