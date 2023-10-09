@@ -23,29 +23,51 @@ public class RecruitManager {
             group.setName("Recruits in Group " + i);
             recruitGroups.add(group);
         }
+        for (int i = 0; i < N; i++) {
+            recruitGroups.get(i).start();
+        }
         while (true) {
-            barrier.waitForCompletion();
-            if(checkGroups()){
+            while (!barrier.isCompleted()) {
+                continue;
+            }
+            if (checkGroups()) {
+                System.out.println("\nAll groups finished turning around!\n");
+                printGroups();
+                stopAllGroups();
+
                 break;
-            }else{
-                barrier.reset();
+            } else {
+                System.out.println("\nNot all groups are turned the right way\n");
+                synchronized (barrier) {
+                    barrier.reset();
+                }
             }
         }
     }
 
-    public boolean checkGroups(){
+    private void stopAllGroups() {
+        Recruits.turningCompleted = true;
+    }
+
+    public boolean checkGroups() {
         boolean allRight = true;
-        for(int i = 0; i < N; i++){
-            if(!recruitGroups.get(i).first().getDirection()){
-                if(i != 0){
-                    if(recruitGroups.get(i-1).last().getDirection()){
+        for (int i = 0; i < N; i++) {
+            if (!recruitGroups.get(i).first().getDirection()) {
+                if (i != 0) {
+                    if (recruitGroups.get(i - 1).last().getDirection()) {
                         recruitGroups.get(i).first().changeDirection();
-                        recruitGroups.get(i-1).last().changeDirection();
+                        recruitGroups.get(i - 1).last().changeDirection();
                         allRight = false;
                     }
                 }
             }
         }
         return allRight;
+    }
+
+    private void printGroups() {
+        for (int i = 0; i < N; i++) {
+            recruitGroups.get(i).print();
+        }
     }
 }

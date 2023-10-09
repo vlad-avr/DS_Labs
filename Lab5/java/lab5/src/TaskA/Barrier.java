@@ -9,21 +9,29 @@ public class Barrier {
         currentThreadCount = 0;
     }
 
-    synchronized public void reportCompletion(String threadName) {
+    public synchronized void reportCompletion(String threadName) {
         System.out.println("\n" + threadName + " finished turning around\n");
         currentThreadCount++;
     }
 
-    synchronized public void waitForCompletion() {
-        while (true) {
-            if (currentThreadCount == finalThreadCount) {
-                break;
-            }
+    public synchronized boolean isCompleted() {
+        if(currentThreadCount == finalThreadCount){
+            return true;
+        }else{
+            return false;
         }
     }
 
-    synchronized public void reset() {
-        notifyAll();
+    public synchronized boolean isReset(){
+        if(currentThreadCount == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public synchronized void reset() {
+        // notifyAll();
         currentThreadCount = 0;
     }
 }

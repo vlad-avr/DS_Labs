@@ -7,6 +7,7 @@ import java.util.List;
 public class Recruits extends Thread {
     private List<Recruit> recruits = new ArrayList<>();
     private Barrier barrier;
+    public static Boolean turningCompleted = false;
     // private final SecureRandom rnd;
 
     public Recruits(int N, SecureRandom rnd, Barrier barrier) {
@@ -18,7 +19,7 @@ public class Recruits extends Thread {
     }
 
     public void shuffle() {
-        System.out.println("\n" + getName() + "started turning around \n");
+        System.out.println("\n" + getName() + " started turning around \n");
         while (true) {
             boolean allRight = true;
             for (int i = 0; i < recruits.size(); i++) {
@@ -44,26 +45,36 @@ public class Recruits extends Thread {
                 break;
             }
         }
-        barrier.reportCompletion(getName());
     }
 
-    public Recruit first(){
+    public Recruit first() {
         return recruits.get(0);
     }
 
-    public Recruit last(){
-        return recruits.get(recruits.size()-1);
+    public Recruit last() {
+        return recruits.get(recruits.size() - 1);
     }
 
     @Override
     public void run() {
         while (true) {
             shuffle();
-            try {
-                wait();
-            } catch (InterruptedException exception) {
-                System.out.println(exception.getMessage());
+            barrier.reportCompletion(getName());
+            while(!barrier.isReset() && !turningCompleted){
+                continue;
+            }
+            if(turningCompleted){
+                break;
             }
         }
+    }
+
+    public void print() {
+        System.out.println(getName() + " : \n");
+        for (int i = 0; i < recruits.size(); i++) {
+            int myInt = recruits.get(i).getDirection() ? 1 : 0;
+            System.out.print(myInt + " ");
+        }
+        System.out.println("\n");
     }
 }
