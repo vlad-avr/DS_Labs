@@ -1,5 +1,8 @@
+import TaskA.RecruitManager;
+
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+        RecruitManager manager = new RecruitManager(200, 4);
+        manager.start();
     }
 }
