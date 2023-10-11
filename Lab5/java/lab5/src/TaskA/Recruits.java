@@ -59,12 +59,14 @@ public class Recruits extends Thread {
     public void run() {
         while (true) {
             shuffle();
-            synchronized (barrier) {
-                barrier.reportCompletion(getName());
+            try {
+                barrier.await(getName());
+            } catch (InterruptedException exception) {
+                // TO DO
             }
-            while (!barrier.isReset() && !turningCompleted) {
-                continue;
-            }
+            // while (!barrier.isReset() && !turningCompleted) {
+            // continue;
+            // }
             if (turningCompleted) {
                 break;
             }

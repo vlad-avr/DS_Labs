@@ -14,7 +14,7 @@ public class RecruitManager {
     public RecruitManager(int n, int N) {
         this.n = n;
         this.N = N;
-        barrier = new Barrier(N);
+        barrier = new Barrier(N + 1);
     }
 
     public void start() {
@@ -34,12 +34,18 @@ public class RecruitManager {
                 System.out.println("\nAll groups finished turning around!\n");
                 printGroups();
                 stopAllGroups();
-
+                try {
+                    barrier.await();
+                } catch (InterruptedException exception) {
+                    // TO DO
+                }
                 break;
             } else {
                 System.out.println("\nNot all groups are turned the right way\n");
-                synchronized (barrier) {
-                    barrier.reset();
+                try {
+                    barrier.await();
+                } catch (InterruptedException exception) {
+                    // TO DO
                 }
             }
         }
