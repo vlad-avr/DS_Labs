@@ -64,9 +64,6 @@ public class Recruits extends Thread {
             } catch (InterruptedException exception) {
                 // TO DO
             }
-            // while (!barrier.isReset() && !turningCompleted) {
-            // continue;
-            // }
             if (turningCompleted) {
                 break;
             }
