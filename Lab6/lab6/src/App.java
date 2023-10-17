@@ -1,5 +1,8 @@
+import tester.MultiplicationComparison;
+
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+        MultiplicationComparison comparison = new MultiplicationComparison();
+        comparison.start();
     }
 }
