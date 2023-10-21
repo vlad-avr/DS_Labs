@@ -144,6 +144,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Lab6_MPI.cpp" />
+    <ClCompile Include="Matrix.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Matrix.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
