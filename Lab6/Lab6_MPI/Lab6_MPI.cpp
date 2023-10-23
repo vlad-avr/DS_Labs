@@ -7,7 +7,7 @@
 int main(int argc, char* argv[])
 {
 	srand(time(0));
-	Matrix* matrix = new Matrix(2, 2);
+	/*Matrix* matrix = new Matrix(2, 2);
 	Matrix* matrix1 = new Matrix(2, 2);
 	matrix1->generate_matrix(5, -2, 0);
 	matrix->generate_matrix(5, -2, 0);
@@ -19,21 +19,14 @@ int main(int argc, char* argv[])
 	std::cout << "\n Matrix A*B : \n";
 	C->print();
 	delete matrix1;
-	delete matrix;
- //   std::cout << "Hello World!\n";
-	//int myid, numprocs, namelen;
-	//char processor_name[MPI_MAX_PROCESSOR_NAME];
+	delete matrix;*/
+    MPI_Init(&argc, &argv);
 
-	//MPI_Init(&argc, &argv);        // starts MPI
-	//MPI_Comm_rank(MPI_COMM_WORLD, &myid);  // get current process id
-	//MPI_Comm_size(MPI_COMM_WORLD, &numprocs);      // get number of processeser
-	//MPI_Get_processor_name(processor_name, &namelen);
-
-	//if (myid == 0) printf("number of processes: %d\n...", numprocs);
-	//printf("%s: Hello world from process %d \n", processor_name, myid);
-
-	//MPI_Finalize();
-
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+	std::cout << "\nPrinting from task " << rank << " \\ " << size;
+	MPI_Finalize();
 	return 0;
 }
 

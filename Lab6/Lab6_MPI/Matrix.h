@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 #include <iostream>
+#include <mpi.h>
 
 class Matrix
 {
@@ -83,5 +84,6 @@ public:
 		}
 		return C;
 	}
+
 };
 
