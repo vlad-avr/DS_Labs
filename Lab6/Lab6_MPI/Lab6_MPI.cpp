@@ -7,22 +7,17 @@
 int main(int argc, char* argv[])
 {
 	srand(time(0));
-	double* A = Matrix::generateRandom(20, 5, 10, 4);
-	double* B = Matrix::generateFilled(2, 4);
-	std::cout << "\n A:\n";
-	Matrix::print(A, 4);
-	std::cout << "\n B:\n";
-	Matrix::print(B, 4);
-	double* C = Matrix::simpleMultiplication(A, B, 4);
-	std::cout << "\n C:\n";
-	Matrix::print(C, 4);
-    /*MPI_Init(&argc, &argv);
+	setvbuf(stdout, 0, _IONBF, 0);
+    MPI_Init(&argc, &argv);
+	int dimensions = 32;
 
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-	std::cout << "\nPrinting from task " << rank << " \\ " << size;
-	MPI_Finalize();*/
+    MPI_Comm_rank(MPI_COMM_WORLD, &proces_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &process_num);
+	
+	MPI_Bcast(&dimensions, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	Matrix::runLineSchemeMultiplicationTest(argc, argv, dimensions);
+
+	MPI_Finalize();
 	return 0;
 }
 
