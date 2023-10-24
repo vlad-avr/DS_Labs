@@ -2,7 +2,6 @@
 #include <mpi.h>
 #include <random>
 #include <time.h>
-#include "Matrix.h"
 
 int main(int argc, char* argv[])
 {
