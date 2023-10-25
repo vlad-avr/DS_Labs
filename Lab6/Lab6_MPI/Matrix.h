@@ -12,9 +12,9 @@ static int process_num = 0;
 static int proces_rank = 0;
 static MPI_Comm col_Comm;
 static MPI_Comm row_Comm;
-static int uppper_bound = 100;
-static int offset = 1;
-static int precision = 100;
+static int uppper_bound = 3;
+static int offset = 0;
+static int precision = 1;
 
 
 namespace Matrix{
@@ -82,7 +82,7 @@ namespace Matrix{
 			for (int j = 0; j < line_len; j++) {
 
 				for (int k = 0; k < size; k++) {
-					C[index] += A[i * size + k] * B[j * size + k];
+					C[index] += A[i * size + k] * B[k * size + j];
 				}
 				index++;
 			}
@@ -129,11 +129,11 @@ namespace Matrix{
 			C = new double[size * size];
 			A = generateRandom(uppper_bound, offset, precision, size);
 			B = generateRandom(uppper_bound, offset, precision, size);
-			/*printf("\n A: \n");
+			printf("\n A: \n");
 			print(A, size);
 			printf("\n B: \n");
-			print(B, size);*/
-			C = generateFilled(0, size);
+			print(B, size);
+			//C = generateFilled(0, size);
 		}
 
 	}
@@ -158,10 +158,10 @@ namespace Matrix{
 
 	void collectResultLineScheme(double* C, double* C_lined, int line_len, int size) {
 		gather(C, C_lined, line_len, size);
-		/*if (proces_rank == 0) {
+		if (proces_rank == 0) {
 			printf("\n C: \n");
 			print(C, size);
-		}*/
+		}
 	}
 
 
@@ -251,6 +251,10 @@ namespace Matrix{
 		if (grid[1] == 0) {
 			MPI_Gather(result, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
 		}
+		if (proces_rank == 0) {
+			printf("\n C: \n");
+			print(C, size);
+		}
 		delete[] result;
 	}
 	void calculate(double* A_block, double* B_block, double* C_block, int size, int block_size) {
@@ -323,6 +327,10 @@ namespace Matrix{
 			C = new double[size * size];
 			A = generateRandom(uppper_bound, offset, precision, size);
 			B = generateRandom(uppper_bound, offset, precision, size);
+			printf("\n A: \n");
+			print(A, size);
+			printf("\n B: \n");
+			print(B, size);
 		}
 	}
 
@@ -349,8 +357,7 @@ namespace Matrix{
 		end_count = MPI_Wtime();
 
 		collectResultCannon(C, C_block, size, block_size);
-		deconstruct(A, B, C, A_block, B_block,
-			C_block);
+		deconstruct(A, B, C, A_block, B_block, C_block);
 
 		delta = end_count - start_count;
 		if (proces_rank == 0)
@@ -376,7 +383,7 @@ namespace Matrix{
 		MPI_Cart_sub(grid_Comm, sub_dimension, &col_Comm);
 	}
 
-	void ProcessInitialization(double*& A, double*& B, double*& C, double*& A_block, double*& B_block, double*& C_block, double*& A_sup_block, int& size, int& block_size) {
+	void initFox(double*& A, double*& B, double*& C, double*& A_block, double*& B_block, double*& C_block, double*& A_sup_block, int& size, int& block_size) {
 
 		block_size = size / grid_size;
 		A_block = new double[block_size * block_size];
@@ -392,6 +399,10 @@ namespace Matrix{
 			C = new double[size * size];
 			A = generateRandom(uppper_bound, offset, precision, size);
 			B = generateRandom(uppper_bound, offset, precision, size);
+			printf("\n A: \n");
+			print(A, size);
+			printf("\n B: \n");
+			print(B, size);
 		}
 	}
 	
@@ -411,13 +422,17 @@ namespace Matrix{
 		scatterMatricesFox(pBMatrix, pBblock, Size, BlockSize);
 	}
 	
-	void gatherFox(double* C, double* C_block, int size, int block_size) {
+	void collectResultFox(double* C, double* C_block, int size, int block_size) {
 		double* pResultRow = new double[size * block_size];
 		for (int i = 0; i < block_size; i++) {
 			MPI_Gather(&C_block[i * block_size], block_size, MPI_DOUBLE, &pResultRow[i * size], block_size, MPI_DOUBLE, 0, row_Comm);
 		}
 		if (grid[1] == 0) {
 			MPI_Gather(pResultRow, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
+		}
+		if (proces_rank == 0) {
+			printf("\n C: \n");
+			print(C, size);
 		}
 		delete[] pResultRow;
 	}
@@ -461,18 +476,24 @@ namespace Matrix{
 		}
 		size = dim;
 		CreateGridCommunicators();
-		ProcessInitialization(A, B, C, A_block, B_block, C_block, A_sup_block, size, block_size);
+		initFox(A, B, C, A_block, B_block, C_block, A_sup_block, size, block_size);
 		scatterFox(A, B, A_sup_block, B_block, size, block_size);
 		start_count = MPI_Wtime();
 		initComputation(A_block, A_sup_block, B_block, C_block, block_size);
 		end_count = MPI_Wtime();
-		gatherFox(C, C_block, size, block_size);
+		collectResultFox(C, C_block, size, block_size);
 		deconstruct(A, B, C, A_block, B_block, C_block, A_sup_block);
 
 		delta = end_count - start_count;
 		if (proces_rank == 0)
 			std::cout << "Fox Test results (size " << size << "x" << size << " ): " << delta << std::endl;
 		return delta;
+	}
+
+	void runAlgorithmTest(int argc, char* argv[], int dim) {
+		runLineSchemeMultiplicationTest(argc, argv, dim);
+		runCannonMultiplicationTest(argc, argv, dim);
+		runFoxMultiplicationTest(argc, argv, dim);
 	}
 };
 
