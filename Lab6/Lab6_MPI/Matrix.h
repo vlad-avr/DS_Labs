@@ -210,7 +210,7 @@ namespace Matrix{
 	int grid[2];
 	int grid_size;
 	MPI_Comm grid_Comm;
-	void multiplyCannonBlocks(double* A, double* B, double* C, int size) {
+	void multiplyBlocks(double* A, double* B, double* C, int size) {
 		int i, j, k;
 		for (i = 0; i < size; i++) {
 			for (j = 0; j < size; j++)
@@ -255,7 +255,7 @@ namespace Matrix{
 	}
 	void calculate(double* A_block, double* B_block, double* C_block, int size, int block_size) {
 		for (int i = 0; i < grid_size; ++i) {
-			multiplyCannonBlocks(A_block, B_block, C_block, block_size);
+			multiplyBlocks(A_block, B_block, C_block, block_size);
 			shiftRight(A_block, size, block_size);
 			shiftLeft(B_block, size, block_size);
 		}
@@ -351,7 +351,217 @@ namespace Matrix{
 
 		delta = end_count - start_count;
 		if (proces_rank == 0)
-			printf("Cannon Algorithm[%dx%d]: %7.4f\n", size, size, delta);
+			std::cout << "Cannon Test results (size " << size << "x" << size << " ): " << delta << std::endl;
+		return delta;
+	}
+
+	void CreateGridCommunicators() {
+		int DimSize[2]; // Number of processes in each dimension of the grid
+		int Periodic[2]; // =1, if the grid dimension should be periodic
+		int Subdims[2]; // =1, if the grid dimension should be fixed
+		DimSize[0] = grid_size;
+		DimSize[1] = grid_size;
+		Periodic[0] = 0;
+		Periodic[1] = 0;
+		// Creation of the Cartesian communicator
+		MPI_Cart_create(MPI_COMM_WORLD, 2, DimSize, Periodic, 1, &grid_Comm);
+		// Determination of the cartesian coordinates for every process
+		MPI_Cart_coords(grid_Comm, proces_rank, 2, grid);
+		// Creating communicators for rows
+		Subdims[0] = 0; // Dimensionality fixing
+		Subdims[1] = 1; // The presence of the given dimension in the subgrid
+		MPI_Cart_sub(grid_Comm, Subdims, &row_Comm);
+		// Creating communicators for columns
+		Subdims[0] = 1;
+		Subdims[1] = 0;
+		MPI_Cart_sub(grid_Comm, Subdims, &col_Comm);
+	}
+	// Function for memory allocation and data initialization
+	void ProcessInitialization(double*& pAMatrix, double*& pBMatrix,
+		double*& pCMatrix, double*& pAblock, double*& pBblock, double*& pCblock,
+		double*& pTemporaryAblock, int& Size, int& BlockSize) {
+
+		BlockSize = Size / grid_size;
+		pAblock = new double[BlockSize * BlockSize];
+		pBblock = new double[BlockSize * BlockSize];
+		pCblock = new double[BlockSize * BlockSize];
+		pTemporaryAblock = new double[BlockSize * BlockSize];
+		for (int i = 0; i < BlockSize * BlockSize; i++) {
+			pCblock[i] = 0;
+		}
+		if (proces_rank == 0) {
+			pAMatrix = new double[Size * Size];
+			pBMatrix = new double[Size * Size];
+			pCMatrix = new double[Size * Size];
+			//DummyDataInitialization(pAMatrix, pBMatrix, Size);
+			pAMatrix = generateRandom(uppper_bound, offset, precision, Size);
+			/*RandomDataInitialization(pAMatrix, pBMatrix, Size);*/
+		}
+	}
+	// Function for checkerboard matrix decomposition
+	void CheckerboardMatrixScatter(double* pMatrix, double* pMatrixBlock,
+		int Size, int BlockSize) {
+		double* MatrixRow = new double[BlockSize * Size];
+		if (grid[1] == 0) {
+			MPI_Scatter(pMatrix, BlockSize * Size, MPI_DOUBLE, MatrixRow,
+				BlockSize * Size, MPI_DOUBLE, 0, col_Comm);
+		}
+		for (int i = 0; i < BlockSize; i++) {
+			MPI_Scatter(&MatrixRow[i * Size], BlockSize, MPI_DOUBLE,
+				&(pMatrixBlock[i * BlockSize]), BlockSize, MPI_DOUBLE, 0, row_Comm);
+		}
+		delete[] MatrixRow;
+	}
+	// Data distribution among the processes
+	void DataDistribution(double* pAMatrix, double* pBMatrix, double* pMatrixAblock, double* pBblock, int Size, int BlockSize) {
+		// Scatter the matrix among the processes of the first grid column
+		CheckerboardMatrixScatter(pAMatrix, pMatrixAblock, Size, BlockSize);
+		CheckerboardMatrixScatter(pBMatrix, pBblock, Size, BlockSize);
+	}
+	// Function for gathering the result matrix
+	void ResultCollection(double* pCMatrix, double* pCblock, int Size,
+		int BlockSize) {
+		double* pResultRow = new double[Size * BlockSize];
+		for (int i = 0; i < BlockSize; i++) {
+			MPI_Gather(&pCblock[i * BlockSize], BlockSize, MPI_DOUBLE,
+				&pResultRow[i * Size], BlockSize, MPI_DOUBLE, 0, row_Comm);
+		}
+		if (grid[1] == 0) {
+			MPI_Gather(pResultRow, BlockSize * Size, MPI_DOUBLE, pCMatrix,
+				BlockSize * Size, MPI_DOUBLE, 0, col_Comm);
+		}
+		delete[] pResultRow;
+	}
+	// Broadcasting blocks of the matrix A to process grid rows
+	void ABlockCommunication(int iter, double* pAblock, double* pMatrixAblock,
+		int BlockSize) {
+		// Defining the leading process of the process grid row
+		int Pivot = (grid[0] + iter) % grid_size;
+		// Copying the transmitted block in a separate memory buffer
+		if (grid[1] == Pivot) {
+			for (int i = 0; i < BlockSize * BlockSize; i++)
+				pAblock[i] = pMatrixAblock[i];
+		}
+		// Block broadcasting
+		MPI_Bcast(pAblock, BlockSize * BlockSize, MPI_DOUBLE, Pivot, row_Comm);
+	}
+	// Function for cyclic shifting the blocks of the matrix B
+	void BblockCommunication(double* pBblock, int BlockSize) {
+		MPI_Status Status;
+		int NextProc = grid[0] + 1;
+		if (grid[0] == grid_size - 1) NextProc = 0;
+		int PrevProc = grid[0] - 1;
+		if (grid[0] == 0) PrevProc = grid_size - 1;
+		MPI_Sendrecv_replace(pBblock, BlockSize * BlockSize, MPI_DOUBLE,
+			NextProc, 0, PrevProc, 0, col_Comm, &Status);
+	}
+	// Function for parallel execution of the Fox method
+	void ParallelResultCalculation(double* pAblock, double* pMatrixAblock,
+		double* pBblock, double* pCblock, int BlockSize) {
+		for (int iter = 0; iter < grid_size; iter++) {
+			// Sending blocks of matrix A to the process grid rows
+			ABlockCommunication(iter, pAblock, pMatrixAblock, BlockSize);
+			// Block multiplication
+			multiplyBlocks(pAblock, pBblock, pCblock, BlockSize);
+			// Cyclic shift of blocks of matrix B in process grid columns
+			BblockCommunication(pBblock, BlockSize);
+		}
+	}
+	// Test printing of the matrix block
+	/*void TestBlocks(double* pBlock, int BlockSize, char str[]) {
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (ProcRank == 0) {
+			printf("%s \n", str);
+		}
+		for (int i = 0; i < ProcNum; i++) {
+			if (ProcRank == i) {
+				printf("ProcRank = %d \n", ProcRank);
+				PrintMatrix(pBlock, BlockSize, BlockSize);
+			}
+			MPI_Barrier(MPI_COMM_WORLD);
+		}
+	}*/
+	// Function for testing the matrix multiplication result
+	void TestResult(double* pAMatrix, double* pBMatrix, double* pCMatrix,
+		int Size) {
+		double* pSerialResult; // Result matrix of serial multiplication
+		double Accuracy = 1.e-6; // Comparison accuracy
+		int equal = 0; // =1, if the matrices are not equal
+		int i; // Loop variable
+		if (proces_rank == 0) {
+			pSerialResult = new double[Size * Size];
+			for (i = 0; i < Size * Size; i++) {
+				pSerialResult[i] = 0;
+			}
+			multiplyBlocks(pAMatrix, pBMatrix, pSerialResult, Size);
+			for (i = 0; i < Size * Size; i++) {
+				if (fabs(pSerialResult[i] - pCMatrix[i]) >= Accuracy)
+					equal = 1;
+			}
+			if (equal == 1)
+				printf("The results of serial and parallel algorithms are NOT"
+					"identical. Check your code.");
+			else
+				printf("The results of serial and parallel algorithms are "
+					"identical. ");
+		}
+	}
+	// Function for computational process termination
+	void ProcessTermination(double* pAMatrix, double* pBMatrix,
+		double* pCMatrix, double* pAblock, double* pBblock, double* pCblock,
+		double* pMatrixAblock) {
+		if (proces_rank == 0) {
+			delete[] pAMatrix;
+			delete[] pBMatrix;
+			delete[] pCMatrix;
+		}
+		delete[] pAblock;
+		delete[] pBblock;
+		delete[] pCblock;
+		delete[] pMatrixAblock;
+	}
+
+	double runFoxMultiplicationTest(int argc, char* argv[], int dim) {
+		double* pAMatrix; // First argument of matrix multiplication
+		double* pBMatrix; // Second argument of matrix multiplication
+		double* pCMatrix; // Result matrix
+		int size; // Size of matrices
+		int BlockSize; // Sizes of matrix blocks
+		double* pAblock; // Initial block of matrix A
+		double* pBblock; // Initial block of matrix B
+		double* pCblock; // Block of result matrix C
+		double* pMatrixAblock;
+		double start_count, end_count, delta;
+		grid_size = sqrt((double)process_num);
+		if (process_num != grid_size * grid_size) {
+			if (proces_rank == 0) {
+				printf("Number of processes must be a perfect square \n");
+			}
+			return 1;
+		}
+		size = dim;
+		// Creating the cartesian grid, row and column communcators
+		CreateGridCommunicators();
+		// Memory allocation and initialization of matrix elements
+		ProcessInitialization(pAMatrix, pBMatrix, pCMatrix, pAblock, pBblock,
+			pCblock, pMatrixAblock, size, BlockSize);
+		DataDistribution(pAMatrix, pBMatrix, pMatrixAblock, pBblock, size,
+			BlockSize);
+		start_count = MPI_Wtime();
+		// Execution of the Fox method
+		ParallelResultCalculation(pAblock, pMatrixAblock, pBblock,
+			pCblock, BlockSize);
+		end_count = MPI_Wtime();
+		// Gathering the result matrix
+		ResultCollection(pCMatrix, pCblock, size, BlockSize);
+		// TestResult(pAMatrix, pBMatrix, pCMatrix, Size); //
+		// Process Termination
+		ProcessTermination(pAMatrix, pBMatrix, pCMatrix, pAblock, pBblock,
+			pCblock, pMatrixAblock);
+
+		delta = end_count - start_count;
+		if (proces_rank == 0)
+			std::cout << "Fox Test results (size " << size << "x" << size << " ): " << delta << std::endl;
 		return delta;
 	}
 };

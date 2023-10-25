@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
 	MPI_Bcast(&dimensions, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	Matrix::runLineSchemeMultiplicationTest(argc, argv, dimensions);
 	Matrix::runCannonMultiplicationTest(argc, argv, dimensions);
+	Matrix::runFoxMultiplicationTest(argc, argv, dimensions);
 	MPI_Finalize();
 	return 0;
 }
