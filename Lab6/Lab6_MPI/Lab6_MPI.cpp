@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 	srand(time(0));
 	setvbuf(stdout, 0, _IONBF, 0);
     MPI_Init(&argc, &argv);
-	int dimensions = 64;
+	int dimensions = 128;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &proces_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &process_num);
