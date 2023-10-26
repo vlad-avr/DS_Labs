@@ -74,13 +74,13 @@ namespace Matrix{
 	namespace LineScheme{
 		int coords;
 
-		void shift(double* B_line, int tapeLen, int size) {
+		void shift(double* B_line, int line_len, int size) {
 			MPI_Status Status;
 			int next_p = coords + 1;
 			if (next_p == process_num) next_p = 0;
 			int prev_p = coords - 1;
 			if (prev_p == -1) prev_p = process_num - 1;
-			MPI_Sendrecv_replace(B_line, tapeLen * size, MPI_DOUBLE, next_p, 0, prev_p, 0, col_Comm, &Status);
+			MPI_Sendrecv_replace(B_line, line_len * size, MPI_DOUBLE, next_p, 0, prev_p, 0, col_Comm, &Status);
 		}
 
 		void lineSchemeMultiplication(double* A_line, double* B_line, double* res, int size, int line_len, int iter) {
@@ -173,7 +173,7 @@ namespace Matrix{
 			size = dim;
 			if (dim % process_num != 0) {
 				if (process_rank == 0) {
-					printf("Invalid dimensions input -> must be dividable by " + process_num);
+					std::cout << "\n Invalid number of proesses for multiplication of matrices of these sizes";
 				}
 				return;
 			}
