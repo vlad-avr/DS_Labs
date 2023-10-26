@@ -369,9 +369,9 @@ namespace Matrix{
 			delete[] row;
 		}
 
-		void scatterFox(double* pAMatrix, double* pBMatrix, double* pMatrixAblock, double* pBblock, int Size, int BlockSize) {
-			scatterMatricesFox(pAMatrix, pMatrixAblock, Size, BlockSize);
-			scatterMatricesFox(pBMatrix, pBblock, Size, BlockSize);
+		void scatterFox(double* A, double* B, double* A_block, double* B_block, int size, int block_size) {
+			scatterMatricesFox(A, A_block, size, block_size);
+			scatterMatricesFox(B, B_block, size, block_size);
 		}
 
 		void collectResultFox(double* C, double* C_block, int size, int block_size) {
