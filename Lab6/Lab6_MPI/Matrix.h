@@ -64,43 +64,38 @@ namespace Matrix{
 	namespace {
 		int coords;
 
-		void shift(double* matr_lined, int line_len, int size) {
-			MPI_Status mpi_status;
-			int next_process = coords + 1;
-			if (next_process == process_num) {
-				next_process = 0;
-			}
-			int prev_process = coords - 1;
-			if (prev_process == -1) {
-				prev_process = process_num - 1;
-			}
-			MPI_Sendrecv_replace(matr_lined, line_len * size, MPI_DOUBLE, next_process, 0, prev_process, 0, col_Comm, &mpi_status);
+		void shift(double* B_line, int tapeLen, int size) {
+			MPI_Status Status;
+			int next_p = coords + 1;
+			if (next_p == process_num) next_p = 0;
+			int prev_p = coords - 1;
+			if (prev_p == -1) prev_p = process_num - 1;
+			MPI_Sendrecv_replace(B_line, tapeLen * size, MPI_DOUBLE,next_p, 0, prev_p, 0, col_Comm, &Status);
 		}
 
-		void lineScemeMultiplication(double* A, double* B, double* C, int size, int line_len, int iteration) {
-			int index = line_len * iteration;
-
+		void lineSchemeMultiplication(double* A_line, double* B_line, double* res, int size, int line_len, int iter) {
+			int ind = line_len * iter;
 			for (int i = 0; i < line_len; i++) {
 				for (int j = 0; j < line_len; j++) {
-
 					for (int k = 0; k < size; k++) {
-						C[index] += A[i * size + k] * B[k * size + j];
+						res[ind] += A_line[i * size + k] * B_line[j * size + k];
 					}
-					index++;
+					ind++;
 				}
-				index += size - line_len;
+				ind += size - line_len;
 			}
 		}
 
-		void computeLine(double* A, double* B, double* C, int line_len, int size) {
+
+		void computeLine(double* A_line, double* B_line, double* C_line, int line_len, int size) {
 			int iter = coords;
 			for (int i = 0; i < process_num; i++) {
-				lineScemeMultiplication(A, B, C, size, line_len, iter);
+				lineSchemeMultiplication(A_line, B_line, C_line, size, line_len, iter);
 				iter++;
 				if (iter == process_num) {
 					iter = 0;
 				}
-				shift(B, line_len, size);
+				shift(B_line, line_len, size);
 			}
 		}
 
@@ -462,7 +457,7 @@ namespace Matrix{
 		}
 	}
 	void runAlgorithmTest(int argc, char* argv[], int dim) {
-		//runLineSchemeMultiplicationTest(argc, argv, dim);
+		runLineSchemeMultiplicationTest(argc, argv, dim);
 		runCannonMultiplicationTest(argc, argv, dim);
 		runFoxMultiplicationTest(argc, argv, dim);
 	}
