@@ -9,7 +9,7 @@
 #include <iostream>
 static int slice_size;
 static int process_num = 0;
-static int proces_rank = 0;
+static int process_rank = 0;
 static MPI_Comm col_Comm;
 static MPI_Comm row_Comm;
 static int uppper_bound = 3;
@@ -112,8 +112,8 @@ namespace Matrix{
 			MPI_Gather(cMatrixTape, tapeLen * size, MPI_DOUBLE, cMatrix, tapeLen * size, MPI_DOUBLE, 0, row_Comm);
 		}
 		void initComms(int line_len) {
-			MPI_Comm_split(MPI_COMM_WORLD, proces_rank / line_len, proces_rank, &row_Comm);
-			MPI_Comm_split(MPI_COMM_WORLD, proces_rank / line_len, proces_rank, &col_Comm);
+			MPI_Comm_split(MPI_COMM_WORLD, process_rank / line_len, process_rank, &row_Comm);
+			MPI_Comm_split(MPI_COMM_WORLD, process_rank / line_len, process_rank, &col_Comm);
 		}
 
 		void initProcess(double*& A, double*& B, double*& C, double*& A_lined, double*& B_lined, double*& C_lined, int& size, int& line_len) {
@@ -125,7 +125,7 @@ namespace Matrix{
 			for (int i = 0; i < line_len * size; i++) {
 				C_lined[i] = 0;
 			}
-			if (proces_rank == 0) {
+			if (process_rank == 0) {
 				A = new double[size * size];
 				B = new double[size * size];
 				C = new double[size * size];
@@ -151,7 +151,7 @@ namespace Matrix{
 		}
 
 		void scatterMatrices(double* A, double* B, double* A_lined, double* B_lined, int size, int line_len) {
-			if (proces_rank == 0) {
+			if (process_rank == 0) {
 				transpose(B, size);
 			}
 			scatter(A, A_lined, line_len, size);
@@ -171,7 +171,7 @@ namespace Matrix{
 			delete[] A_lined;
 			delete[] B_lined;
 			delete[] C_lined;
-			if (proces_rank == 0) {
+			if (process_rank == 0) {
 				delete[] A;
 				delete[] B;
 				delete[] C;
@@ -183,10 +183,10 @@ namespace Matrix{
 			int size;
 			int line_len;
 			double start_count, end_count, delta;
-			coords = proces_rank;
+			coords = process_rank;
 			size = dim;
 			if (dim % process_num != 0) {
-				if (proces_rank == 0) {
+				if (process_rank == 0) {
 					printf("Invalid dimensions input -> must be dividable by " + process_num);
 				}
 				return 1;
@@ -201,7 +201,7 @@ namespace Matrix{
 			collectResultLineScheme(C, C_lined, line_len, size);
 			destruct(A, B, C, A_lined, B_lined, C_lined);
 			delta = end_count - start_count;
-			if (proces_rank == 0) {
+			if (process_rank == 0) {
 				std::cout << "Line Scheme Test results (size " << size << "x" << size << " ): " << delta << std::endl;
 			}
 			return delta;
@@ -213,71 +213,50 @@ namespace Matrix{
 		int grid[2];
 		int grid_size;
 		MPI_Comm grid_Comm;
-		void multiplyBlocks(double* A, double* B, double* C, int size) {
-			int i, j, k;
-			for (i = 0; i < size; i++) {
-				for (j = 0; j < size; j++)
-					for (k = 0; k < size; k++)
-						C[i * size + j] += A[i * size + k] * B[k * size + j];
-			}
+		void shiftLeft(double* A, int size, int block_size) {
+			int next_p = grid[1] + 1;
+			if (grid[1] == grid_size - 1) next_p = 0;
+			int prev_p = grid[1] - 1;
+			if (grid[1] == 0) prev_p = grid_size - 1;
+			MPI_Status status;
+			MPI_Sendrecv_replace(A, block_size * block_size, MPI_DOUBLE, next_p, 0, prev_p, 0, row_Comm, &status);
 		}
-		void shiftRight(double* left_block, int Size, int size) {
-			int next_process = grid[1] + 1;
-			MPI_Status mpi_status;
-			if (grid[1] == grid_size - 1) {
-				next_process = 0;
-			}
-			int prev_process = grid[1] - 1;
-			if (grid[1] == 0) {
-				prev_process = grid_size - 1;
-			}
-			MPI_Sendrecv_replace(left_block, size * size, MPI_DOUBLE, next_process, 0, prev_process, 0, row_Comm, &mpi_status);
-		}
-		void shiftLeft(double* right_block, int Size, int BlockSize) {
-			int next_process = grid[0] + 1;
-			MPI_Status mpi_status;
-			if (grid[0] == grid_size - 1) {
-				next_process = 0;
-			}
-			int prev_process = grid[1] - 1;
-			if (grid[0] == 0) {
-				prev_process = grid_size - 1;
-			}
-			MPI_Sendrecv_replace(right_block, BlockSize * BlockSize, MPI_DOUBLE, next_process, 0, prev_process, 0, col_Comm, &mpi_status);
+		void shiftRight(double* B, int size, int block_size) {
+			MPI_Status Status;
+			int NextProc = grid[0] + 1;
+			if (grid[0] == grid_size - 1) NextProc = 0;
+			int PrevProc = grid[0] - 1;
+			if (grid[0] == 0) PrevProc = grid_size - 1;
+			MPI_Sendrecv_replace(B, block_size * block_size, MPI_DOUBLE, NextProc, 0, PrevProc, 0, col_Comm, &Status);
 		}
 
 		void collectResultCannon(double* C, double* C_block, int size, int block_size) {
-			double* result = new double[size * block_size];
+			double* res_row = new double[size * block_size];
 			for (int i = 0; i < block_size; i++) {
-				MPI_Gather(&C_block[i * block_size], block_size, MPI_DOUBLE, &result[i * size], block_size, MPI_DOUBLE, 0, row_Comm);
+				MPI_Gather(&C_block[i * block_size], block_size, MPI_DOUBLE, &res_row[i * size], block_size, MPI_DOUBLE, 0, row_Comm);
 			}
 			if (grid[1] == 0) {
-				MPI_Gather(result, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
+				MPI_Gather(res_row, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
 			}
-			/*if (proces_rank == 0) {
-				printf("\n C: \n");
-				print(C, size);
-			}*/
-			delete[] result;
+			delete[] res_row;
 		}
-		void calculate(double* A_block, double* B_block, double* C_block, int size, int block_size) {
+		void initComputation(double* A, double* B, double* C, int size, int block_size) {
 			for (int i = 0; i < grid_size; ++i) {
-				multiplyBlocks(A_block, B_block, C_block, block_size);
-				shiftRight(A_block, size, block_size);
-				shiftLeft(B_block, size, block_size);
+				simpleMultiplication(A, B, C, block_size);
+				shiftLeft(A, size, block_size);
+				shiftRight(B, size, block_size);
 			}
 		}
 
-		void scatterBlock(double* matrix, double* block, int x, int y, int size, int block_size) {
-			int start_pos = y * block_size * size + x * block_size;
+		void scatterBlock(double* matr, double* block, int row, int col, int size, int block_size) {
+			int start_pos = col * block_size * size + row * block_size;
 			int cur_pos = start_pos;
 			for (int i = 0; i < block_size; ++i, cur_pos += size) {
-				MPI_Scatter(&matrix[cur_pos], block_size, MPI_DOUBLE, &(block[i * block_size]), block_size, MPI_DOUBLE, 0, grid_Comm);
+				MPI_Scatter(&matr[cur_pos], block_size, MPI_DOUBLE, &(block[i * block_size]), block_size, MPI_DOUBLE, 0, grid_Comm);
 			}
 		}
 
-		void scatterBlocks(double* A, double* A_block, double* B, double* B_block, int size, int block_size) {
-			//double* block_row = new double[block_size * size];
+		void scatter(double* A, double* A_block, double* B, double* B_block, int size, int block_size) {
 			int N = grid[0];
 			int M = grid[1];
 			scatterBlock(A, A_block, N, (N + M) % grid_size, size, block_size);
@@ -285,25 +264,25 @@ namespace Matrix{
 		}
 
 		void initGridCommsCannon() {
-			int dims_sizes[2];
-			int periods[2];
-			int dims_divs[2];
-			dims_sizes[0] = grid_size;
-			dims_sizes[1] = grid_size;
-			periods[0] = 0;
-			periods[1] = 0;
-			MPI_Cart_create(MPI_COMM_WORLD, 2, dims_sizes, periods, 1, &grid_Comm);
-			MPI_Cart_coords(grid_Comm, proces_rank, 2, grid);
-			dims_divs[0] = 0;
-			dims_divs[1] = 1;
-			MPI_Cart_sub(grid_Comm, dims_divs, &row_Comm);
-			dims_divs[0] = 1;
-			dims_divs[1] = 0;
-			MPI_Cart_sub(grid_Comm, dims_divs, &col_Comm);
+			int d_size[2];
+			int period[2];
+			int sub_dim[2];
+			d_size[0] = grid_size;
+			d_size[1] = grid_size;
+			period[0] = 0;
+			period[1] = 0;
+			MPI_Cart_create(MPI_COMM_WORLD, 2, d_size, period, 1, &grid_Comm);
+			MPI_Cart_coords(grid_Comm, process_rank, 2, grid);
+			sub_dim[0] = 0;
+			sub_dim[1] = 1;
+			MPI_Cart_sub(grid_Comm, sub_dim, &row_Comm);
+			sub_dim[0] = 1;
+			sub_dim[1] = 0;
+			MPI_Cart_sub(grid_Comm, sub_dim, &col_Comm);
 		}
 
 		void deconstruct(double* A, double* B, double* C, double* A_block, double* B_block, double* C_block, double* A_sup_block = NULL) {
-			if (proces_rank == 0) {
+			if (process_rank == 0) {
 				delete[] A;
 				delete[] B;
 				delete[] C;
@@ -320,25 +299,18 @@ namespace Matrix{
 			A_block = new double[block_size * block_size];
 			B_block = new double[block_size * block_size];
 			C_block = new double[block_size * block_size];
-
-			for (int i = 0; i < block_size * block_size; i++) {
-				C_block[i] = 0;
-			}
-			if (proces_rank == 0) {
+			C_block = generateFilled(0, block_size);
+			if (process_rank == 0) {
 				A = new double[size * size];
 				B = new double[size * size];
 				C = new double[size * size];
 				A = generateRandom(uppper_bound, offset, precision, size);
 				B = generateRandom(uppper_bound, offset, precision, size);
-				/*printf("\n A: \n");
-				print(A, size);
-				printf("\n B: \n");
-				print(B, size);*/
 			}
 		}
 
 
-		double runCannonMultiplicationTest(int argc, char* argv[], int dim) {
+		void runCannonMultiplicationTest(int argc, char* argv[], int dim) {
 			double* A, * B, * C, * A_block, * B_block, * C_block;
 			int size;
 			int block_size;
@@ -346,26 +318,22 @@ namespace Matrix{
 			size = dim;
 			grid_size = sqrt((double)process_num);
 			if (process_num != grid_size * grid_size) {
-				if (proces_rank == 0) {
-					printf("Number of processes must be a perfect square \n");
+				if (process_rank == 0) {
+					std::cout << "\n Invalid number of processes for algoritm execution";
 				}
-				return 1;
+				return;
 			}
 			initGridCommsCannon();
 			initCannon(A, B, C, A_block, B_block, C_block, size, block_size);
-			scatterBlocks(A, A_block, B, B_block, size, block_size);
-
+			scatter(A, A_block, B, B_block, size, block_size);
 			start_count = MPI_Wtime();
-			calculate(A_block, B_block, C_block, size, block_size);
+			initComputation(A_block, B_block, C_block, size, block_size);
 			end_count = MPI_Wtime();
-
 			collectResultCannon(C, C_block, size, block_size);
 			deconstruct(A, B, C, A_block, B_block, C_block);
-
 			delta = end_count - start_count;
-			if (proces_rank == 0)
+			if (process_rank == 0)
 				std::cout << "Cannon Test results (size " << size << "x" << size << " ): " << delta << std::endl;
-			return delta;
 		}
 	}
 
@@ -380,7 +348,7 @@ namespace Matrix{
 			period[0] = 0;
 			period[1] = 0;
 			MPI_Cart_create(MPI_COMM_WORLD, 2, dim_size, period, 1, &grid_Comm);
-			MPI_Cart_coords(grid_Comm, proces_rank, 2, grid);
+			MPI_Cart_coords(grid_Comm, process_rank, 2, grid);
 			sub_dimension[0] = 0;
 			sub_dimension[1] = 1;
 			MPI_Cart_sub(grid_Comm, sub_dimension, &row_Comm);
@@ -390,16 +358,13 @@ namespace Matrix{
 		}
 
 		void initFox(double*& A, double*& B, double*& C, double*& A_block, double*& B_block, double*& C_block, double*& A_sup_block, int& size, int& block_size) {
-
 			block_size = size / grid_size;
 			A_block = new double[block_size * block_size];
 			B_block = new double[block_size * block_size];
 			C_block = new double[block_size * block_size];
 			A_sup_block = new double[block_size * block_size];
-			for (int i = 0; i < block_size * block_size; i++) {
-				C_block[i] = 0;
-			}
-			if (proces_rank == 0) {
+			C_block = generateFilled(0, block_size);
+			if (process_rank == 0) {
 				A = new double[size * size];
 				B = new double[size * size];
 				C = new double[size * size];
@@ -463,7 +428,7 @@ namespace Matrix{
 		void initComputation(double* A, double* A_sup_block, double* B, double* C, int block_size) {
 			for (int i = 0; i < grid_size; i++) {
 				sendA(i, A, A_sup_block, block_size);
-				multiplyBlocks(A, B, C, block_size);
+				simpleMultiplication(A, B, C, block_size);
 				sendB(B, block_size);
 			}
 		}
@@ -475,7 +440,7 @@ namespace Matrix{
 			double start_count, end_count, delta;
 			grid_size = sqrt((double)process_num);
 			if (process_num != grid_size * grid_size) {
-				if (proces_rank == 0) {
+				if (process_rank == 0) {
 					std::cout << "\nNumber of processes must be a perfect square \n";
 				}
 				return 1;
@@ -491,13 +456,13 @@ namespace Matrix{
 			deconstruct(A, B, C, A_block, B_block, C_block, A_sup_block);
 
 			delta = end_count - start_count;
-			if (proces_rank == 0)
+			if (process_rank == 0)
 				std::cout << "Fox Test results (size " << size << "x" << size << " ): " << delta << std::endl;
 			return delta;
 		}
 	}
 	void runAlgorithmTest(int argc, char* argv[], int dim) {
-		runLineSchemeMultiplicationTest(argc, argv, dim);
+		//runLineSchemeMultiplicationTest(argc, argv, dim);
 		runCannonMultiplicationTest(argc, argv, dim);
 		runFoxMultiplicationTest(argc, argv, dim);
 	}
