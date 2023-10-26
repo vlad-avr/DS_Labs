@@ -19,7 +19,7 @@ static int precision = 1;
 
 namespace Matrix{
 	//General
-	namespace {
+	namespace General {
 		double* generateRandom(unsigned int upper_bound, int offset, unsigned int precision, unsigned int size) {
 			unsigned int actual_size = size * size;
 			double* matr = new double[actual_size];
@@ -58,10 +58,20 @@ namespace Matrix{
 				std::cout << std::endl;
 			}
 		}
+
+		void transpose(double* matrix, int size) {
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
+					double t = matrix[i * size + j];
+					matrix[i * size + j] = matrix[j * size + i];
+					matrix[j * size + i] = t;
+				}
+			}
+		}
 	}
 
 	//Line Scheme Multiplication
-	namespace {
+	namespace LineScheme{
 		int coords;
 
 		void shift(double* B_line, int tapeLen, int size) {
@@ -70,7 +80,7 @@ namespace Matrix{
 			if (next_p == process_num) next_p = 0;
 			int prev_p = coords - 1;
 			if (prev_p == -1) prev_p = process_num - 1;
-			MPI_Sendrecv_replace(B_line, tapeLen * size, MPI_DOUBLE,next_p, 0, prev_p, 0, col_Comm, &Status);
+			MPI_Sendrecv_replace(B_line, tapeLen * size, MPI_DOUBLE, next_p, 0, prev_p, 0, col_Comm, &Status);
 		}
 
 		void lineSchemeMultiplication(double* A_line, double* B_line, double* res, int size, int line_len, int iter) {
@@ -103,8 +113,8 @@ namespace Matrix{
 			MPI_Scatter(&(matrix[size * line_len * coords]), line_len * size, MPI_DOUBLE, matrix_lined, line_len * size, MPI_DOUBLE, 0, row_Comm);
 		}
 
-		void gather(double* cMatrix, double* cMatrixTape, int tapeLen, int size) {
-			MPI_Gather(cMatrixTape, tapeLen * size, MPI_DOUBLE, cMatrix, tapeLen * size, MPI_DOUBLE, 0, row_Comm);
+		void gather(double* C, double* C_lined, int line_len, int size) {
+			MPI_Gather(C_lined, line_len * size, MPI_DOUBLE, C, line_len * size, MPI_DOUBLE, 0, row_Comm);
 		}
 		void initComms(int line_len) {
 			MPI_Comm_split(MPI_COMM_WORLD, process_rank / line_len, process_rank, &row_Comm);
@@ -124,30 +134,15 @@ namespace Matrix{
 				A = new double[size * size];
 				B = new double[size * size];
 				C = new double[size * size];
-				A = generateRandom(uppper_bound, offset, precision, size);
-				B = generateRandom(uppper_bound, offset, precision, size);
-				/*printf("\n A: \n");
-				print(A, size);
-				printf("\n B: \n");
-				print(B, size);*/
-				//C = generateFilled(0, size);
+				A = General::generateRandom(uppper_bound, offset, precision, size);
+				B = General::generateRandom(uppper_bound, offset, precision, size);
 			}
 
-		}
-
-		void transpose(double* matrix, int size) {
-			for (int i = 0; i < size; i++) {
-				for (int j = 0; j < size; j++) {
-					double t = matrix[i * size + j];
-					matrix[i * size + j] = matrix[j * size + i];
-					matrix[j * size + i] = t;
-				}
-			}
 		}
 
 		void scatterMatrices(double* A, double* B, double* A_lined, double* B_lined, int size, int line_len) {
 			if (process_rank == 0) {
-				transpose(B, size);
+				General::transpose(B, size);
 			}
 			scatter(A, A_lined, line_len, size);
 			scatter(B, B_lined, line_len, size);
@@ -155,10 +150,6 @@ namespace Matrix{
 
 		void collectResultLineScheme(double* C, double* C_lined, int line_len, int size) {
 			gather(C, C_lined, line_len, size);
-			/*if (proces_rank == 0) {
-				printf("\n C: \n");
-				print(C, size);
-			}*/
 		}
 
 
@@ -173,7 +164,7 @@ namespace Matrix{
 			}
 		}
 
-		double runLineSchemeMultiplicationTest(int argc, char* argv[], int dim) {
+		void runLineSchemeMultiplicationTest(int argc, char* argv[], int dim) {
 			double* A, * B, * C, * A_lined, * B_lined, * C_lined;
 			int size;
 			int line_len;
@@ -184,7 +175,7 @@ namespace Matrix{
 				if (process_rank == 0) {
 					printf("Invalid dimensions input -> must be dividable by " + process_num);
 				}
-				return 1;
+				return;
 			}
 			initProcess(A, B, C, A_lined, B_lined, C_lined, size, line_len);
 			initComms(line_len);
@@ -199,12 +190,11 @@ namespace Matrix{
 			if (process_rank == 0) {
 				std::cout << "Line Scheme Test results (size " << size << "x" << size << " ): " << delta << std::endl;
 			}
-			return delta;
 		}
 	}
 
 	//Cannon Multiplication
-	namespace {
+	namespace Cannon{
 		int grid[2];
 		int grid_size;
 		MPI_Comm grid_Comm;
@@ -237,7 +227,7 @@ namespace Matrix{
 		}
 		void initComputation(double* A, double* B, double* C, int size, int block_size) {
 			for (int i = 0; i < grid_size; ++i) {
-				simpleMultiplication(A, B, C, block_size);
+				General::simpleMultiplication(A, B, C, block_size);
 				shiftLeft(A, size, block_size);
 				shiftRight(B, size, block_size);
 			}
@@ -276,7 +266,7 @@ namespace Matrix{
 			MPI_Cart_sub(grid_Comm, sub_dim, &col_Comm);
 		}
 
-		void deconstruct(double* A, double* B, double* C, double* A_block, double* B_block, double* C_block, double* A_sup_block = NULL) {
+		void deconstruct(double* A, double* B, double* C, double* A_block, double* B_block, double* C_block) {
 			if (process_rank == 0) {
 				delete[] A;
 				delete[] B;
@@ -285,22 +275,19 @@ namespace Matrix{
 			delete[] A_block;
 			delete[] B_block;
 			delete[] C_block;
-			if (!A_sup_block) {
-				delete[] A_sup_block;
-			}
 		}
 		void initCannon(double*& A, double*& B, double*& C, double*& A_block, double*& B_block, double*& C_block, int& size, int& block_size) {
 			block_size = size / grid_size;
 			A_block = new double[block_size * block_size];
 			B_block = new double[block_size * block_size];
 			C_block = new double[block_size * block_size];
-			C_block = generateFilled(0, block_size);
+			C_block = General::generateFilled(0, block_size);
 			if (process_rank == 0) {
 				A = new double[size * size];
 				B = new double[size * size];
 				C = new double[size * size];
-				A = generateRandom(uppper_bound, offset, precision, size);
-				B = generateRandom(uppper_bound, offset, precision, size);
+				A = General::generateRandom(uppper_bound, offset, precision, size);
+				B = General::generateRandom(uppper_bound, offset, precision, size);
 			}
 		}
 
@@ -333,7 +320,10 @@ namespace Matrix{
 	}
 
 	//Fox Multiplication
-	namespace {
+	namespace Fox{
+		int grid[2];
+		int grid_size;
+		MPI_Comm grid_Comm;
 		void initGridCommsFox() {
 			int dim_size[2];
 			int period[2];
@@ -358,17 +348,13 @@ namespace Matrix{
 			B_block = new double[block_size * block_size];
 			C_block = new double[block_size * block_size];
 			A_sup_block = new double[block_size * block_size];
-			C_block = generateFilled(0, block_size);
+			C_block = General::generateFilled(0, block_size);
 			if (process_rank == 0) {
 				A = new double[size * size];
 				B = new double[size * size];
 				C = new double[size * size];
-				A = generateRandom(uppper_bound, offset, precision, size);
-				B = generateRandom(uppper_bound, offset, precision, size);
-				/*printf("\n A: \n");
-				print(A, size);
-				printf("\n B: \n");
-				print(B, size);*/
+				A = General::generateRandom(uppper_bound, offset, precision, size);
+				B = General::generateRandom(uppper_bound, offset, precision, size);
 			}
 		}
 
@@ -396,10 +382,6 @@ namespace Matrix{
 			if (grid[1] == 0) {
 				MPI_Gather(res_row, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
 			}
-			/*if (proces_rank == 0) {
-				printf("\n C: \n");
-				print(C, size);
-			}*/
 			delete[] res_row;
 		}
 		void sendA(int i, double* A, double* A_sup_block, int block_size) {
@@ -423,12 +405,26 @@ namespace Matrix{
 		void initComputation(double* A, double* A_sup_block, double* B, double* C, int block_size) {
 			for (int i = 0; i < grid_size; i++) {
 				sendA(i, A, A_sup_block, block_size);
-				simpleMultiplication(A, B, C, block_size);
+				General::simpleMultiplication(A, B, C, block_size);
 				sendB(B, block_size);
 			}
 		}
 
-		double runFoxMultiplicationTest(int argc, char* argv[], int dim) {
+		void deconstruct(double* A, double* B, double* C, double* A_block, double* B_block, double* C_block, double* A_sup_block = NULL) {
+			if (process_rank == 0) {
+				delete[] A;
+				delete[] B;
+				delete[] C;
+			}
+			delete[] A_block;
+			delete[] B_block;
+			delete[] C_block;
+			if (!A_sup_block) {
+				delete[] A_sup_block;
+			}
+		}
+
+		void runFoxMultiplicationTest(int argc, char* argv[], int dim) {
 			double* A, * B, * C, * A_block, * B_block, * C_block, * A_sup_block;
 			int size;
 			int block_size;
@@ -438,7 +434,7 @@ namespace Matrix{
 				if (process_rank == 0) {
 					std::cout << "\nNumber of processes must be a perfect square \n";
 				}
-				return 1;
+				return;
 			}
 			size = dim;
 			initGridCommsFox();
@@ -453,13 +449,12 @@ namespace Matrix{
 			delta = end_count - start_count;
 			if (process_rank == 0)
 				std::cout << "Fox Test results (size " << size << "x" << size << " ): " << delta << std::endl;
-			return delta;
 		}
 	}
 	void runAlgorithmTest(int argc, char* argv[], int dim) {
-		runLineSchemeMultiplicationTest(argc, argv, dim);
-		runCannonMultiplicationTest(argc, argv, dim);
-		runFoxMultiplicationTest(argc, argv, dim);
+		LineScheme::runLineSchemeMultiplicationTest(argc, argv, dim);
+		Cannon::runCannonMultiplicationTest(argc, argv, dim);
+		Fox::runFoxMultiplicationTest(argc, argv, dim);
 	}
 };
 
