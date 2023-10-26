@@ -389,18 +389,18 @@ namespace Matrix{
 		}
 
 		void collectResultFox(double* C, double* C_block, int size, int block_size) {
-			double* pResultRow = new double[size * block_size];
+			double* res_row = new double[size * block_size];
 			for (int i = 0; i < block_size; i++) {
-				MPI_Gather(&C_block[i * block_size], block_size, MPI_DOUBLE, &pResultRow[i * size], block_size, MPI_DOUBLE, 0, row_Comm);
+				MPI_Gather(&C_block[i * block_size], block_size, MPI_DOUBLE, &res_row[i * size], block_size, MPI_DOUBLE, 0, row_Comm);
 			}
 			if (grid[1] == 0) {
-				MPI_Gather(pResultRow, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
+				MPI_Gather(res_row, block_size * size, MPI_DOUBLE, C, block_size * size, MPI_DOUBLE, 0, col_Comm);
 			}
 			/*if (proces_rank == 0) {
 				printf("\n C: \n");
 				print(C, size);
 			}*/
-			delete[] pResultRow;
+			delete[] res_row;
 		}
 		void sendA(int i, double* A, double* A_sup_block, int block_size) {
 			int Pivot = (grid[0] + i) % grid_size;
