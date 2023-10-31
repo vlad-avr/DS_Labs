@@ -66,4 +66,8 @@ public class Book {
     public void setAuthor(String Id) {
         this.authorId = Id;
     }
+
+    public String getId(){
+        return this.id;
+    }
 }
