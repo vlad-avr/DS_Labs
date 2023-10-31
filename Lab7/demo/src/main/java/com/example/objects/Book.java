@@ -4,7 +4,7 @@ package com.example.objects;
 
 public class Book {
 
-    enum Genre{
+    public static enum Genre {
         horror,
         scifi,
         comedy,
@@ -12,14 +12,15 @@ public class Book {
         adventure,
         biography
     }
+
     private String id;
     private String name;
     private Double price;
     private Genre genre;
     private String authorId;
-    //private IDGenerator authorIds;
+    // private IDGenerator authorIds;
 
-    public Book(String id, String name, Double price, Genre genre, String authorId){
+    public Book(String id, String name, Double price, Genre genre, String authorId) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -27,37 +28,42 @@ public class Book {
         this.authorId = authorId;
     }
 
-    public Book(){}
+    public Book(String id) {
+        this.id = id;
+    }
 
-    public String getName(){
+    public Book() {
+    }
+
+    public String getName() {
         return this.name;
     }
 
-    public double getPrice(){
+    public double getPrice() {
         return this.price;
     }
 
-    public String getGenre(){
+    public String getGenre() {
         return this.genre.toString();
     }
 
-    public String getAuthor(){
+    public String getAuthor() {
         return this.authorId;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setPrice(double price){
+    public void setPrice(double price) {
         this.price = price;
     }
 
-    public void setGenre(Genre genre){
+    public void setGenre(Genre genre) {
         this.genre = genre;
     }
 
-    public void setAuthor(String Id){
+    public void setAuthor(String Id) {
         this.authorId = Id;
     }
 }

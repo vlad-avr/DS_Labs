@@ -52,4 +52,8 @@ public class Author {
     public List<String> getBooks(){
         return this.books;
     }
+
+	public String getId() {
+		return this.ID;
+	}
 }
