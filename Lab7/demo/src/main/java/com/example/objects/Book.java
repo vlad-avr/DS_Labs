@@ -9,7 +9,8 @@ public class Book {
         scifi,
         comedy,
         drama,
-        adventure
+        adventure,
+        biography
     }
     private String id;
     private String name;
