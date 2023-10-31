@@ -32,4 +32,24 @@ public class Author {
     public void setLastName(String lastName){
         this.lastName = lastName;
     }
+
+    public void addBook(String bookId){
+        if(!books.contains(bookId)){
+            books.add(bookId);
+        }else{
+            System.out.println("\nAuthor " + ID + "  is ALREADY the author of book : " + bookId);
+        }
+    }
+
+    public void removeBook(String bookId){
+        if(books.contains(bookId)){
+            books.remove(bookId);
+        }else{
+            System.out.println("\nAuthor " + ID + " is NOT the author of book : " + bookId);
+        }
+    }
+
+    public List<String> getBooks(){
+        return this.books;
+    }
 }

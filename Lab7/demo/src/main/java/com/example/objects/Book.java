@@ -26,6 +26,8 @@ public class Book {
         this.authorId = authorId;
     }
 
+    public Book(){}
+
     public String getName(){
         return this.name;
     }
