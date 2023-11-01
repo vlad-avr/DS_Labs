@@ -10,14 +10,17 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.example.db_controller.DatabaseManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
 
 public class MyParser {
     private final String path;
+    private DatabaseManager dbManager;
 
-    public MyParser(String path){
+    public MyParser(String path, DatabaseManager dbManager){
         this.path = path;
+        this.dbManager = dbManager;
     }
 
     public void parseSAX() {
@@ -51,11 +54,11 @@ public class MyParser {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             switch (qName) {
                 case "author":
-                    //Save author to DB
+                    dbManager.addAuthor(curAuthor);
                     break;
                 case "book":
                     curBook.setAuthor(curAuthor.getId());
-                    //Save book to DB
+                    dbManager.addBook(curBook);
                     break;
                 case "name":
                     curBook.setName(curValue.toString());

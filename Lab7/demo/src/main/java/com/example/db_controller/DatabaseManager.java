@@ -11,7 +11,17 @@ import com.example.objects.Author;
 import com.example.objects.Book;
 
 public class DatabaseManager {
-    private final String db_url = "jdbc:sqlite:library.db";
+    private final String db_url = "jdbc:sqlite:D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\db\\library.db";
+    IDGenerator booksIdGenerator = new IDGenerator("B");
+    IDGenerator authorsIdGenerator = new IDGenerator("A");
+
+    public IDGenerator getBooksGenerator(){
+        return this.booksIdGenerator;
+    }
+
+    public IDGenerator getAuthorsGenerator(){
+        return this.authorsIdGenerator;
+    }
 
     public void initDB() {
         create_database();
@@ -90,6 +100,7 @@ public class DatabaseManager {
                 + author.getFirstName() + ", " + author.getLastName() + ")";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(sql)) {
             statement.executeUpdate();
+            authorsIdGenerator.addId(author.getId());
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -100,6 +111,7 @@ public class DatabaseManager {
                 + book.getName() + ", " + book.getPrice() + ", " + book.getGenre() + ", " + book.getAuthor() + ")";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(sql)) {
             statement.executeUpdate();
+            booksIdGenerator.addId(book.getId());
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -174,15 +186,20 @@ public class DatabaseManager {
     }
 
     public void deleteAuthor(String ID) {
+        Author author = getAuthor(ID, true);
         String authorSql = "DELETE FROM authors WHERE id = " + ID;
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(authorSql)) {
             String bookSql = "DELETE FROM books WHERE author_id =  " + ID;
             try (PreparedStatement statement2 = con.prepareStatement(bookSql)) {
                 statement2.executeQuery();
+                for(Book book : author.getBooks()){
+                    booksIdGenerator.removeId(book.getId());
+                }
             } catch (SQLException exception) {
                 System.out.println(exception.getMessage());
             }
             statement.executeUpdate();
+            authorsIdGenerator.removeId(ID);
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -192,6 +209,7 @@ public class DatabaseManager {
         String bookSql = "DELETE FROM books WHERE id =  " + ID;
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(bookSql)) {
             statement.executeQuery();
+            booksIdGenerator.removeId(ID);
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
