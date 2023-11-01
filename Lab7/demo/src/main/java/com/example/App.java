@@ -1,17 +1,12 @@
 package com.example;
 
-/**
- * Hello world!
- */
+import com.example.control.Controller;
+
 public final class App {
     private App() {
     }
-
-    /**
-     * Says hello to the world.
-     * @param args The arguments of the program.
-     */
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Controller controller = new Controller();
+        controller.start();
     }
 }

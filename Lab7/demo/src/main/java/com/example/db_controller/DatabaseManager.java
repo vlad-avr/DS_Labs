@@ -17,11 +17,11 @@ public class DatabaseManager {
     IDGenerator booksIdGenerator = new IDGenerator("B");
     IDGenerator authorsIdGenerator = new IDGenerator("A");
 
-    public IDGenerator getBooksGenerator(){
+    public IDGenerator getBooksGenerator() {
         return this.booksIdGenerator;
     }
 
-    public IDGenerator getAuthorsGenerator(){
+    public IDGenerator getAuthorsGenerator() {
         return this.authorsIdGenerator;
     }
 
@@ -69,11 +69,11 @@ public class DatabaseManager {
 
     private void create_books_table() {
         String sql = "CREATE TABLE IF NOT EXISTS books (\n"
-                + "     id text NOT NULL, \n"
+                + "     id text PRIMARY KEY, \n"
                 + "     name text NOT NULL, \n"
                 + "     price real NOT NULL, \n"
                 + "     genre text NOT NULL, \n"
-                + "     author_id text NOT NULL, \n"
+                + "     author_id text NOT NULL \n"
                 + ");";
 
         try (Connection con = DriverManager.getConnection(db_url); Statement st = con.createStatement()) {
@@ -85,9 +85,9 @@ public class DatabaseManager {
 
     private void create_authors_table() {
         String sql = "CREATE TABLE IF NOT EXISTS authors (\n"
-                + "     id text NOT NULL, \n"
+                + "     id text PRIMARY KEY, \n"
                 + "     firstname text NOT NULL, \n"
-                + "     lastname text NOT NULL, \n"
+                + "     lastname text NOT NULL \n"
                 + ");";
 
         try (Connection con = DriverManager.getConnection(db_url); Statement st = con.createStatement()) {
@@ -98,9 +98,11 @@ public class DatabaseManager {
     }
 
     public void addAuthor(Author author) {
-        String sql = "INSERT INTO authors (id, firstname, lastname) VALUES (" + author.getId() + ", "
-                + author.getFirstName() + ", " + author.getLastName() + ")";
+        String sql = "INSERT INTO authors (id, firstname, lastname) VALUES (?, ?, ?)";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setString(1, author.getId());
+            statement.setString(2, author.getFirstName());
+            statement.setString(3, author.getLastName());
             statement.executeUpdate();
             authorsIdGenerator.addId(author.getId());
         } catch (SQLException exception) {
@@ -109,9 +111,13 @@ public class DatabaseManager {
     }
 
     public void addBook(Book book) {
-        String sql = "INSERT INTO books (id, name, price, genre, author_id) VALUES (" + book.getId() + ", "
-                + book.getName() + ", " + book.getPrice() + ", " + book.getGenre() + ", " + book.getAuthor() + ")";
+        String sql = "INSERT INTO books (id, name, price, genre, author_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setString(1, book.getId());
+            statement.setString(2, book.getName());
+            statement.setDouble(3, book.getPrice());
+            statement.setString(4, book.getGenre());
+            statement.setString(5, book.getAuthor());
             statement.executeUpdate();
             booksIdGenerator.addId(book.getId());
         } catch (SQLException exception) {
@@ -120,9 +126,11 @@ public class DatabaseManager {
     }
 
     public void updateAuthor(Author author) {
-        String str = "UPDATE authors SET firstname = " + author.getFirstName() + ", lastname = " + author.getLastName()
-                + " WHERE id = " + author.getId();
+        String str = "UPDATE authors SET firstname = ?, lastname = ? WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(str)) {
+            statement.setString(1, author.getFirstName());
+            statement.setString(2, author.getLastName());
+            statement.setString(3, author.getId());
             statement.executeUpdate();
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
@@ -130,9 +138,13 @@ public class DatabaseManager {
     }
 
     public void updateBook(Book book) {
-        String str = "UPDATE books SET name = " + book.getName() + ", price = " + book.getPrice() + ", genre = "
-                + book.getGenre() + ", author_id = " + book.getAuthor() + " WHERE id = " + book.getId();
+        String str = "UPDATE books SET name = ?, price = ?, genre = ?, author_id = ? WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(str)) {
+            statement.setString(1, book.getName());
+            statement.setDouble(2, book.getPrice());
+            statement.setString(3, book.getGenre());
+            statement.setString(4, book.getAuthor());
+            statement.setString(5, book.getId());
             statement.executeUpdate();
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
@@ -140,15 +152,17 @@ public class DatabaseManager {
     }
 
     public Author getAuthor(String ID, boolean load_books) {
-        String authorSql = "SELECT *\nFROM authors WHERE id = " + ID;
+        String authorSql = "SELECT *\nFROM authors WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(authorSql)) {
+            statement.setString(1, ID);
             ResultSet res = statement.executeQuery();
             if (res.next()) {
                 Author author = new Author(res.getString("firstname"), res.getString("lastname"),
                         res.getString("id"));
                 if (load_books) {
-                    String bookSql = "SELECT *\nFROM books WHERE author_id = " + ID;
+                    String bookSql = "SELECT *\nFROM books WHERE author_id = ?";
                     try (PreparedStatement statement2 = con.prepareStatement(bookSql)) {
+                        statement2.setString(1, ID);
                         ResultSet f_res = statement2.executeQuery();
                         while (f_res.next()) {
                             Book book = new Book(f_res.getString("id"), f_res.getString("name"),
@@ -173,22 +187,22 @@ public class DatabaseManager {
         return null;
     }
 
-    public List<Author> getAuthors(){
+    public List<Author> getAuthors() {
         List<Author> authors = new ArrayList<>();
-        for(String ID : authorsIdGenerator.getIDs()){
+        for (String ID : authorsIdGenerator.getIDs()) {
             Author author = getAuthor(ID, true);
-            if(author != null){
+            if (author != null) {
                 authors.add(author);
             }
         }
         return authors;
     }
 
-    public List<Book> getBooks(){
+    public List<Book> getBooks() {
         List<Book> books = new ArrayList<>();
-        for(String ID : booksIdGenerator.getIDs()){
+        for (String ID : booksIdGenerator.getIDs()) {
             Book book = getBook(ID);
-            if(book != null){
+            if (book != null) {
                 books.add(book);
             }
         }
@@ -196,8 +210,9 @@ public class DatabaseManager {
     }
 
     public Book getBook(String ID) {
-        String bookSql = "SELECT *\nFROM books WHERE id = " + ID;
+        String bookSql = "SELECT *\nFROM books WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(bookSql)) {
+            statement.setString(1, ID);
             ResultSet f_res = statement.executeQuery();
             Book book = new Book(f_res.getString("id"), f_res.getString("name"),
                     f_res.getDouble("price"), Book.Genre.valueOf(f_res.getString("genre")),
@@ -211,12 +226,14 @@ public class DatabaseManager {
 
     public void deleteAuthor(String ID) {
         Author author = getAuthor(ID, true);
-        String authorSql = "DELETE FROM authors WHERE id = " + ID;
+        String authorSql = "DELETE FROM authors WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(authorSql)) {
-            String bookSql = "DELETE FROM books WHERE author_id =  " + ID;
+            statement.setString(1, ID);
+            String bookSql = "DELETE FROM books WHERE author_id = ?";
             try (PreparedStatement statement2 = con.prepareStatement(bookSql)) {
+                statement2.setString(1, ID);
                 statement2.executeQuery();
-                for(Book book : author.getBooks()){
+                for (Book book : author.getBooks()) {
                     booksIdGenerator.removeId(book.getId());
                 }
             } catch (SQLException exception) {
@@ -230,8 +247,9 @@ public class DatabaseManager {
     }
 
     public void deleteBook(String ID) {
-        String bookSql = "DELETE FROM books WHERE id =  " + ID;
+        String bookSql = "DELETE FROM books WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(bookSql)) {
+            statement.setString(1, ID);
             statement.executeQuery();
             booksIdGenerator.removeId(ID);
         } catch (SQLException exception) {
