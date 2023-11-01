@@ -1,11 +1,21 @@
 package com.example.xml_parser;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -30,6 +40,16 @@ public class MyParser {
             MyHandler handler = new MyHandler();
             parser.parse(path, handler);
         } catch (ParserConfigurationException | SAXException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void writeXML(){
+        List<Author> authors = dbManager.getAuthors();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
             System.out.println(e.getMessage());
         }
     }
