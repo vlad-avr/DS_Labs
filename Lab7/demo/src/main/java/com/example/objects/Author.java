@@ -7,7 +7,7 @@ public class Author {
     private String firstName;
     private String lastName;
     private String ID;
-    private List<String> books = new ArrayList<>();
+    private List<Book> books = new ArrayList<>();
 
     public Author(String firstName, String lastName, String ID){
         this.firstName = firstName;
@@ -33,27 +33,33 @@ public class Author {
         this.lastName = lastName;
     }
 
-    public void addBook(String bookId){
-        if(!books.contains(bookId)){
-            books.add(bookId);
-        }else{
-            System.out.println("\nAuthor " + ID + "  is ALREADY the author of book : " + bookId);
-        }
+    public void addBook(Book book){
+        books.add(book);
     }
 
     public void removeBook(String bookId){
-        if(books.contains(bookId)){
-            books.remove(bookId);
-        }else{
-            System.out.println("\nAuthor " + ID + " is NOT the author of book : " + bookId);
+        for(Book book : books){
+            if(book.getId().equals(bookId)){
+                books.remove(book);
+                return;
+            }
         }
+        System.out.println("\nBook with id " + bookId + " not found!");
     }
 
-    public List<String> getBooks(){
+    public List<Book> getBooks(){
         return this.books;
     }
 
 	public String getId() {
 		return this.ID;
 	}
+
+    public String toString(){
+        String res = "\nID : " + this.ID + "\nName : " + this.firstName + " " + this.lastName + "\nBooks :";
+        for(Book book : books){
+            res += book.toString();
+        }
+        return res;
+    }
 }

@@ -70,4 +70,8 @@ public class Book {
     public String getId(){
         return this.id;
     }
+
+    public String toString(){
+        return "\n ID : " + this.id + "\n Name : " + this.name + "\n Price : " + this.price + " $ \n Genre : " + this.genre;
+    }
 }

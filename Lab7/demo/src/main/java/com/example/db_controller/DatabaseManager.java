@@ -105,4 +105,96 @@ public class DatabaseManager {
         }
     }
 
+    public void updateAuthor(Author author) {
+        String str = "UPDATE authors SET firstname = " + author.getFirstName() + ", lastname = " + author.getLastName()
+                + " WHERE id = " + author.getId();
+        try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(str)) {
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    public void updateBook(Book book) {
+        String str = "UPDATE books SET name = " + book.getName() + ", price = " + book.getPrice() + ", genre = "
+                + book.getGenre() + ", author_id = " + book.getAuthor() + " WHERE id = " + book.getId();
+        try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(str)) {
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    public Author getAuthor(String ID, boolean load_books) {
+        String authorSql = "SELECT *\nFROM authors WHERE id = " + ID;
+        try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(authorSql)) {
+            ResultSet res = statement.executeQuery();
+            if (res.next()) {
+                Author author = new Author(res.getString("firstname"), res.getString("lastname"),
+                        res.getString("id"));
+                if (load_books) {
+                    String bookSql = "SELECT *\nFROM books WHERE author_id = " + ID;
+                    try (PreparedStatement statement2 = con.prepareStatement(bookSql)) {
+                        ResultSet f_res = statement2.executeQuery();
+                        while (f_res.next()) {
+                            Book book = new Book(f_res.getString("id"), f_res.getString("name"),
+                                    f_res.getDouble("price"), Book.Genre.valueOf(f_res.getString("genre")),
+                                    f_res.getString("author_id"));
+                            if (book != null) {
+                                author.addBook(book);
+                            }
+                        }
+                    } catch (SQLException exception) {
+                        System.out.println(exception.getMessage());
+                    }
+                }
+                return author;
+            } else {
+                SQLException exception = new SQLException("Author with ID " + ID + " does not exist!");
+                throw exception;
+            }
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+        return null;
+    }
+
+    public Book getBook(String ID) {
+        String bookSql = "SELECT *\nFROM books WHERE id = " + ID;
+        try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(bookSql)) {
+            ResultSet f_res = statement.executeQuery();
+            Book book = new Book(f_res.getString("id"), f_res.getString("name"),
+                    f_res.getDouble("price"), Book.Genre.valueOf(f_res.getString("genre")),
+                    f_res.getString("author_id"));
+            return book;
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+            return null;
+        }
+    }
+
+    public void deleteAuthor(String ID) {
+        String authorSql = "DELETE FROM authors WHERE id = " + ID;
+        try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(authorSql)) {
+            String bookSql = "DELETE FROM books WHERE author_id =  " + ID;
+            try (PreparedStatement statement2 = con.prepareStatement(bookSql)) {
+                statement2.executeQuery();
+            } catch (SQLException exception) {
+                System.out.println(exception.getMessage());
+            }
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    public void deleteBook(String ID) {
+        String bookSql = "DELETE FROM books WHERE id =  " + ID;
+        try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(bookSql)) {
+            statement.executeQuery();
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
 }
