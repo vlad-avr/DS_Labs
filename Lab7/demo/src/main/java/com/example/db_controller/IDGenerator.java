@@ -80,4 +80,8 @@ public class IDGenerator {
         }
         return false;
     }
+
+    public List<String> getIDs(){
+        return this.idRecord;
+    }
 }

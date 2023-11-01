@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.example.objects.Author;
 import com.example.objects.Book;
@@ -169,6 +171,28 @@ public class DatabaseManager {
             System.out.println(exception.getMessage());
         }
         return null;
+    }
+
+    public List<Author> getAuthors(){
+        List<Author> authors = new ArrayList<>();
+        for(String ID : authorsIdGenerator.getIDs()){
+            Author author = getAuthor(ID, true);
+            if(author != null){
+                authors.add(author);
+            }
+        }
+        return authors;
+    }
+
+    public List<Book> getBooks(){
+        List<Book> books = new ArrayList<>();
+        for(String ID : booksIdGenerator.getIDs()){
+            Book book = getBook(ID);
+            if(book != null){
+                books.add(book);
+            }
+        }
+        return books;
     }
 
     public Book getBook(String ID) {
