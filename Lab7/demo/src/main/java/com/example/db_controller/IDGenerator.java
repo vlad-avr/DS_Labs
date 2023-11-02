@@ -34,7 +34,7 @@ public class IDGenerator {
     }
 
     public String generateId(){
-        int Id = 0;
+        int Id = 1;
         if(idRecord.size() > 0){
             if(Id < getValue(idRecord.get(0))){
                 addId(idFormat + Id);
@@ -43,7 +43,7 @@ public class IDGenerator {
             for(int i = 1; i < idRecord.size(); i++){
                 if(getValue(idRecord.get(i)) - getValue(idRecord.get(i-1)) > 1){
                     addId(i, idFormat + getValue(idRecord.get(i-1)) + 1);
-                    return idFormat + getValue(idRecord.get(i-1)) + 1;
+                    return idFormat + (getValue(idRecord.get(i-1)) + 1);
                 }else{
                     Id = getValue(idRecord.get(i));
                 }

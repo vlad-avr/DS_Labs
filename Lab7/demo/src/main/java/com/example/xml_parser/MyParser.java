@@ -129,7 +129,7 @@ public class MyParser {
             };
 
             validator.setErrorHandler(errorHandler);
-            validator.validate(new StreamSource(new File(doc.getDocumentURI())));
+            validator.validate(new StreamSource(new File(xmlPath)));
             return true;
         } catch (SAXException | IOException e) {
             System.out.println(e.getMessage());
@@ -176,19 +176,23 @@ public class MyParser {
             authorElem.setAttribute("lastname", author.getLastName());
             List<Book> books = author.getBooks();
             for (Book book : books) {
-                updateBook(book, doc);
+                updateBook(book, doc, false);
             }
+            writeXML(doc);
             return;
         }
         System.out.println("\nAuthor not found");
     }
 
-    public void updateBook(Book book, Document doc) {
+    public void updateBook(Book book, Document doc, boolean andWrite) {
         Element bookElem = getBookById(book.getId(), doc);
         if (bookElem != null) {
             bookElem.getElementsByTagName("name").item(0).setTextContent(book.getName());
             bookElem.getElementsByTagName("price").item(0).setTextContent(String.valueOf(book.getPrice()));
             bookElem.getElementsByTagName("genre").item(0).setTextContent(book.getGenre());
+            if(andWrite){
+                writeXML(doc);
+            }
             return;
         }
         System.out.println("\nBook " + book.getId() + " Not Found");
