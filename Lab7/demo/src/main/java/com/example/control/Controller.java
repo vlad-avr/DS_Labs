@@ -5,7 +5,6 @@ import java.util.List;
 import com.example.db_controller.DatabaseManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
-import com.example.objects.Book.Genre;
 import com.example.xml_parser.MyParser;
 
 public class Controller {
@@ -159,6 +158,60 @@ public class Controller {
         }
         book = new Book(dbManager.getBooksGenerator().generateId(), "Good Book", 10.0, Book.Genre.drama, "A-2");
         parser.addBook(book, parser.getXml());
+        System.out.println("\n After: \n");
+        authors = parser.getAuthors(parser.getXml());
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        //DELETERS
+        System.out.println("\n TESTING DELETERS : \n");
+        System.out.println("\n FROM DB:\n");
+        System.out.println("\n Deleting Author : \n");
+        System.out.println("\n Before: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        dbManager.deleteAuthor("A-1");
+        System.out.println("\n After: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+
+        System.out.println("\n Deleting Book : \n");
+        System.out.println("\n Before: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        dbManager.deleteBook("B-9");
+        System.out.println("\n After: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+
+        System.out.println("\n FROM XML:\n");
+        System.out.println("\n Deleting Author : \n");
+        System.out.println("\n Before: \n");
+        authors = parser.getAuthors(parser.getXml());
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        parser.deleteAuthor("A-1", parser.getXml());
+        System.out.println("\n After: \n");
+        authors = parser.getAuthors(parser.getXml());
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        System.out.println("\n Deleting Book : \n");
+        System.out.println("\n Before: \n");
+        authors = parser.getAuthors(parser.getXml());
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        parser.deleteBook("A-2", parser.getXml());
         System.out.println("\n After: \n");
         authors = parser.getAuthors(parser.getXml());
         for (Author a : authors) {

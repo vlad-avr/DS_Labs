@@ -49,13 +49,11 @@ public class IDGenerator {
         if(idRecord.size() > 0){
             if(Id < getValue(idRecord.get(0))){
                 addId(idFormat + Id);
-                System.out.println(idRecord);
                 return idFormat + Id;
             }
             for(int i = 1; i < idRecord.size(); i++){
                 if(getValue(idRecord.get(i)) - getValue(idRecord.get(i-1)) > 1){
                     addId(idFormat + (getValue(idRecord.get(i-1)) + 1));
-                    System.out.println(idRecord);
                     return idFormat + (getValue(idRecord.get(i-1)) + 1);
                 }else{
                     Id = getValue(idRecord.get(i));
@@ -64,7 +62,6 @@ public class IDGenerator {
         }
         Id++;
         addId(idFormat + Id);
-        System.out.println(idRecord);
         return idFormat + Id;
     }
 
