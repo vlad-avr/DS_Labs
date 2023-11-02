@@ -19,8 +19,18 @@ public class Controller {
         parser.parseSAX();
         // GENERAL
         System.out.println("\n ENTRY DATA : \n");
+        System.out.println("\n DB : \n");
         List<Author> authors = dbManager.getAuthors();
         List<Book> books = dbManager.getBooks();
+        for (Author author : authors) {
+            System.out.println(author.toString());
+        }
+        for (Book book : books) {
+            System.out.println(book.toString());
+        }
+        System.out.println("\n XML : \n");
+        authors = parser.getAuthors(parser.getXml());
+        books = parser.getBooks(parser.getXml());
         for (Author author : authors) {
             System.out.println(author.toString());
         }
@@ -135,22 +145,22 @@ public class Controller {
         author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "BOOOOK", 22.8, Book.Genre.horror, author.getId()));
         author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "GO lang", 200.8, Book.Genre.adventure, author.getId()));
         author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "My Fight", 144.8, Book.Genre.biography, author.getId()));
-        dbManager.addAuthor(author);
+        parser.addAuthor(author, parser.getXml());
         System.out.println("\n After: \n");
-        authors = dbManager.getAuthors();
+        authors = parser.getAuthors(parser.getXml());
         for (Author a : authors) {
             System.out.println(a.toString());
         }
         System.out.println("\n Adding Book : \n");
         System.out.println("\n Before: \n");
-        authors = dbManager.getAuthors();
+        authors = parser.getAuthors(parser.getXml());
         for (Author a : authors) {
             System.out.println(a.toString());
         }
         book = new Book(dbManager.getBooksGenerator().generateId(), "Good Book", 10.0, Book.Genre.drama, "A-2");
-        dbManager.addBook(book);
+        parser.addBook(book, parser.getXml());
         System.out.println("\n After: \n");
-        authors = dbManager.getAuthors();
+        authors = parser.getAuthors(parser.getXml());
         for (Author a : authors) {
             System.out.println(a.toString());
         }

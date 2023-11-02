@@ -19,14 +19,25 @@ public class IDGenerator {
         Collections.sort(idRecord, new Comparator<String>() {
             @Override
             public int compare(String id1, String id2) {
-                return id1.compareTo(id2);
+                if(id1.length() < id2.length()){
+                    return -1;
+                }else if(id1.length() > id2.length()){
+                    return 1;
+                }else{
+                    if(getValue(id1) < getValue(id2)){
+                        return -1;
+                    }else if(getValue(id1) > getValue(id2)){
+                        return 1;
+                    }
+                }
+                return 0;
             }
         });
     }
 
     private int getValue(String ID){
         try{
-            return Integer.parseInt(ID.substring(ID.lastIndexOf('-'), ID.length()));
+            return Integer.parseInt(ID.substring(ID.lastIndexOf('-')+1, ID.length()));
         }catch(NumberFormatException e){
             System.out.println(e.getMessage());
             return 0;
@@ -38,11 +49,13 @@ public class IDGenerator {
         if(idRecord.size() > 0){
             if(Id < getValue(idRecord.get(0))){
                 addId(idFormat + Id);
+                System.out.println(idRecord);
                 return idFormat + Id;
             }
             for(int i = 1; i < idRecord.size(); i++){
                 if(getValue(idRecord.get(i)) - getValue(idRecord.get(i-1)) > 1){
-                    addId(i, idFormat + getValue(idRecord.get(i-1)) + 1);
+                    addId(idFormat + (getValue(idRecord.get(i-1)) + 1));
+                    System.out.println(idRecord);
                     return idFormat + (getValue(idRecord.get(i-1)) + 1);
                 }else{
                     Id = getValue(idRecord.get(i));
@@ -51,19 +64,17 @@ public class IDGenerator {
         }
         Id++;
         addId(idFormat + Id);
+        System.out.println(idRecord);
         return idFormat + Id;
     }
 
-    public void addId(int index, String Id){
+    public void addId(String Id){
         if (!idRecord.contains(Id)) {
-            idRecord.add(index, Id);
+            idRecord.add(Id);
+            sort();
         } else {
             System.out.println("\nThis ID already exists!");
         }
-    }
-
-    public void addId(String Id) {
-        addId(idRecord.size(), Id);
     }
 
     public void removeId(String Id) {
