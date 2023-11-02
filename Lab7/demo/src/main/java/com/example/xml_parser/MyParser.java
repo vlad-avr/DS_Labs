@@ -191,32 +191,21 @@ public class MyParser {
 
     public void deleteAuthor(String ID, Document doc) {
         Element root = doc.getDocumentElement();
-        NodeList authorList = root.getElementsByTagName("author");
-        for(int i = 0; i < authorList.getLength(); i++){
-            Element author = (Element)authorList.item(i);
-            if(author.getAttribute("id").equals(ID)){
-                root.removeChild(author);
-                writeXML(doc);
-                return;
-            }
+        Element author = doc.getElementById(ID);
+        if(author != null){
+            root.removeChild(author);
+            writeXML(doc);
+            return;
         }
         System.out.println("\nAuthor " + ID + " Not Found");
     }
 
     public void deleteBook(String ID, Document doc) {
-        Element root = doc.getDocumentElement();
-        NodeList authorList = root.getElementsByTagName("author");
-        for(int i = 0; i < authorList.getLength(); i++){
-            Element author = (Element)authorList.item(i);
-            NodeList bookList = author.getElementsByTagName("book");
-            for(int j = 0; j < bookList.getLength(); j++){
-                Element book = (Element)bookList.item(j);
-                if(book.getAttribute("id").equals(ID)){
-                    author.removeChild(book);
-                    writeXML(doc);
-                    return;
-                }
-            }
+        Element book = doc.getElementById(ID);
+        if(book != null){
+            Element author = (Element) book.getParentNode();
+            author.removeChild(book);
+            writeXML(doc);
         }
         System.out.println("\nBook " + ID + " Not Found");
     }
