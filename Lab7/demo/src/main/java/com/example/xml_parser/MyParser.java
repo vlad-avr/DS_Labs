@@ -1,8 +1,6 @@
 package com.example.xml_parser;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -11,11 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -26,7 +20,6 @@ import javax.xml.validation.Validator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -69,33 +62,33 @@ public class MyParser {
         return null;
     }
 
-    private void setDataInAuthor(Author author, Element authorElem){
-        authorElem.setAttribute("id", author.getId());
-        authorElem.setAttribute("firstname", author.getFirstName());
-        authorElem.setAttribute("lastname", author.getLastName());
+    // private void setDataInAuthor(Author author, Element authorElem){
+    //     authorElem.setAttribute("id", author.getId());
+    //     authorElem.setAttribute("firstname", author.getFirstName());
+    //     authorElem.setAttribute("lastname", author.getLastName());
         
-    }
+    // }
 
-    private void setDataInBook(Book book, Element bookElem){
-        bookElem.setAttribute("id", book.getId());
-        NodeList nodes = bookElem.getChildNodes();
-        for(int i = 0; i < nodes.getLength(); i++){
-            Element elem = (Element)nodes.item(i);
-            switch (elem.getTagName()) {
-                case "name":
-                    elem.setTextContent(book.getName());    
-                    break;
-                case "price":
-                    elem.setTextContent(String.valueOf(book.getPrice()));    
-                    break;
-                case "genre":
-                    elem.setTextContent(book.getGenre());    
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
+    // private void setDataInBook(Book book, Element bookElem){
+    //     bookElem.setAttribute("id", book.getId());
+    //     NodeList nodes = bookElem.getChildNodes();
+    //     for(int i = 0; i < nodes.getLength(); i++){
+    //         Element elem = (Element)nodes.item(i);
+    //         switch (elem.getTagName()) {
+    //             case "name":
+    //                 elem.setTextContent(book.getName());    
+    //                 break;
+    //             case "price":
+    //                 elem.setTextContent(String.valueOf(book.getPrice()));    
+    //                 break;
+    //             case "genre":
+    //                 elem.setTextContent(book.getGenre());    
+    //                 break;
+    //             default:
+    //                 break;
+    //         }
+    //     }
+    // }
 
     private Element convertAuthor(Author author, Document doc) {
         Element newAuthor = doc.createElement("author");
@@ -178,15 +171,27 @@ public class MyParser {
 
     public void updateAuthor(Author author, Document doc) {
         Element authorElem = doc.getElementById(author.getId());
-        if(authorElem == null){
-            System.out.println("\nAuthor not found");
+        if(authorElem != null){
+            authorElem.setAttribute("firstname", author.getFirstName());
+            authorElem.setAttribute("lastname", author.getLastName());
+            List<Book> books = author.getBooks();
+            for(Book book : books){
+                updateBook(book, doc);
+            }
             return;
         }
-        authorElem.setAttribute(xsdPath, xmlPath);
+        System.out.println("\nAuthor not found");       
     }
 
-    public void updateBook() {
-
+    public void updateBook(Book book, Document doc) {
+        Element bookElem = doc.getElementById(book.getId());
+        if(bookElem != null){
+            bookElem.getElementsByTagName("name").item(0).setTextContent(book.getName());
+            bookElem.getElementsByTagName("price").item(0).setTextContent(String.valueOf(book.getPrice()));
+            bookElem.getElementsByTagName("genre").item(0).setTextContent(book.getGenre());
+            return;
+        }
+        System.out.println("\nBook " + book.getId() + " Not Found");
     }
 
     public void deleteAuthor(String ID, Document doc) {
@@ -206,6 +211,7 @@ public class MyParser {
             Element author = (Element) book.getParentNode();
             author.removeChild(book);
             writeXML(doc);
+            return;
         }
         System.out.println("\nBook " + ID + " Not Found");
     }
