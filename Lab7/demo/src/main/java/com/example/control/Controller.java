@@ -48,20 +48,12 @@ public class Controller {
         System.out.println(book.toString());
         // UPDATERS
         System.out.println("\n TESTING UPDATERS : \n");
-        System.out.println("\n TESTING GETTERS : \n");
         System.out.println("\n FROM DB:\n");
         System.out.println("\n Updating Author : \n");
         System.out.println("\n Before : \n");
         author = dbManager.getAuthor("A-2", true);
         System.out.println(author.toString());
         author.setFirstName("Govi");
-        // Book newBook = new Book(dbManager.getBooksGenerator().generateId());
-        // newBook.setAuthor("A-2");
-        // newBook.setGenre(Genre.drama);
-        // newBook.setName("Cthulu and Dagon");
-        // newBook.setPrice(69.69);
-        // author.addBook(newBook);
-        // author.removeBook(author.getBooks().get(0).getId());
         dbManager.updateAuthor(author);
         author = dbManager.getAuthor("A-2", true);
         System.out.println("\n After : \n");
@@ -83,13 +75,6 @@ public class Controller {
         author = parser.getAuthor("A-2", parser.getXml());
         System.out.println(author.toString());
         author.setFirstName("Govi");
-        // newBook = new Book(dbManager.getBooksGenerator().generateId());
-        // newBook.setAuthor("A-2");
-        // newBook.setGenre(Genre.drama);
-        // newBook.setName("Cthulu and Dagon");
-        // newBook.setPrice(69.69);
-        // author.addBook(newBook);
-        // author.removeBook(author.getBooks().get(0).getId());
         parser.updateAuthor(author, parser.getXml());
         author = parser.getAuthor("A-2", parser.getXml());
         System.out.println("\n After : \n");
@@ -105,6 +90,70 @@ public class Controller {
         System.out.println("\n After : \n");
         System.out.println(book.toString());
 
+        //ADDERS
+        System.out.println("\n TESTING ADDERS : \n");
+        System.out.println("\n FROM DB:\n");
+        System.out.println("\n Adding Author : \n");
+        System.out.println("\n Before: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        author = new Author("Smith", "Bob", dbManager.getAuthorsGenerator().generateId());
+        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "BOOOOK", 22.8, Book.Genre.horror, author.getId()));
+        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "GO lang", 200.8, Book.Genre.adventure, author.getId()));
+        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "My Fight", 144.8, Book.Genre.biography, author.getId()));
+        dbManager.addAuthor(author);
+        System.out.println("\n After: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+
+        System.out.println("\n Adding Book : \n");
+        System.out.println("\n Before: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        book = new Book(dbManager.getBooksGenerator().generateId(), "Good Book", 10.0, Book.Genre.drama, "A-2");
+        dbManager.addBook(book);
+        System.out.println("\n After: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+
+        System.out.println("\n FROM XML:\n");
+        System.out.println("\n Adding Author : \n");
+        System.out.println("\n Before: \n");
+        authors = parser.getAuthors(parser.getXml());
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        author = new Author("Smith", "Bob", dbManager.getAuthorsGenerator().generateId());
+        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "BOOOOK", 22.8, Book.Genre.horror, author.getId()));
+        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "GO lang", 200.8, Book.Genre.adventure, author.getId()));
+        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "My Fight", 144.8, Book.Genre.biography, author.getId()));
+        dbManager.addAuthor(author);
+        System.out.println("\n After: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        System.out.println("\n Adding Book : \n");
+        System.out.println("\n Before: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
+        book = new Book(dbManager.getBooksGenerator().generateId(), "Good Book", 10.0, Book.Genre.drama, "A-2");
+        dbManager.addBook(book);
+        System.out.println("\n After: \n");
+        authors = dbManager.getAuthors();
+        for (Author a : authors) {
+            System.out.println(a.toString());
+        }
 
 
         dbManager.destroyDB();

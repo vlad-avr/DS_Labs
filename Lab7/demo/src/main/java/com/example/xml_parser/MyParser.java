@@ -2,6 +2,7 @@ package com.example.xml_parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -53,22 +54,22 @@ public class MyParser {
         }
     }
 
-    private Element getAuthorById(String ID, Document doc){
+    private Element getAuthorById(String ID, Document doc) {
         NodeList authors = doc.getElementsByTagName("author");
-        for(int i = 0; i < authors.getLength(); i++){
-            Element author = (Element)authors.item(i);
-            if(author.getAttribute("id").equals(ID)){
+        for (int i = 0; i < authors.getLength(); i++) {
+            Element author = (Element) authors.item(i);
+            if (author.getAttribute("id").equals(ID)) {
                 return author;
             }
         }
         return null;
     }
 
-    private Element getBookById(String ID, Document doc){
+    private Element getBookById(String ID, Document doc) {
         NodeList books = doc.getElementsByTagName("book");
-        for(int i = 0; i < books.getLength(); i++){
-            Element book = (Element)books.item(i);
-            if(book.getAttribute("id").equals(ID)){
+        for (int i = 0; i < books.getLength(); i++) {
+            Element book = (Element) books.item(i);
+            if (book.getAttribute("id").equals(ID)) {
                 return book;
             }
         }
@@ -190,12 +191,48 @@ public class MyParser {
             bookElem.getElementsByTagName("name").item(0).setTextContent(book.getName());
             bookElem.getElementsByTagName("price").item(0).setTextContent(String.valueOf(book.getPrice()));
             bookElem.getElementsByTagName("genre").item(0).setTextContent(book.getGenre());
-            if(andWrite){
+            if (andWrite) {
                 writeXML(doc);
             }
             return;
         }
         System.out.println("\nBook " + book.getId() + " Not Found");
+    }
+
+    public List<Author> getAuthors(Document doc) {
+        List<Author> res = new ArrayList<>();
+        NodeList authors = doc.getElementsByTagName("author");
+        for (int i = 0; i < authors.getLength(); i++) {
+            Author authorObj = new Author(((Element) authors.item(i)).getAttribute("firstname"),
+                    ((Element) authors.item(i)).getAttribute("lastname"),
+                    ((Element) authors.item(i)).getAttribute("id"));
+            NodeList booksList = ((Element) authors.item(i)).getElementsByTagName("book");
+            for (int j = 0; j < booksList.getLength(); j++) {
+                Element book = (Element) booksList.item(j);
+                authorObj.addBook(
+                        new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
+                                Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                                Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                                authorObj.getId()));
+            }
+            res.add(authorObj);
+        }
+        return res;
+    }
+
+    public List<Book> getBooks(Document doc) {
+        List<Book> res = new ArrayList<>();
+        NodeList booksList = doc.getElementsByTagName("book");
+        for (int j = 0; j < booksList.getLength(); j++) {
+            Element book = (Element) booksList.item(j);
+            Element parent = (Element)book.getParentNode();
+            res.add(
+                    new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
+                            Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                            Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                            parent.getAttribute("id")));
+        }
+        return res;
     }
 
     public Author getAuthor(String ID, Document doc) {
