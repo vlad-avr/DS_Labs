@@ -26,6 +26,7 @@ import javax.xml.validation.Validator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -66,6 +67,34 @@ public class MyParser {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    private void setDataInAuthor(Author author, Element authorElem){
+        authorElem.setAttribute("id", author.getId());
+        authorElem.setAttribute("firstname", author.getFirstName());
+        authorElem.setAttribute("lastname", author.getLastName());
+        
+    }
+
+    private void setDataInBook(Book book, Element bookElem){
+        bookElem.setAttribute("id", book.getId());
+        NodeList nodes = bookElem.getChildNodes();
+        for(int i = 0; i < nodes.getLength(); i++){
+            Element elem = (Element)nodes.item(i);
+            switch (elem.getTagName()) {
+                case "name":
+                    elem.setTextContent(book.getName());    
+                    break;
+                case "price":
+                    elem.setTextContent(String.valueOf(book.getPrice()));    
+                    break;
+                case "genre":
+                    elem.setTextContent(book.getGenre());    
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private Element convertAuthor(Author author, Document doc) {
@@ -117,9 +146,6 @@ public class MyParser {
     }
 
     public void addAuthor(Author author, Document doc) {
-        if (doc == null) {
-            return;
-        }
         Element list = doc.getDocumentElement();
         list.appendChild(convertAuthor(author, doc));
         writeXML(doc);
@@ -150,20 +176,49 @@ public class MyParser {
         writeXML(doc);
     }
 
-    public void updateAuthor() {
-
+    public void updateAuthor(Author author, Document doc) {
+        Element authorElem = doc.getElementById(author.getId());
+        if(authorElem == null){
+            System.out.println("\nAuthor not found");
+            return;
+        }
+        authorElem.setAttribute(xsdPath, xmlPath);
     }
 
     public void updateBook() {
 
     }
 
-    public void deleteAuthor() {
-
+    public void deleteAuthor(String ID, Document doc) {
+        Element root = doc.getDocumentElement();
+        NodeList authorList = root.getElementsByTagName("author");
+        for(int i = 0; i < authorList.getLength(); i++){
+            Element author = (Element)authorList.item(i);
+            if(author.getAttribute("id").equals(ID)){
+                root.removeChild(author);
+                writeXML(doc);
+                return;
+            }
+        }
+        System.out.println("\nAuthor " + ID + " Not Found");
     }
 
-    public void deleteBook() {
-
+    public void deleteBook(String ID, Document doc) {
+        Element root = doc.getDocumentElement();
+        NodeList authorList = root.getElementsByTagName("author");
+        for(int i = 0; i < authorList.getLength(); i++){
+            Element author = (Element)authorList.item(i);
+            NodeList bookList = author.getElementsByTagName("book");
+            for(int j = 0; j < bookList.getLength(); j++){
+                Element book = (Element)bookList.item(j);
+                if(book.getAttribute("id").equals(ID)){
+                    author.removeChild(book);
+                    writeXML(doc);
+                    return;
+                }
+            }
+        }
+        System.out.println("\nBook " + ID + " Not Found");
     }
 
     class MyHandler extends DefaultHandler {
