@@ -56,7 +56,7 @@ public class Author {
 	}
 
     public String toString(){
-        String res = "\nID : " + this.ID + "\nName : " + this.firstName + " " + this.lastName + "\nBooks :";
+        String res = "\nID : " + this.ID + "\nName : " + this.lastName + " " + this.firstName + "\nBooks :";
         for(Book book : books){
             res += book.toString();
         }

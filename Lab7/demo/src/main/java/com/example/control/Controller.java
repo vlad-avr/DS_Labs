@@ -12,16 +12,29 @@ public class Controller {
     MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml", "D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd",dbManager);
 
     public void start(){
+        dbManager.destroyDB();
         dbManager.initDB();
         parser.parseSAX();
+        System.out.println("\n ENTRY DATA : \n");
         List<Author> authors = dbManager.getAuthors();
+        List<Book> books = dbManager.getBooks();
         for(Author author : authors){
             System.out.println(author.toString());
         }
-        List<Book> books = dbManager.getBooks();
         for(Book book : books){
             System.out.println(book.toString());
         }
+        System.out.println("\n TESTING GETTERS : \n");
+        System.out.println("\n FROM DB:\n");
+        Author author = dbManager.getAuthor("A-1", true);
+        System.out.println(author.toString());
+        Book book = dbManager.getBook("B-1");
+        System.out.println(book.toString());
+        System.out.println("\n FROM XML:\n");
+        author = parser.getAuthor("A-1", parser.getXml());
+        System.out.println(author.toString());
+        book = parser.getBook("B-1", parser.getXml());
+        System.out.println(book.toString());
         dbManager.destroyDB();
     }
 }
