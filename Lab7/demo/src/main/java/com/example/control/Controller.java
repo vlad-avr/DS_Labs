@@ -77,17 +77,42 @@ public class Controller {
                                 break;
                             case "gbp":
                                 books = getBooksByParams();
-                                if(books != null){
-                                    for(Book book : books){
+                                if (books != null) {
+                                    for (Book book : books) {
                                         System.out.println(book.toString());
                                     }
                                 }
+                            case "da":
+                                dbManager.deleteAuthor(
+                                        manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
+                                break;
+                            case "db":
+                                dbManager.deleteBook(manager.getID(dbManager.getBooksGenerator(), "Enter book id : "));
+                                break;
+                            case "ga":
+                                System.out.println(dbManager
+                                        .getAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "),
+                                                true)
+                                        .toString());
+                                break;
+                            case "gb":
+                                System.out.println(dbManager
+                                        .getBook(manager.getID(dbManager.getBooksGenerator(), "Enter author id : "))
+                                        .toString());
+                                break;
+                            case "h":
+                                helpActions();
+                                break;
+                            case "e":
+                                working = false;
+                                break;
                             default:
+                                System.out.println("Invalid command!");
                                 break;
                         }
                     }
                     break;
-                case "os":
+                case "ox":
 
                     break;
                 case "e":
@@ -147,12 +172,13 @@ public class Controller {
         return null;
     }
 
-    private List<Book> getBooksByParams(){
+    private List<Book> getBooksByParams() {
         System.out.println("\n You are in book loading menu \n");
         String input;
         while (manager.getBool("Do you want to load anything?")) {
             System.out
-                    .println("\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
+                    .println(
+                            "\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
             input = manager.getString("Enter Command");
             switch (input) {
                 case "n":
@@ -160,9 +186,11 @@ public class Controller {
                 case "g":
                     return dbManager.getBooks(manager.getGenre("Enter the genre : "));
                 case "p":
-                    return dbManager.getBooks(manager.getDouble("Enter min price : "), manager.getDouble("Enter max price : "));
+                    return dbManager.getBooks(manager.getDouble("Enter min price : "),
+                            manager.getDouble("Enter max price : "));
                 case "a":
-                    return dbManager.getBooksOfAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
+                    return dbManager
+                            .getBooksOfAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
                 default:
                     System.out.println("Invalid command!");
                     break;
