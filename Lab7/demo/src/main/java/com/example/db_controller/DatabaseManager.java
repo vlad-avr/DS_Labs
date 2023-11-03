@@ -313,7 +313,7 @@ public class DatabaseManager {
             String bookSql = "DELETE FROM books WHERE author_id = ?";
             try (PreparedStatement statement2 = con.prepareStatement(bookSql)) {
                 statement2.setString(1, ID);
-                statement2.executeQuery();
+                statement2.execute();
                 for (Book book : author.getBooks()) {
                     booksIdGenerator.removeId(book.getId());
                 }
@@ -331,7 +331,7 @@ public class DatabaseManager {
         String bookSql = "DELETE FROM books WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(bookSql)) {
             statement.setString(1, ID);
-            statement.executeQuery();
+            statement.executeUpdate();
             booksIdGenerator.removeId(ID);
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());

@@ -76,7 +76,7 @@ public class IDGenerator {
 
     public void removeId(String Id) {
         if (idRecord.contains(Id)) {
-            idRecord.add(Id);
+            idRecord.remove(Id);
         } else {
             System.out.println("\nThis ID does not exist!");
         }
