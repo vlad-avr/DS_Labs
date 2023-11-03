@@ -8,10 +8,11 @@ import com.example.objects.Author;
 import com.example.objects.Book;
 import com.example.xml_parser.MyParser;
 
+//"D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml"
+
 public class Controller {
     DatabaseManager dbManager = new DatabaseManager();
-    MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml",
-            "D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd", dbManager);
+    MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd", dbManager);
     InputManager manager = new InputManager();
 
     public void start() {

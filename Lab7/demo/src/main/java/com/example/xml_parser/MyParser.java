@@ -29,18 +29,29 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.example.db_controller.DatabaseManager;
+import com.example.db_controller.IDGenerator;
 import com.example.objects.Author;
 import com.example.objects.Book;
 
 public class MyParser {
-    private final String xmlPath;
+    private Document curDoc;
+    private String curXmlPath;
     private final String xsdPath;
+    private IDGenerator authorGenerator;
+    private IDGenerator bookGenerator;
     private DatabaseManager dbManager;
 
-    public MyParser(String path, String xsdPath, DatabaseManager dbManager) {
-        this.xmlPath = path;
+    public MyParser(String xsdPath, DatabaseManager dbManager) {
         this.xsdPath = xsdPath;
         this.dbManager = dbManager;
+    }
+
+    public IDGenerator getBookGenerator() {
+        return bookGenerator;
+    }
+
+    public IDGenerator getAuthorGenerator() {
+        return authorGenerator;
     }
 
     public void parseSAX() {
@@ -48,14 +59,14 @@ public class MyParser {
         try {
             SAXParser parser = factory.newSAXParser();
             MyHandler handler = new MyHandler();
-            parser.parse(xmlPath, handler);
+            parser.parse(curXmlPath, handler);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private Element getAuthorById(String ID, Document doc) {
-        NodeList authors = doc.getElementsByTagName("author");
+    private Element getAuthorById(String ID) {
+        NodeList authors = curDoc.getElementsByTagName("author");
         for (int i = 0; i < authors.getLength(); i++) {
             Element author = (Element) authors.item(i);
             if (author.getAttribute("id").equals(ID)) {
@@ -65,8 +76,8 @@ public class MyParser {
         return null;
     }
 
-    private Element getBookById(String ID, Document doc) {
-        NodeList books = doc.getElementsByTagName("book");
+    private Element getBookById(String ID) {
+        NodeList books = curDoc.getElementsByTagName("book");
         for (int i = 0; i < books.getLength(); i++) {
             Element book = (Element) books.item(i);
             if (book.getAttribute("id").equals(ID)) {
@@ -76,46 +87,49 @@ public class MyParser {
         return null;
     }
 
-    public Document getXml() {
+    public void getXml(String xmlPath) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlPath);
-            return doc;
+            if (validateXml(xmlPath)) {
+                curDoc = doc;
+                curXmlPath = xmlPath;
+            }
         } catch (SAXException | IOException | ParserConfigurationException e) {
             System.out.println(e.getMessage());
         }
-        return null;
+        curDoc = null;
     }
 
-    private Element convertAuthor(Author author, Document doc) {
-        Element newAuthor = doc.createElement("author");
+    private Element convertAuthor(Author author) {
+        Element newAuthor = curDoc.createElement("author");
         newAuthor.setAttribute("id", author.getId());
         newAuthor.setAttribute("firstname", author.getFirstName());
         newAuthor.setAttribute("lastname", author.getLastName());
         List<Book> books = author.getBooks();
         for (Book book : books) {
-            newAuthor.appendChild(convertBook(book, doc));
+            newAuthor.appendChild(convertBook(book));
         }
         return newAuthor;
     }
 
-    private Element convertBook(Book book, Document doc) {
-        Element newBook = doc.createElement("book");
+    private Element convertBook(Book book) {
+        Element newBook = curDoc.createElement("book");
         newBook.setAttribute("id", book.getId());
-        Element elem = doc.createElement("name");
+        Element elem = curDoc.createElement("name");
         elem.setTextContent(book.getName());
         newBook.appendChild(elem);
-        elem = doc.createElement("price");
+        elem = curDoc.createElement("price");
         elem.setTextContent(String.valueOf(book.getPrice()));
         newBook.appendChild(elem);
-        elem = doc.createElement("genre");
+        elem = curDoc.createElement("genre");
         elem.setTextContent(book.getGenre());
         newBook.appendChild(elem);
         return newBook;
     }
 
-    private boolean validateXml(Document doc) {
+    private boolean validateXml(String xmlPath) {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(xsdPath));
@@ -138,70 +152,66 @@ public class MyParser {
         }
     }
 
-    public void addAuthor(Author author, Document doc) {
-        Element list = doc.getDocumentElement();
-        list.appendChild(convertAuthor(author, doc));
-        writeXML(doc);
+    public void addAuthor(Author author) {
+        Element list = curDoc.getDocumentElement();
+        list.appendChild(convertAuthor(author));
+        writeXML();
     }
 
-    private void writeXML(Document doc) {
-        if (validateXml(doc)) {
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer;
-            try {
-                transformer = transformerFactory.newTransformer();
-                transformer.transform(new javax.xml.transform.dom.DOMSource(doc), new StreamResult(new File(xmlPath)));
-            } catch (TransformerException e) {
-                System.out.println(e.getMessage());
-            }
-        } else {
-            System.out.println(
-                    "\nXSD error: current state of XML file can not be validated by relative XSD, thus can not be updated");
+    private void writeXML() {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer;
+        try {
+            transformer = transformerFactory.newTransformer();
+            transformer.transform(new javax.xml.transform.dom.DOMSource(curDoc),
+                    new StreamResult(new File(curXmlPath)));
+        } catch (TransformerException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    public void addBook(Book book, Document doc) {
-        Element author = getAuthorById(book.getAuthor(), doc);
+    public void addBook(Book book) {
+        Element author = getAuthorById(book.getAuthor());
         if (author == null) {
             System.out.println("\nAuthor not found in XNL!");
             return;
         }
-        author.appendChild(convertBook(book, doc));
-        writeXML(doc);
+        author.appendChild(convertBook(book));
+        writeXML();
     }
 
-    public void updateAuthor(Author author, Document doc) {
-        Element authorElem = getAuthorById(author.getId(), doc);
+    public void updateAuthor(Author author) {
+        Element authorElem = getAuthorById(author.getId());
         if (authorElem != null) {
             authorElem.setAttribute("firstname", author.getFirstName());
             authorElem.setAttribute("lastname", author.getLastName());
             List<Book> books = author.getBooks();
             for (Book book : books) {
-                updateBook(book, doc, false);
+                updateBook(book, false);
             }
-            writeXML(doc);
+            writeXML();
             return;
         }
         System.out.println("\nAuthor not found");
     }
 
-    public void updateBook(Book book, Document doc, boolean andWrite) {
-        Element bookElem = getBookById(book.getId(), doc);
+    public void updateBook(Book book, boolean andWrite) {
+        Element bookElem = getBookById(book.getId());
         if (bookElem != null) {
             bookElem.getElementsByTagName("name").item(0).setTextContent(book.getName());
             bookElem.getElementsByTagName("price").item(0).setTextContent(String.valueOf(book.getPrice()));
             bookElem.getElementsByTagName("genre").item(0).setTextContent(book.getGenre());
             if (andWrite) {
-                writeXML(doc);
+                writeXML();
             }
             return;
         }
         System.out.println("\nBook " + book.getId() + " Not Found");
     }
 
-    public List<Author> getAuthors(Document doc) {
+    public List<Author> getAuthors() {
         List<Author> res = new ArrayList<>();
-        NodeList authors = doc.getElementsByTagName("author");
+        NodeList authors = curDoc.getElementsByTagName("author");
         for (int i = 0; i < authors.getLength(); i++) {
             Author authorObj = new Author(((Element) authors.item(i)).getAttribute("firstname"),
                     ((Element) authors.item(i)).getAttribute("lastname"),
@@ -220,12 +230,12 @@ public class MyParser {
         return res;
     }
 
-    public List<Book> getBooks(Document doc) {
+    public List<Book> getBooks() {
         List<Book> res = new ArrayList<>();
-        NodeList booksList = doc.getElementsByTagName("book");
+        NodeList booksList = curDoc.getElementsByTagName("book");
         for (int j = 0; j < booksList.getLength(); j++) {
             Element book = (Element) booksList.item(j);
-            Element parent = (Element)book.getParentNode();
+            Element parent = (Element) book.getParentNode();
             res.add(
                     new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
                             Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
@@ -235,8 +245,8 @@ public class MyParser {
         return res;
     }
 
-    public Author getAuthor(String ID, Document doc) {
-        Element author = getAuthorById(ID, doc);
+    public Author getAuthor(String ID) {
+        Element author = getAuthorById(ID);
         if (author != null) {
             Author authorObj = new Author(author.getAttribute("firstname"),
                     author.getAttribute("lastname"), ID);
@@ -255,8 +265,8 @@ public class MyParser {
         return null;
     }
 
-    public Book getBook(String ID, Document doc) {
-        Element book = getBookById(ID, doc);
+    public Book getBook(String ID) {
+        Element book = getBookById(ID);
         if (book != null) {
             Element parent = (Element) book.getParentNode();
             Book bookObj = new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
@@ -269,23 +279,23 @@ public class MyParser {
         return null;
     }
 
-    public void deleteAuthor(String ID, Document doc) {
-        Element root = doc.getDocumentElement();
-        Element author = getAuthorById(ID, doc);
+    public void deleteAuthor(String ID) {
+        Element root = curDoc.getDocumentElement();
+        Element author = getAuthorById(ID);
         if (author != null) {
             root.removeChild(author);
-            writeXML(doc);
+            writeXML();
             return;
         }
         System.out.println("\nAuthor " + ID + " Not Found");
     }
 
-    public void deleteBook(String ID, Document doc) {
-        Element book = getBookById(ID, doc);
+    public void deleteBook(String ID) {
+        Element book = getBookById(ID);
         if (book != null) {
             Element author = (Element) book.getParentNode();
             author.removeChild(book);
-            writeXML(doc);
+            writeXML();
             return;
         }
         System.out.println("\nBook " + ID + " Not Found");
