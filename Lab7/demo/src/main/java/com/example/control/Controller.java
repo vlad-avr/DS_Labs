@@ -61,6 +61,7 @@ public class Controller {
                                 break;
                             case "ub":
                                 dbManager.updateBook(updateBook(dbManager.getBook(manager.getID(dbManager.getBooksGenerator(), "Enter book ID : ")), dbManager.getAuthorsGenerator()));
+                                break;
                             default:
                                 break;
                         }

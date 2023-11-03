@@ -26,9 +26,9 @@ public class DatabaseManager {
     }
 
     public void initDB() {
-        create_database();
-        create_authors_table();
-        create_books_table();
+        createDatabase();
+        createAuthorsTable();
+        createBooksTable();
     }
 
     public void destroyDB() {
@@ -56,7 +56,7 @@ public class DatabaseManager {
         return con;
     }
 
-    private void create_database() {
+    private void createDatabase() {
         try (Connection conn = DriverManager.getConnection(db_url)) {
             if (conn == null) {
                 System.out.println("\n UNABLE TO ESTABLISH CONNECTION!\n");
@@ -67,7 +67,7 @@ public class DatabaseManager {
         }
     }
 
-    private void create_books_table() {
+    private void createBooksTable() {
         String sql = "CREATE TABLE IF NOT EXISTS books (\n"
                 + "     id text PRIMARY KEY, \n"
                 + "     name text NOT NULL, \n"
@@ -83,7 +83,7 @@ public class DatabaseManager {
         }
     }
 
-    private void create_authors_table() {
+    private void createAuthorsTable() {
         String sql = "CREATE TABLE IF NOT EXISTS authors (\n"
                 + "     id text PRIMARY KEY, \n"
                 + "     firstname text NOT NULL, \n"
