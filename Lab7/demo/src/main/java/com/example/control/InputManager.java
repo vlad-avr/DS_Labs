@@ -84,7 +84,10 @@ public class InputManager {
     }
 
     public Book.Genre getGenre(String prompt) {
-        System.out.println("Available genres : " + Book.Genre.values());
+        System.out.println("Available genres : ");
+        for(Book.Genre genre : Book.Genre.values()){
+            System.out.println(genre.toString());
+        }
         System.out.println(prompt);
         while (true) {
             try {

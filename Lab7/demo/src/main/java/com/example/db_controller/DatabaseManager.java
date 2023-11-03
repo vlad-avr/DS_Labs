@@ -104,7 +104,11 @@ public class DatabaseManager {
             statement.setString(2, author.getFirstName());
             statement.setString(3, author.getLastName());
             statement.executeUpdate();
-            authorsIdGenerator.addId(author.getId());
+            List<Book> books = author.getBooks();
+            for (Book book : books) {
+                addBook(book);
+            }
+            // authorsIdGenerator.addId(author.getId());
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -119,7 +123,7 @@ public class DatabaseManager {
             statement.setString(4, book.getGenre());
             statement.setString(5, book.getAuthor());
             statement.executeUpdate();
-            booksIdGenerator.addId(book.getId());
+            // booksIdGenerator.addId(book.getId());
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -214,7 +218,8 @@ public class DatabaseManager {
         List<Author> authors = new ArrayList<>();
         for (String ID : authorsIdGenerator.getIDs()) {
             Author author = getAuthor(ID, true);
-            if (author != null && (author.getFirstName().contains(toContain) || author.getLastName().contains(toContain))) {
+            if (author != null
+                    && (author.getFirstName().contains(toContain) || author.getLastName().contains(toContain))) {
                 authors.add(author);
             }
         }
@@ -243,7 +248,7 @@ public class DatabaseManager {
         return books;
     }
 
-    public List<Book> getBooks(String toContain){
+    public List<Book> getBooks(String toContain) {
         List<Book> books = new ArrayList<>();
         for (String ID : booksIdGenerator.getIDs()) {
             Book book = getBook(ID);
@@ -254,7 +259,7 @@ public class DatabaseManager {
         return books;
     }
 
-    public List<Book> getBooks(Book.Genre genre){
+    public List<Book> getBooks(Book.Genre genre) {
         List<Book> books = new ArrayList<>();
         for (String ID : booksIdGenerator.getIDs()) {
             Book book = getBook(ID);

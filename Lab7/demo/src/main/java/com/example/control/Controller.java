@@ -51,7 +51,7 @@ public class Controller {
                                 }
                                 break;
                             case "aa":
-                                dbManager.addAuthor(createAuthor(dbManager.getAuthorsGenerator()));
+                                dbManager.addAuthor(createAuthor(dbManager.getAuthorsGenerator(), dbManager.getBooksGenerator()));
                                 break;
                             case "ab":
                                 dbManager.addBook(
@@ -82,6 +82,7 @@ public class Controller {
                                         System.out.println(book.toString());
                                     }
                                 }
+                                break;
                             case "da":
                                 dbManager.deleteAuthor(
                                         manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
@@ -104,6 +105,7 @@ public class Controller {
                                 helpActions();
                                 break;
                             case "e":
+                                System.out.println("\nYou stopped working with DB\n");
                                 working = false;
                                 break;
                             default:
@@ -199,14 +201,14 @@ public class Controller {
         return null;
     }
 
-    private Author createAuthor(IDGenerator idGenerator) {
+    private Author createAuthor(IDGenerator idGenerator, IDGenerator bookGenerator) {
         System.out.println("\n You are in author creation menu\n");
         Author author = new Author(idGenerator.generateId());
         System.out.println("\n New author`s ID is " + author.getId());
         author.setFirstName(manager.getString("Enter firstname : "));
         author.setLastName(manager.getString("Enter last name : "));
         while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
-            author.addBook(createBook(idGenerator, author.getId()));
+            author.addBook(createBook(bookGenerator, author.getId()));
         }
         return author;
     }
