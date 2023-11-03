@@ -36,9 +36,13 @@ public class Controller {
                         input = manager.getString("Enter command : ");
                         switch (input) {
                             case "aa":
-                                
+                                dbManager.addAuthor(createAuthor(dbManager.getAuthorsGenerator()));
                                 break;
-                        
+                            case "ab":
+                                dbManager.addBook(createBook(dbManager.getBooksGenerator(), dbManager.getAuthorsGenerator()));
+                                break;
+                            case "ua":
+                                
                             default:
                                 break;
                         }
@@ -84,14 +88,35 @@ public class Controller {
     }
 
     private Author createAuthor(IDGenerator idGenerator){
+        System.out.println("\n You are in author creation menu\n");
         Author author = new Author(idGenerator.generateId());
-
+        System.out.println("\n New author`s ID is " + author.getId());
+        author.setFirstName(manager.getString("Enter firstname : "));
+        author.setLastName(manager.getString("Enter last name : "));
+        while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
+            author.addBook(createBook(idGenerator, author.getId()));
+        }
         return author;
     }
 
-    private Book createBook(IDGenerator idGenerator){
-        Book book = new Book(idGenerator.generateId());
+    private Book createBook(IDGenerator idGenerator, IDGenerator authorGenerator){
+        return createBook(idGenerator, manager.geID(authorGenerator, "Enter author ID : "));
+    }
 
+    private Book createBook(IDGenerator idGenerator, String authorID){
+        System.out.println("\n You are in book creation menu\n");
+        Book book = new Book(idGenerator.generateId());
+        book.setAuthor(authorID);
+        System.out.println("\n New author`s ID is " + book.getId() + " and its author is " + book.getAuthor());
+        book.setName(manager.getString("Enter name : "));
+        book.setPrice(manager.getDouble("Enter price : "));
+        book.setGenre(manager.getGenre("Enter genre : "));
         return book;
+    }
+
+    private Author updateAuthor(Author author){
+        System.out.println("\n You are in author modification menu\n");
+        
+        return author;
     }
 }

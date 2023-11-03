@@ -2,6 +2,7 @@ package com.example.control;
 
 import java.util.Scanner;
 
+import com.example.db_controller.IDGenerator;
 import com.example.objects.Book;
 
 public class InputManager {
@@ -18,6 +19,34 @@ public class InputManager {
     public String getString(String prompt) {
         System.out.println(prompt);
         return getLine();
+    }
+
+    public boolean getBool(String prompt) {
+        System.out.println(prompt);
+        while (true) {
+            String input = getLine();
+            if (input.equals("+")) {
+                return true;
+            } else if (input.equals("-")) {
+                return false;
+            } else {
+                System.out.println("Invalid input: enter '+' for yes or '-' for no!");
+            }
+        }
+    }
+
+    public String geID(IDGenerator idGenerator, String prompt){
+        System.out.println(prompt);
+        System.out.println("Available IDs : \n");
+        System.out.println(idGenerator.getIDs());
+        while (true) {
+            String id = getLine();
+            if(idGenerator.exists(id)){
+                return id;
+            }else{
+                System.out.println(id + " does not exist!");
+            }            
+        }
     }
 
     public double getDouble(String prompt) {
@@ -37,14 +66,14 @@ public class InputManager {
         }
     }
 
-    public Book.Genre getGenre(String prompt){
+    public Book.Genre getGenre(String prompt) {
         System.out.println(prompt);
         while (true) {
-            try{
+            try {
                 String input = getLine();
                 Book.Genre genre = Book.Genre.valueOf(input);
                 return genre;
-            }catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
