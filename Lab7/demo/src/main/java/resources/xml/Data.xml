@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Schema.xsd">
-    <author firstname="Halo" id="A-1" lastname="John">
+<?xml version="1.0" encoding="UTF-8"?>
+<list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="Schema.xsd">
+    <author firstname="Halo" lastname="John" id="A-1">
         <book id="B-1">
             <name>Covenant F*cker</name>
-            <price>1000.1</price>
+            <price>117</price>
             <genre>comedy</genre>
         </book>
         <book id="B-4">
@@ -21,7 +23,7 @@
             <genre>drama</genre>
         </book>
     </author>
-    <author firstname="Govi" id="A-2" lastname="Govard">
+    <author firstname="Lovecraft" lastname="Govard" id="A-2">
         <book id="B-2">
             <name>My Cat Niggerman</name>
             <price>14.88</price>
@@ -33,7 +35,7 @@
             <genre>comedy</genre>
         </book>
     </author>
-    <author firstname="Matvienko" id="A-3" lastname="Volodymyr">
+    <author firstname="Matvienko" lastname="Volodymyr" id="A-3">
         <book id="B-3">
             <name>The Art of Being Old</name>
             <price>27.15</price>

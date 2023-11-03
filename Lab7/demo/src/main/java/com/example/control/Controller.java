@@ -3,6 +3,7 @@ package com.example.control;
 import java.util.List;
 
 import com.example.db_controller.DatabaseManager;
+import com.example.db_controller.IDGenerator;
 import com.example.objects.Author;
 import com.example.objects.Book;
 import com.example.xml_parser.MyParser;
@@ -11,214 +12,82 @@ public class Controller {
     DatabaseManager dbManager = new DatabaseManager();
     MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml",
             "D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd", dbManager);
+    InputManager manager = new InputManager();
 
     public void start() {
         dbManager.destroyDB();
         dbManager.initDB();
         parser.parseSAX();
-        // GENERAL
-        System.out.println("\n ENTRY DATA : \n");
-        System.out.println("\n DB : \n");
-        List<Author> authors = dbManager.getAuthors();
-        List<Book> books = dbManager.getBooks();
-        for (Author author : authors) {
-            System.out.println(author.toString());
-        }
-        for (Book book : books) {
-            System.out.println(book.toString());
-        }
-        System.out.println("\n XML : \n");
-        authors = parser.getAuthors(parser.getXml());
-        books = parser.getBooks(parser.getXml());
-        for (Author author : authors) {
-            System.out.println(author.toString());
-        }
-        for (Book book : books) {
-            System.out.println(book.toString());
-        }
-        // GETTERS
-        System.out.println("\n TESTING GETTERS : \n");
-        System.out.println("\n FROM DB:\n");
-        System.out.println("\n Loading Author : \n");
-        Author author = dbManager.getAuthor("A-1", true);
-        System.out.println(author.toString());
-
-        System.out.println("\n Loading Book : \n");
-        Book book = dbManager.getBook("B-1");
-        System.out.println(book.toString());
-
-        System.out.println("\n FROM XML:\n");
-        System.out.println("\n Loading Author : \n");
-        author = parser.getAuthor("A-1", parser.getXml());
-        System.out.println(author.toString());
-
-        System.out.println("\n Loading Book : \n");
-        book = parser.getBook("B-1", parser.getXml());
-        System.out.println(book.toString());
-        // UPDATERS
-        System.out.println("\n TESTING UPDATERS : \n");
-        System.out.println("\n FROM DB:\n");
-        System.out.println("\n Updating Author : \n");
-        System.out.println("\n Before : \n");
-        author = dbManager.getAuthor("A-2", true);
-        System.out.println(author.toString());
-        author.setFirstName("Govi");
-        dbManager.updateAuthor(author);
-        author = dbManager.getAuthor("A-2", true);
-        System.out.println("\n After : \n");
-        System.out.println(author.toString());
-
-        System.out.println("\n Updating Book : \n");
-        System.out.println("\n Before : \n");
-        book = dbManager.getBook("B-1");
-        System.out.println(book.toString());
-        book.setPrice(1000.1);
-        dbManager.updateBook(book);
-        book = dbManager.getBook("B-1");
-        System.out.println("\n After : \n");
-        System.out.println(book.toString());
-
-        System.out.println("\n FROM XML:\n");
-        System.out.println("\n Updating Author : \n");
-        System.out.println("\n Before : \n");
-        author = parser.getAuthor("A-2", parser.getXml());
-        System.out.println(author.toString());
-        author.setFirstName("Govi");
-        parser.updateAuthor(author, parser.getXml());
-        author = parser.getAuthor("A-2", parser.getXml());
-        System.out.println("\n After : \n");
-        System.out.println(author.toString());
-
-        System.out.println("\n Updating Book : \n");
-        System.out.println("\n Before : \n");
-        book = parser.getBook("B-1", parser.getXml());
-        System.out.println(book.toString());
-        book.setPrice(1000.1);
-        parser.updateBook(book, parser.getXml(), true);
-        book = parser.getBook("B-1", parser.getXml());
-        System.out.println("\n After : \n");
-        System.out.println(book.toString());
-
-        //ADDERS
-        System.out.println("\n TESTING ADDERS : \n");
-        System.out.println("\n FROM DB:\n");
-        System.out.println("\n Adding Author : \n");
-        System.out.println("\n Before: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        author = new Author("Smith", "Bob", dbManager.getAuthorsGenerator().generateId());
-        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "BOOOOK", 22.8, Book.Genre.horror, author.getId()));
-        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "GO lang", 200.8, Book.Genre.adventure, author.getId()));
-        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "My Fight", 144.8, Book.Genre.biography, author.getId()));
-        dbManager.addAuthor(author);
-        System.out.println("\n After: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-
-        System.out.println("\n Adding Book : \n");
-        System.out.println("\n Before: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        book = new Book(dbManager.getBooksGenerator().generateId(), "Good Book", 10.0, Book.Genre.drama, "A-2");
-        dbManager.addBook(book);
-        System.out.println("\n After: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-
-        System.out.println("\n FROM XML:\n");
-        System.out.println("\n Adding Author : \n");
-        System.out.println("\n Before: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        author = new Author("Smith", "Bob", dbManager.getAuthorsGenerator().generateId());
-        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "BOOOOK", 22.8, Book.Genre.horror, author.getId()));
-        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "GO lang", 200.8, Book.Genre.adventure, author.getId()));
-        author.addBook(new Book(dbManager.getBooksGenerator().generateId(), "My Fight", 144.8, Book.Genre.biography, author.getId()));
-        parser.addAuthor(author, parser.getXml());
-        System.out.println("\n After: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        System.out.println("\n Adding Book : \n");
-        System.out.println("\n Before: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        book = new Book(dbManager.getBooksGenerator().generateId(), "Good Book", 10.0, Book.Genre.drama, "A-2");
-        parser.addBook(book, parser.getXml());
-        System.out.println("\n After: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        //DELETERS
-        System.out.println("\n TESTING DELETERS : \n");
-        System.out.println("\n FROM DB:\n");
-        System.out.println("\n Deleting Author : \n");
-        System.out.println("\n Before: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        dbManager.deleteAuthor("A-1");
-        System.out.println("\n After: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-
-        System.out.println("\n Deleting Book : \n");
-        System.out.println("\n Before: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        dbManager.deleteBook("B-9");
-        System.out.println("\n After: \n");
-        authors = dbManager.getAuthors();
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-
-        System.out.println("\n FROM XML:\n");
-        System.out.println("\n Deleting Author : \n");
-        System.out.println("\n Before: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        parser.deleteAuthor("A-1", parser.getXml());
-        System.out.println("\n After: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        System.out.println("\n Deleting Book : \n");
-        System.out.println("\n Before: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-        parser.deleteBook("A-2", parser.getXml());
-        System.out.println("\n After: \n");
-        authors = parser.getAuthors(parser.getXml());
-        for (Author a : authors) {
-            System.out.println(a.toString());
-        }
-
-
         dbManager.destroyDB();
     }
+
+    private void mainLoop() {
+        help();
+        String input;
+        boolean working;
+        while(true){
+            input = manager.getString("Enter command : ");
+            switch (input) {
+                case "od":
+                    System.out.println("\n Now Working with Database \n");
+                    helpActions();
+                    working = true;
+                    while (working) {
+                        input = manager.getString("Enter command : ");
+                        switch (input) {
+                            case "aa":
+                                
+                                break;
+                        
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case "os":
+
+                    break;
+                case "e":
+                    return;
+                case "h":
+                    help();
+                    break;
+                default:
+                    System.out.println("Invalid Command!");
+                    break;
+            }
+        }
+    }
+
+    private void help(){
+        System.out.println("\n e - exit program;\n" + 
+                " od - open DB;\n" + 
+                " ox - open XML;\n" +
+                " h - help;");
+    }
+
+    private void helpActions() {
+        System.out.println("\n sa - show authors;\n" + 
+                " sb - show books;\n" +
+                " ga - get author;\n" +
+                " gb - get book:\n" +
+                " gap - get authors by param;\n" +
+                " gbp - get books by param;\n" + 
+                " aa - add author;\n" + 
+                " ab - add book;\n" +
+                " ua - update author;\n" +
+                " ub - update book;\n" +
+                " da - delete author;\n" +
+                " db - delete book;\n" + 
+                " e - exit current environment;\n" +
+                " h - help;");
+    }
+
+    // private Author createAuthor(IDGenerator idGenerator){
+    //     Author author = new Author(idGenerator.generateId());
+    // }
+
+    // private Book createBook(){
+
+    // }
 }
