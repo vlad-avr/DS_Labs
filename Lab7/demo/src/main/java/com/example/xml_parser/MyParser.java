@@ -34,7 +34,7 @@ import com.example.objects.Author;
 import com.example.objects.Book;
 
 public class MyParser {
-    private Document curDoc;
+    private Document curDoc = null;
     private String curXmlPath;
     private final String xsdPath;
     private IDGenerator authorGenerator;
@@ -85,6 +85,13 @@ public class MyParser {
             }
         }
         return null;
+    }
+
+    public boolean isOk(){
+        if(curDoc != null){
+            return true;
+        }
+        return false;
     }
 
     public void getXml(String xmlPath) {

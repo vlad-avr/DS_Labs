@@ -116,7 +116,12 @@ public class Controller {
                     }
                     break;
                 case "ox":
-
+                    System.out.println("\n Now Working with Database \n");
+                    System.out.println("\n Open XML file as a data source: \n");
+                    parser.getXml(manager.getString("Enter xml file path : "));
+                    if(parser.isOk()){
+                        System.out.println("\n File opened successfully!\n");
+                    }
                     break;
                 case "e":
                     return;
