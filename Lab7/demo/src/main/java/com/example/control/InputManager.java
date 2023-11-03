@@ -66,6 +66,23 @@ public class InputManager {
         }
     }
 
+    public int getInt(String prompt) {
+        System.out.println(prompt);
+        while (true) {
+            try {
+                String input = getLine();
+                int res = Integer.parseInt(input);
+                if (res < 0) {
+                    NumberFormatException e = new NumberFormatException("Value must be greater than 0!");
+                    throw e;
+                }
+                return res;
+            } catch (NumberFormatException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     public Book.Genre getGenre(String prompt) {
         System.out.println("Available genres : " + Book.Genre.values());
         System.out.println(prompt);

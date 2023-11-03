@@ -26,7 +26,7 @@ public class Controller {
         help();
         String input;
         boolean working;
-        while(true){
+        while (true) {
             input = manager.getString("Enter command : ");
             switch (input) {
                 case "od":
@@ -40,13 +40,13 @@ public class Controller {
                         switch (input) {
                             case "sa":
                                 authors = dbManager.getAuthors();
-                                for(Author author : authors){
+                                for (Author author : authors) {
                                     System.out.println(author.toString());
                                 }
                                 break;
                             case "sb":
                                 books = dbManager.getBooks();
-                                for(Book book : books){
+                                for (Book book : books) {
                                     System.out.println(book.toString());
                                 }
                                 break;
@@ -54,14 +54,34 @@ public class Controller {
                                 dbManager.addAuthor(createAuthor(dbManager.getAuthorsGenerator()));
                                 break;
                             case "ab":
-                                dbManager.addBook(createBook(dbManager.getBooksGenerator(), dbManager.getAuthorsGenerator()));
+                                dbManager.addBook(
+                                        createBook(dbManager.getBooksGenerator(), dbManager.getAuthorsGenerator()));
                                 break;
                             case "ua":
-                                dbManager.updateAuthor(updateAuthor(dbManager.getAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author ID : "), false)));
+                                dbManager.updateAuthor(updateAuthor(dbManager.getAuthor(
+                                        manager.getID(dbManager.getAuthorsGenerator(), "Enter author ID : "), false)));
                                 break;
                             case "ub":
-                                dbManager.updateBook(updateBook(dbManager.getBook(manager.getID(dbManager.getBooksGenerator(), "Enter book ID : ")), dbManager.getAuthorsGenerator()));
+                                dbManager.updateBook(updateBook(
+                                        dbManager.getBook(
+                                                manager.getID(dbManager.getBooksGenerator(), "Enter book ID : ")),
+                                        dbManager.getAuthorsGenerator()));
                                 break;
+                            case "gap":
+                                authors = getAuthorsByParams();
+                                if (authors != null) {
+                                    for (Author author : authors) {
+                                        System.out.println(author.toString());
+                                    }
+                                }
+                                break;
+                            case "gbp":
+                                books = getBooksByParams();
+                                if(books != null){
+                                    for(Book book : books){
+                                        System.out.println(book.toString());
+                                    }
+                                }
                             default:
                                 break;
                         }
@@ -82,31 +102,76 @@ public class Controller {
         }
     }
 
-    private void help(){
-        System.out.println("\n e - exit program;\n" + 
-                " od - open DB;\n" + 
+    private void help() {
+        System.out.println("\n e - exit program;\n" +
+                " od - open DB;\n" +
                 " ox - open XML;\n" +
                 " h - help;");
     }
 
     private void helpActions() {
-        System.out.println("\n sa - show authors;\n" + 
+        System.out.println("\n sa - show authors;\n" +
                 " sb - show books;\n" +
                 " ga - get author;\n" +
                 " gb - get book:\n" +
                 " gap - get authors by param;\n" +
-                " gbp - get books by param;\n" + 
-                " aa - add author;\n" + 
+                " gbp - get books by param;\n" +
+                " aa - add author;\n" +
                 " ab - add book;\n" +
                 " ua - update author;\n" +
                 " ub - update book;\n" +
                 " da - delete author;\n" +
-                " db - delete book;\n" + 
+                " db - delete book;\n" +
                 " e - exit current environment;\n" +
                 " h - help;");
     }
 
-    private Author createAuthor(IDGenerator idGenerator){
+    private List<Author> getAuthorsByParams() {
+        System.out.println("\n You are in author loading menu \n");
+        String input;
+        while (manager.getBool("Do you want to load anything?")) {
+            System.out
+                    .println("\n n - find by number of books;\n c - find authors whose names contain certian string;");
+            input = manager.getString("Enter Command");
+            switch (input) {
+                case "n":
+                    return dbManager.getAuthors(manager.getInt("Enter min number of books : "),
+                            manager.getInt("Enter max number of books : "));
+                case "c":
+                    return dbManager.getAuthors(manager.getString("Enter the string : "));
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return null;
+    }
+
+    private List<Book> getBooksByParams(){
+        System.out.println("\n You are in book loading menu \n");
+        String input;
+        while (manager.getBool("Do you want to load anything?")) {
+            System.out
+                    .println("\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
+            input = manager.getString("Enter Command");
+            switch (input) {
+                case "n":
+                    return dbManager.getBooks(manager.getString("Enter the string : "));
+                case "g":
+                    return dbManager.getBooks(manager.getGenre("Enter the genre : "));
+                case "p":
+                    return dbManager.getBooks(manager.getDouble("Enter min price : "), manager.getDouble("Enter max price : "));
+                case "a":
+                    return dbManager.getBooksOfAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return null;
+    }
+
+    private Author createAuthor(IDGenerator idGenerator) {
         System.out.println("\n You are in author creation menu\n");
         Author author = new Author(idGenerator.generateId());
         System.out.println("\n New author`s ID is " + author.getId());
@@ -118,11 +183,11 @@ public class Controller {
         return author;
     }
 
-    private Book createBook(IDGenerator idGenerator, IDGenerator authorGenerator){
+    private Book createBook(IDGenerator idGenerator, IDGenerator authorGenerator) {
         return createBook(idGenerator, manager.getID(authorGenerator, "Enter author ID : "));
     }
 
-    private Book createBook(IDGenerator idGenerator, String authorID){
+    private Book createBook(IDGenerator idGenerator, String authorID) {
         System.out.println("\n You are in book creation menu\n");
         Book book = new Book(idGenerator.generateId());
         book.setAuthor(authorID);
@@ -133,7 +198,7 @@ public class Controller {
         return book;
     }
 
-    private Author updateAuthor(Author author){
+    private Author updateAuthor(Author author) {
         System.out.println("\n You are in author modification menu\n");
         while (manager.getBool("Do you want change something? ")) {
             System.out.println(" f - change firstname;\n l - change lastname;");
@@ -153,7 +218,7 @@ public class Controller {
         return author;
     }
 
-    private Book updateBook(Book book, IDGenerator authorGenerator){
+    private Book updateBook(Book book, IDGenerator authorGenerator) {
         System.out.println("\n You are in author modification menu\n");
         while (manager.getBool("Do you want change something? ")) {
             System.out.println(" a - change author;\n n - change name;\n p - change price;\n g - change genre;");

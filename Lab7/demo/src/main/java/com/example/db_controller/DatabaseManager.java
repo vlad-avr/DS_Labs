@@ -198,6 +198,29 @@ public class DatabaseManager {
         return authors;
     }
 
+    public List<Author> getAuthors(int minBookCount, int maxBookCount) {
+        List<Author> authors = new ArrayList<>();
+        for (String ID : authorsIdGenerator.getIDs()) {
+            Author author = getAuthor(ID, true);
+            if (author != null && author.getBooks().size() >= minBookCount
+                    && author.getBooks().size() <= maxBookCount) {
+                authors.add(author);
+            }
+        }
+        return authors;
+    }
+
+    public List<Author> getAuthors(String toContain) {
+        List<Author> authors = new ArrayList<>();
+        for (String ID : authorsIdGenerator.getIDs()) {
+            Author author = getAuthor(ID, true);
+            if (author != null && (author.getFirstName().contains(toContain) || author.getLastName().contains(toContain))) {
+                authors.add(author);
+            }
+        }
+        return authors;
+    }
+
     public List<Book> getBooks() {
         List<Book> books = new ArrayList<>();
         for (String ID : booksIdGenerator.getIDs()) {
@@ -205,6 +228,59 @@ public class DatabaseManager {
             if (book != null) {
                 books.add(book);
             }
+        }
+        return books;
+    }
+
+    public List<Book> getBooks(double minPrice, double maxPrice) {
+        List<Book> books = new ArrayList<>();
+        for (String ID : booksIdGenerator.getIDs()) {
+            Book book = getBook(ID);
+            if (book != null && book.getPrice() >= minPrice && book.getPrice() <= maxPrice) {
+                books.add(book);
+            }
+        }
+        return books;
+    }
+
+    public List<Book> getBooks(String toContain){
+        List<Book> books = new ArrayList<>();
+        for (String ID : booksIdGenerator.getIDs()) {
+            Book book = getBook(ID);
+            if (book != null && book.getName().contains(toContain)) {
+                books.add(book);
+            }
+        }
+        return books;
+    }
+
+    public List<Book> getBooks(Book.Genre genre){
+        List<Book> books = new ArrayList<>();
+        for (String ID : booksIdGenerator.getIDs()) {
+            Book book = getBook(ID);
+            if (book != null && Book.Genre.valueOf(book.getGenre()) == genre) {
+                books.add(book);
+            }
+        }
+        return books;
+    }
+
+    public List<Book> getBooksOfAuthor(String ID) {
+        String bookSql = "SELECT *\nFROM books WHERE author_id = ?";
+        List<Book> books = new ArrayList<>();
+        try (Connection con = connect(); PreparedStatement statement2 = con.prepareStatement(bookSql)) {
+            statement2.setString(1, ID);
+            ResultSet f_res = statement2.executeQuery();
+            while (f_res.next()) {
+                Book book = new Book(f_res.getString("id"), f_res.getString("name"),
+                        f_res.getDouble("price"), Book.Genre.valueOf(f_res.getString("genre")),
+                        f_res.getString("author_id"));
+                if (book != null) {
+                    books.add(book);
+                }
+            }
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
         }
         return books;
     }
