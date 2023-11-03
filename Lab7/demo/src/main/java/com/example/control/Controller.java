@@ -83,11 +83,15 @@ public class Controller {
                 " h - help;");
     }
 
-    // private Author createAuthor(IDGenerator idGenerator){
-    //     Author author = new Author(idGenerator.generateId());
-    // }
+    private Author createAuthor(IDGenerator idGenerator){
+        Author author = new Author(idGenerator.generateId());
 
-    // private Book createBook(){
+        return author;
+    }
 
-    // }
+    private Book createBook(IDGenerator idGenerator){
+        Book book = new Book(idGenerator.generateId());
+
+        return book;
+    }
 }

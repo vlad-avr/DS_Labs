@@ -13,7 +13,7 @@ public class Book {
         biography
     }
 
-    private String id;
+    private final String id;
     private String name;
     private Double price;
     private Genre genre;
@@ -31,10 +31,7 @@ public class Book {
     public Book(String id) {
         this.id = id;
     }
-
-    public Book() {
-    }
-
+    
     public String getName() {
         return this.name;
     }

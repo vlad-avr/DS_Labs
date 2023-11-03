@@ -6,7 +6,7 @@ import java.util.List;
 public class Author {
     private String firstName;
     private String lastName;
-    private String ID;
+    private final String ID;
     private List<Book> books = new ArrayList<>();
 
     public Author(String firstName, String lastName, String ID){
@@ -15,7 +15,10 @@ public class Author {
         this.ID = ID;
     }
 
-    public Author(){}
+    public Author(String ID){
+        this.ID = ID;
+    }
+
 
     public String getFirstName(){
         return this.firstName;
