@@ -18,6 +18,7 @@ public class Controller {
         dbManager.destroyDB();
         dbManager.initDB();
         parser.parseSAX();
+        mainLoop();
         dbManager.destroyDB();
     }
 
@@ -34,7 +35,21 @@ public class Controller {
                     working = true;
                     while (working) {
                         input = manager.getString("Enter command : ");
+                        List<Author> authors;
+                        List<Book> books;
                         switch (input) {
+                            case "sa":
+                                authors = dbManager.getAuthors();
+                                for(Author author : authors){
+                                    System.out.println(author.toString());
+                                }
+                                break;
+                            case "sb":
+                                books = dbManager.getBooks();
+                                for(Book book : books){
+                                    System.out.println(book.toString());
+                                }
+                                break;
                             case "aa":
                                 dbManager.addAuthor(createAuthor(dbManager.getAuthorsGenerator()));
                                 break;
@@ -42,7 +57,10 @@ public class Controller {
                                 dbManager.addBook(createBook(dbManager.getBooksGenerator(), dbManager.getAuthorsGenerator()));
                                 break;
                             case "ua":
-                                
+                                dbManager.updateAuthor(updateAuthor(dbManager.getAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author ID : "), false)));
+                                break;
+                            case "ub":
+                                dbManager.updateBook(updateBook(dbManager.getBook(manager.getID(dbManager.getBooksGenerator(), "Enter book ID : ")), dbManager.getAuthorsGenerator()));
                             default:
                                 break;
                         }
@@ -100,7 +118,7 @@ public class Controller {
     }
 
     private Book createBook(IDGenerator idGenerator, IDGenerator authorGenerator){
-        return createBook(idGenerator, manager.geID(authorGenerator, "Enter author ID : "));
+        return createBook(idGenerator, manager.getID(authorGenerator, "Enter author ID : "));
     }
 
     private Book createBook(IDGenerator idGenerator, String authorID){
@@ -116,7 +134,47 @@ public class Controller {
 
     private Author updateAuthor(Author author){
         System.out.println("\n You are in author modification menu\n");
-        
+        while (manager.getBool("Do you want change something? ")) {
+            System.out.println(" f - change firstname;\n l - change lastname;");
+            String input = manager.getString("Enter command : ");
+            switch (input) {
+                case "f":
+                    author.setFirstName(manager.getString("Enter firstname : "));
+                    break;
+                case "l":
+                    author.setLastName(manager.getString("Enter lastname : "));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
         return author;
+    }
+
+    private Book updateBook(Book book, IDGenerator authorGenerator){
+        System.out.println("\n You are in author modification menu\n");
+        while (manager.getBool("Do you want change something? ")) {
+            System.out.println(" a - change author;\n n - change name;\n p - change price;\n g - change genre;");
+            String input = manager.getString("Enter command : ");
+            switch (input) {
+                case "a":
+                    book.setAuthor(manager.getID(authorGenerator, "Enter author ID : "));
+                    break;
+                case "n":
+                    book.setName(manager.getString("Enter namr : "));
+                    break;
+                case "p":
+                    book.setPrice(manager.getDouble("Enter price : "));
+                    break;
+                case "g":
+                    book.setGenre(manager.getGenre("Enter genre"));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return book;
     }
 }

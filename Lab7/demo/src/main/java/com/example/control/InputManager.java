@@ -35,7 +35,7 @@ public class InputManager {
         }
     }
 
-    public String geID(IDGenerator idGenerator, String prompt){
+    public String getID(IDGenerator idGenerator, String prompt){
         System.out.println(prompt);
         System.out.println("Available IDs : \n");
         System.out.println(idGenerator.getIDs());
@@ -67,6 +67,7 @@ public class InputManager {
     }
 
     public Book.Genre getGenre(String prompt) {
+        System.out.println("Available genres : " + Book.Genre.values());
         System.out.println(prompt);
         while (true) {
             try {
