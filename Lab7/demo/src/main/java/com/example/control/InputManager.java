@@ -22,8 +22,8 @@ public class InputManager {
     }
 
     public boolean getBool(String prompt) {
-        System.out.println(prompt);
         while (true) {
+            System.out.println(prompt);
             String input = getLine();
             if (input.equals("+")) {
                 return true;
@@ -36,10 +36,10 @@ public class InputManager {
     }
 
     public String getID(IDGenerator idGenerator, String prompt){
-        System.out.println(prompt);
         System.out.println("Available IDs : \n");
         System.out.println(idGenerator.getIDs());
         while (true) {
+            System.out.println(prompt);
             String id = getLine();
             if(idGenerator.exists(id)){
                 return id;
@@ -50,8 +50,8 @@ public class InputManager {
     }
 
     public double getDouble(String prompt) {
-        System.out.println(prompt);
         while (true) {
+            System.out.println(prompt);
             try {
                 String input = getLine();
                 double res = Double.parseDouble(input);
@@ -67,8 +67,8 @@ public class InputManager {
     }
 
     public int getInt(String prompt) {
-        System.out.println(prompt);
         while (true) {
+            System.out.println(prompt);
             try {
                 String input = getLine();
                 int res = Integer.parseInt(input);
@@ -88,8 +88,8 @@ public class InputManager {
         for(Book.Genre genre : Book.Genre.values()){
             System.out.println(genre.toString());
         }
-        System.out.println(prompt);
         while (true) {
+            System.out.println(prompt);
             try {
                 String input = getLine();
                 Book.Genre genre = Book.Genre.valueOf(input);

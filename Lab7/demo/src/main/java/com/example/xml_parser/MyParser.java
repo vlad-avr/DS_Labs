@@ -261,7 +261,7 @@ public class MyParser {
                     ((Element) authors.item(i)).getAttribute("lastname"),
                     ((Element) authors.item(i)).getAttribute("id"));
             NodeList booksList = ((Element) authors.item(i)).getElementsByTagName("book");
-            if (booksList.getLength() > minNum && booksList.getLength() < maxNum) {
+            if (booksList.getLength() >= minNum && booksList.getLength() <= maxNum) {
                 for (int j = 0; j < booksList.getLength(); j++) {
                     Element book = (Element) booksList.item(j);
                     authorObj.addBook(
@@ -315,13 +315,14 @@ public class MyParser {
         return res;
     }
 
-    public List<Book> getBooks(double minPrice, double maxPrice){
+    public List<Book> getBooks(double minPrice, double maxPrice) {
         List<Book> res = new ArrayList<>();
         NodeList booksList = curDoc.getElementsByTagName("book");
         for (int j = 0; j < booksList.getLength(); j++) {
             Element book = (Element) booksList.item(j);
             Element parent = (Element) book.getParentNode();
-            if (Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()) > minPrice && Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()) < maxPrice) {
+            if (Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()) >= minPrice
+                    && Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()) <= maxPrice) {
                 res.add(
                         new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
                                 Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
@@ -332,7 +333,7 @@ public class MyParser {
         return res;
     }
 
-    public List<Book> getBooks(Book.Genre genre){
+    public List<Book> getBooks(Book.Genre genre) {
         List<Book> res = new ArrayList<>();
         NodeList booksList = curDoc.getElementsByTagName("book");
         for (int j = 0; j < booksList.getLength(); j++) {
