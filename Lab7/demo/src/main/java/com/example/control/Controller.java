@@ -9,16 +9,18 @@ import com.example.objects.Book;
 import com.example.xml_parser.MyParser;
 
 //"D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml"
+//"D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Dynamic.xml"
 
 public class Controller {
     DatabaseManager dbManager = new DatabaseManager();
-    MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd", dbManager);
+    MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd",
+            dbManager);
     InputManager manager = new InputManager();
 
     public void start() {
         dbManager.destroyDB();
         dbManager.initDB();
-        parser.parseSAX();
+        parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
         mainLoop();
         dbManager.destroyDB();
     }
@@ -52,7 +54,8 @@ public class Controller {
                                 }
                                 break;
                             case "aa":
-                                dbManager.addAuthor(createAuthor(dbManager.getAuthorsGenerator(), dbManager.getBooksGenerator()));
+                                dbManager.addAuthor(
+                                        createAuthor(dbManager.getAuthorsGenerator(), dbManager.getBooksGenerator()));
                                 break;
                             case "ab":
                                 dbManager.addBook(
@@ -119,8 +122,96 @@ public class Controller {
                     System.out.println("\n Now Working with Database \n");
                     System.out.println("\n Open XML file as a data source: \n");
                     parser.getXml(manager.getString("Enter xml file path : "));
-                    if(parser.isOk()){
+                    if (parser.isOk()) {
                         System.out.println("\n File opened successfully!\n");
+                        helpActions();
+                        working = true;
+                        while (working) {
+                            input = manager.getString("Enter command : ");
+                            List<Author> authors;
+                            List<Book> books;
+                            switch (input) {
+                                case "sa":
+                                    authors = parser.getAuthors();
+                                    for (Author author : authors) {
+                                        System.out.println(author.toString());
+                                    }
+                                    break;
+                                case "sb":
+                                    books = parser.getBooks();
+                                    for (Book book : books) {
+                                        System.out.println(book.toString());
+                                    }
+                                    break;
+                                case "aa":
+                                    parser.addAuthor(createAuthor(parser.getAuthorGenerator(),
+                                            parser.getBookGenerator()));
+                                    break;
+                                case "ab":
+                                    parser.addBook(
+                                            createBook(parser.getBookGenerator(), parser.getAuthorGenerator()));
+                                    break;
+                                case "ua":
+                                    parser.updateAuthor(updateAuthor(parser.getAuthor(
+                                            manager.getID(parser.getAuthorGenerator(), "Enter author ID : "))));
+                                    break;
+                                case "ub":
+                                    parser.updateBook(updateBook(
+                                            parser.getBook(
+                                                    manager.getID(parser.getBookGenerator(), "Enter book ID : ")),
+                                            parser.getAuthorGenerator()), true);
+                                    break;
+                                case "gap":
+                                    // authors = getAuthorsByParams();
+                                    // if (authors != null) {
+                                    // for (Author author : authors) {
+                                    // System.out.println(author.toString());
+                                    // }
+                                    // }
+                                    break;
+                                case "gbp":
+                                    // books = getBooksByParams();
+                                    // if (books != null) {
+                                    // for (Book book : books) {
+                                    // System.out.println(book.toString());
+                                    // }
+                                    // }
+                                    break;
+                                case "da":
+                                    parser.deleteAuthor(
+                                            manager.getID(parser.getAuthorGenerator(), "Enter author id : "));
+                                    break;
+                                case "db":
+                                    parser.deleteBook(
+                                            manager.getID(parser.getBookGenerator(), "Enter book id : "));
+                                    break;
+                                case "ga":
+                                    System.out.println(parser
+                                            .getAuthor(
+                                                    manager.getID(parser.getAuthorGenerator(),
+                                                            "Enter author id : "))
+                                            .toString());
+                                    break;
+                                case "gb":
+                                    System.out.println(parser
+                                            .getBook(manager.getID(parser.getBookGenerator(), "Enter author id : "))
+                                            .toString());
+                                    break;
+                                case "h":
+                                    helpActions();
+                                    break;
+                                case "e":
+                                    System.out.println("\nYou stopped working with XML\n");
+                                    working = false;
+                                    break;
+                                default:
+                                    System.out.println("Invalid command!");
+                                    break;
+                            }
+                        }
+                    } else {
+                        System.out.println(
+                                "\n Unble to open XML file (file not found or file structure wasn`t validated by XSD\n");
                     }
                     break;
                 case "e":

@@ -54,12 +54,12 @@ public class MyParser {
         return authorGenerator;
     }
 
-    public void parseSAX() {
+    public void parseSAX(String xmlPath) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
             MyHandler handler = new MyHandler();
-            parser.parse(curXmlPath, handler);
+            parser.parse(xmlPath, handler);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             System.out.println(e.getMessage());
         }
@@ -102,6 +102,7 @@ public class MyParser {
             if (validateXml(xmlPath)) {
                 curDoc = doc;
                 curXmlPath = xmlPath;
+                return;
             }
         } catch (SAXException | IOException | ParserConfigurationException e) {
             System.out.println(e.getMessage());
