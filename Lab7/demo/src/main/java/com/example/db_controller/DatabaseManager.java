@@ -17,11 +17,11 @@ public class DatabaseManager {
     IDGenerator booksIdGenerator = new IDGenerator("B");
     IDGenerator authorsIdGenerator = new IDGenerator("A");
 
-    public IDGenerator getBooksGenerator() {
+    public IDGenerator getBookGenerator() {
         return this.booksIdGenerator;
     }
 
-    public IDGenerator getAuthorsGenerator() {
+    public IDGenerator getAuthorGenerator() {
         return this.authorsIdGenerator;
     }
 

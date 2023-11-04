@@ -87,8 +87,8 @@ public class MyParser {
         return null;
     }
 
-    public boolean isOk(){
-        if(curDoc != null){
+    public boolean isOk() {
+        if (curDoc != null) {
             return true;
         }
         return false;
@@ -111,14 +111,14 @@ public class MyParser {
         curDoc = null;
     }
 
-    private void getIds(Document doc){
+    private void getIds(Document doc) {
         NodeList authors = doc.getElementsByTagName("author");
-        for(int i = 0; i < authors.getLength(); i++){
-            authorGenerator.addId(((Element)authors.item(i)).getAttribute("id"));
+        for (int i = 0; i < authors.getLength(); i++) {
+            authorGenerator.addId(((Element) authors.item(i)).getAttribute("id"));
         }
         NodeList books = doc.getElementsByTagName("book");
-        for(int i = 0; i < books.getLength(); i++){
-            bookGenerator.addId(((Element)books.item(i)).getAttribute("id"));
+        for (int i = 0; i < books.getLength(); i++) {
+            bookGenerator.addId(((Element) books.item(i)).getAttribute("id"));
         }
     }
 
@@ -229,6 +229,54 @@ public class MyParser {
         System.out.println("\nBook " + book.getId() + " Not Found");
     }
 
+    public List<Author> getAuthors(String toContain) {
+        List<Author> res = new ArrayList<>();
+        NodeList authors = curDoc.getElementsByTagName("author");
+        for (int i = 0; i < authors.getLength(); i++) {
+            Author authorObj = new Author(((Element) authors.item(i)).getAttribute("firstname"),
+                    ((Element) authors.item(i)).getAttribute("lastname"),
+                    ((Element) authors.item(i)).getAttribute("id"));
+            if (authorObj.getFirstName().contains(toContain) || authorObj.getLastName().contains(toContain)) {
+                NodeList booksList = ((Element) authors.item(i)).getElementsByTagName("book");
+                for (int j = 0; j < booksList.getLength(); j++) {
+                    Element book = (Element) booksList.item(j);
+                    authorObj.addBook(
+                            new Book(book.getAttribute("id"),
+                                    book.getElementsByTagName("name").item(0).getTextContent(),
+                                    Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                                    Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                                    authorObj.getId()));
+                }
+                res.add(authorObj);
+            }
+        }
+        return res;
+    }
+
+    public List<Author> getAuthors(int minNum, int maxNum) {
+        List<Author> res = new ArrayList<>();
+        NodeList authors = curDoc.getElementsByTagName("author");
+        for (int i = 0; i < authors.getLength(); i++) {
+            Author authorObj = new Author(((Element) authors.item(i)).getAttribute("firstname"),
+                    ((Element) authors.item(i)).getAttribute("lastname"),
+                    ((Element) authors.item(i)).getAttribute("id"));
+            NodeList booksList = ((Element) authors.item(i)).getElementsByTagName("book");
+            if (booksList.getLength() > minNum && booksList.getLength() < maxNum) {
+                for (int j = 0; j < booksList.getLength(); j++) {
+                    Element book = (Element) booksList.item(j);
+                    authorObj.addBook(
+                            new Book(book.getAttribute("id"),
+                                    book.getElementsByTagName("name").item(0).getTextContent(),
+                                    Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                                    Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                                    authorObj.getId()));
+                }
+                res.add(authorObj);
+            }
+        }
+        return res;
+    }
+
     public List<Author> getAuthors() {
         List<Author> res = new ArrayList<>();
         NodeList authors = curDoc.getElementsByTagName("author");
@@ -246,6 +294,57 @@ public class MyParser {
                                 authorObj.getId()));
             }
             res.add(authorObj);
+        }
+        return res;
+    }
+
+    public List<Book> getBooks(String toContain) {
+        List<Book> res = new ArrayList<>();
+        NodeList booksList = curDoc.getElementsByTagName("book");
+        for (int j = 0; j < booksList.getLength(); j++) {
+            Element book = (Element) booksList.item(j);
+            Element parent = (Element) book.getParentNode();
+            if (book.getElementsByTagName("name").item(0).getTextContent().contains(toContain)) {
+                res.add(
+                        new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
+                                Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                                Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                                parent.getAttribute("id")));
+            }
+        }
+        return res;
+    }
+
+    public List<Book> getBooks(double minPrice, double maxPrice){
+        List<Book> res = new ArrayList<>();
+        NodeList booksList = curDoc.getElementsByTagName("book");
+        for (int j = 0; j < booksList.getLength(); j++) {
+            Element book = (Element) booksList.item(j);
+            Element parent = (Element) book.getParentNode();
+            if (Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()) > minPrice && Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()) < maxPrice) {
+                res.add(
+                        new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
+                                Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                                Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                                parent.getAttribute("id")));
+            }
+        }
+        return res;
+    }
+
+    public List<Book> getBooks(Book.Genre genre){
+        List<Book> res = new ArrayList<>();
+        NodeList booksList = curDoc.getElementsByTagName("book");
+        for (int j = 0; j < booksList.getLength(); j++) {
+            Element book = (Element) booksList.item(j);
+            Element parent = (Element) book.getParentNode();
+            if (Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()) == genre) {
+                res.add(
+                        new Book(book.getAttribute("id"), book.getElementsByTagName("name").item(0).getTextContent(),
+                                Double.parseDouble(book.getElementsByTagName("price").item(0).getTextContent()),
+                                Book.Genre.valueOf(book.getElementsByTagName("genre").item(0).getTextContent()),
+                                parent.getAttribute("id")));
+            }
         }
         return res;
     }
@@ -307,7 +406,7 @@ public class MyParser {
             root.removeChild(author);
             writeXML();
             authorGenerator.removeId(ID);
-            for(Book book : books){
+            for (Book book : books) {
                 bookGenerator.removeId(book.getId());
             }
             return;
@@ -348,11 +447,11 @@ public class MyParser {
             switch (qName) {
                 case "author":
                     dbManager.addAuthor(curAuthor);
-                    dbManager.getAuthorsGenerator().addId(curAuthor.getId());
+                    dbManager.getAuthorGenerator().addId(curAuthor.getId());
                     break;
                 case "book":
                     curBook.setAuthor(curAuthor.getId());
-                    dbManager.getBooksGenerator().addId(curBook.getId());
+                    dbManager.getBookGenerator().addId(curBook.getId());
                     curAuthor.addBook(curBook);
                     break;
                 case "name":

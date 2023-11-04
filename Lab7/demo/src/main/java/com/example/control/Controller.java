@@ -55,24 +55,24 @@ public class Controller {
                                 break;
                             case "aa":
                                 dbManager.addAuthor(
-                                        createAuthor(dbManager.getAuthorsGenerator(), dbManager.getBooksGenerator()));
+                                        createAuthor(dbManager.getAuthorGenerator(), dbManager.getBookGenerator()));
                                 break;
                             case "ab":
                                 dbManager.addBook(
-                                        createBook(dbManager.getBooksGenerator(), dbManager.getAuthorsGenerator()));
+                                        createBook(dbManager.getBookGenerator(), dbManager.getAuthorGenerator()));
                                 break;
                             case "ua":
                                 dbManager.updateAuthor(updateAuthor(dbManager.getAuthor(
-                                        manager.getID(dbManager.getAuthorsGenerator(), "Enter author ID : "), false)));
+                                        manager.getID(dbManager.getAuthorGenerator(), "Enter author ID : "), false)));
                                 break;
                             case "ub":
                                 dbManager.updateBook(updateBook(
                                         dbManager.getBook(
-                                                manager.getID(dbManager.getBooksGenerator(), "Enter book ID : ")),
-                                        dbManager.getAuthorsGenerator()));
+                                                manager.getID(dbManager.getBookGenerator(), "Enter book ID : ")),
+                                        dbManager.getAuthorGenerator()));
                                 break;
                             case "gap":
-                                authors = getAuthorsByParams();
+                                authors = getAuthorsByParamsDB();
                                 if (authors != null) {
                                     for (Author author : authors) {
                                         System.out.println(author.toString());
@@ -80,7 +80,7 @@ public class Controller {
                                 }
                                 break;
                             case "gbp":
-                                books = getBooksByParams();
+                                books = getBooksByParamsDB();
                                 if (books != null) {
                                     for (Book book : books) {
                                         System.out.println(book.toString());
@@ -89,20 +89,20 @@ public class Controller {
                                 break;
                             case "da":
                                 dbManager.deleteAuthor(
-                                        manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
+                                        manager.getID(dbManager.getAuthorGenerator(), "Enter author id : "));
                                 break;
                             case "db":
-                                dbManager.deleteBook(manager.getID(dbManager.getBooksGenerator(), "Enter book id : "));
+                                dbManager.deleteBook(manager.getID(dbManager.getBookGenerator(), "Enter book id : "));
                                 break;
                             case "ga":
                                 System.out.println(dbManager
-                                        .getAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "),
+                                        .getAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author id : "),
                                                 true)
                                         .toString());
                                 break;
                             case "gb":
                                 System.out.println(dbManager
-                                        .getBook(manager.getID(dbManager.getBooksGenerator(), "Enter author id : "))
+                                        .getBook(manager.getID(dbManager.getBookGenerator(), "Enter author id : "))
                                         .toString());
                                 break;
                             case "h":
@@ -162,20 +162,20 @@ public class Controller {
                                             parser.getAuthorGenerator()), true);
                                     break;
                                 case "gap":
-                                    // authors = getAuthorsByParams();
-                                    // if (authors != null) {
-                                    // for (Author author : authors) {
-                                    // System.out.println(author.toString());
-                                    // }
-                                    // }
+                                    authors = getAuthorsByParamsXML();
+                                    if (authors != null) {
+                                        for (Author author : authors) {
+                                            System.out.println(author.toString());
+                                        }
+                                    }
                                     break;
                                 case "gbp":
-                                    // books = getBooksByParams();
-                                    // if (books != null) {
-                                    // for (Book book : books) {
-                                    // System.out.println(book.toString());
-                                    // }
-                                    // }
+                                    books = getBooksByParamsXML();
+                                    if (books != null) {
+                                        for (Book book : books) {
+                                            System.out.println(book.toString());
+                                        }
+                                    }
                                     break;
                                 case "da":
                                     parser.deleteAuthor(
@@ -250,7 +250,7 @@ public class Controller {
                 " h - help;");
     }
 
-    private List<Author> getAuthorsByParams() {
+    private List<Author> getAuthorsByParamsDB() {
         System.out.println("\n You are in author loading menu \n");
         String input;
         while (manager.getBool("Do you want to load anything?")) {
@@ -271,7 +271,28 @@ public class Controller {
         return null;
     }
 
-    private List<Book> getBooksByParams() {
+    private List<Author> getAuthorsByParamsXML() {
+        System.out.println("\n You are in author loading menu \n");
+        String input;
+        while (manager.getBool("Do you want to load anything?")) {
+            System.out
+                    .println("\n n - find by number of books;\n c - find authors whose names contain certian string;");
+            input = manager.getString("Enter Command");
+            switch (input) {
+                case "n":
+                    return parser.getAuthors(manager.getInt("Enter min number of books : "),
+                            manager.getInt("Enter max number of books : "));
+                case "c":
+                    return parser.getAuthors(manager.getString("Enter the string : "));
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return null;
+    }
+
+    private List<Book> getBooksByParamsDB() {
         System.out.println("\n You are in book loading menu \n");
         String input;
         while (manager.getBool("Do you want to load anything?")) {
@@ -289,7 +310,34 @@ public class Controller {
                             manager.getDouble("Enter max price : "));
                 case "a":
                     return dbManager
-                            .getBooksOfAuthor(manager.getID(dbManager.getAuthorsGenerator(), "Enter author id : "));
+                            .getBooksOfAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author id : "));
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return null;
+    }
+
+    private List<Book> getBooksByParamsXML() {
+        System.out.println("\n You are in book loading menu \n");
+        String input;
+        while (manager.getBool("Do you want to load anything?")) {
+            System.out
+                    .println(
+                            "\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
+            input = manager.getString("Enter Command");
+            switch (input) {
+                case "n":
+                    return parser.getBooks(manager.getString("Enter the string : "));
+                case "g":
+                    return parser.getBooks(manager.getGenre("Enter the genre : "));
+                case "p":
+                    return parser.getBooks(manager.getDouble("Enter min price : "),
+                            manager.getDouble("Enter max price : "));
+                case "a":
+                    return parser.getAuthor(manager.getID(parser.getAuthorGenerator(), "Enter author id : "))
+                            .getBooks();
                 default:
                     System.out.println("Invalid command!");
                     break;
