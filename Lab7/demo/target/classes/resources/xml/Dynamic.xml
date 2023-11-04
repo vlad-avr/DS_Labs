@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<list>
-    <author firstname="Halo" lastname="John" id="A-1">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><list>
+    <author firstname="Halo" id="A-1" lastname="John">
         <book id="B-1">
             <name>Covenant F*cker</name>
             <price>117</price>
@@ -11,30 +10,15 @@
             <price>5.5</price>
             <genre>scifi</genre>
         </book>
-        <book id="B-5">
-            <name>Grunty Flavour</name>
-            <price>4.20</price>
-            <genre>horror</genre>
-        </book>
+        
         <book id="B-8">
             <name>Reach: Glassification</name>
             <price>69.99</price>
             <genre>drama</genre>
         </book>
     </author>
-    <author firstname="Lovecraft" lastname="Govard" id="A-2">
-        <book id="B-2">
-            <name>My Cat Niggerman</name>
-            <price>14.88</price>
-            <genre>horror</genre>
-        </book>
-        <book id="B-6">
-            <name>At the Mountains of Shitpost</name>
-            <price>16.16</price>
-            <genre>comedy</genre>
-        </book>
-    </author>
-    <author firstname="Matvienko" lastname="Volodymyr" id="A-3">
+    
+    <author firstname="Matvienko" id="A-3" lastname="Volodymyr">
         <book id="B-3">
             <name>The Art of Being Old</name>
             <price>27.15</price>

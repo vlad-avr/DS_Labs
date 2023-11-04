@@ -37,8 +37,8 @@ public class MyParser {
     private Document curDoc = null;
     private String curXmlPath;
     private final String xsdPath;
-    private IDGenerator authorGenerator;
-    private IDGenerator bookGenerator;
+    private IDGenerator authorGenerator = new IDGenerator("A");
+    private IDGenerator bookGenerator = new IDGenerator("B");
     private DatabaseManager dbManager;
 
     public MyParser(String xsdPath, DatabaseManager dbManager) {
@@ -100,6 +100,7 @@ public class MyParser {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlPath);
             if (validateXml(xmlPath)) {
+                getIds(doc);
                 curDoc = doc;
                 curXmlPath = xmlPath;
                 return;
@@ -108,6 +109,17 @@ public class MyParser {
             System.out.println(e.getMessage());
         }
         curDoc = null;
+    }
+
+    private void getIds(Document doc){
+        NodeList authors = doc.getElementsByTagName("author");
+        for(int i = 0; i < authors.getLength(); i++){
+            authorGenerator.addId(((Element)authors.item(i)).getAttribute("id"));
+        }
+        NodeList books = doc.getElementsByTagName("book");
+        for(int i = 0; i < books.getLength(); i++){
+            bookGenerator.addId(((Element)books.item(i)).getAttribute("id"));
+        }
     }
 
     private Element convertAuthor(Author author) {
@@ -289,10 +301,15 @@ public class MyParser {
 
     public void deleteAuthor(String ID) {
         Element root = curDoc.getDocumentElement();
+        List<Book> books = getAuthor(ID).getBooks();
         Element author = getAuthorById(ID);
         if (author != null) {
             root.removeChild(author);
             writeXML();
+            authorGenerator.removeId(ID);
+            for(Book book : books){
+                bookGenerator.removeId(book.getId());
+            }
             return;
         }
         System.out.println("\nAuthor " + ID + " Not Found");
@@ -304,6 +321,7 @@ public class MyParser {
             Element author = (Element) book.getParentNode();
             author.removeChild(book);
             writeXML();
+            bookGenerator.removeId(ID);
             return;
         }
         System.out.println("\nBook " + ID + " Not Found");

@@ -346,7 +346,7 @@ public class Controller {
     }
 
     private Book updateBook(Book book, IDGenerator authorGenerator) {
-        System.out.println("\n You are in author modification menu\n");
+        System.out.println("\n You are in book modification menu\n");
         while (manager.getBool("Do you want change something? ")) {
             System.out.println(" a - change author;\n n - change name;\n p - change price;\n g - change genre;");
             String input = manager.getString("Enter command : ");
