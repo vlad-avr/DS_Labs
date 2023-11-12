@@ -26,6 +26,7 @@ public class DatabaseManager {
     }
 
     public void initDB() {
+        destroyDB();
         createDatabase();
         createAuthorsTable();
         createBooksTable();

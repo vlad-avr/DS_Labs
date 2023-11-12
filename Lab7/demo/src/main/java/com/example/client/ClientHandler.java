@@ -61,11 +61,11 @@ public class ClientHandler implements Runnable {
         Lock readLock = lock.readLock();
         Lock writeLock = lock.writeLock();
         try {
-            while(socket.isConnected() && !socket.isClosed()){
+            while (socket.isConnected() && !socket.isClosed()) {
                 String input = reader.readLine();
                 List<Author> authors;
-                List<Book> books; 
-                String toSend = "";
+                List<Book> books;
+                String temp = "";
                 switch (input) {
                     case "sa":
                         readLock.lock();
@@ -79,6 +79,56 @@ public class ClientHandler implements Runnable {
                         readLock.unlock();
                         writer.println(toJsonBooks(books));
                         break;
+                    case "gap":
+                        switch (reader.readLine()) {
+                            case "n":
+                                int min = Integer.parseInt(reader.readLine());
+                                int max = Integer.parseInt(reader.readLine());
+                                readLock.lock();
+                                authors = serverHandler.dbManager.getAuthors(min, max);
+                                readLock.unlock();
+                                writer.println(toJsonAuthors(authors));
+                                break;
+                            case "c":
+                                temp = reader.readLine();
+                                readLock.lock();
+                                authors = serverHandler.dbManager.getAuthors(temp);
+                                readLock.unlock();
+                                writer.println(toJsonAuthors(authors));
+                                break;
+                            default:
+                                break;
+                        }
+                    case "gbp":
+                        switch (reader.readLine()) {
+                            case "n":
+                                temp = reader.readLine();
+                                readLock.lock();
+                                books = serverHandler.dbManager.getBooks(temp);
+                                readLock.unlock();
+                                writer.println(toJsonBooks(books));
+                                break;
+                            case "g":
+                                temp = reader.readLine();
+                                readLock.lock();
+                                books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
+                                readLock.unlock();
+                                writer.println(toJsonBooks(books));
+                                break;
+                            case "p":
+                                double min = Double.parseDouble(reader.readLine());
+                                double max = Double.parseDouble(reader.readLine());
+                                readLock.lock();
+                                books = serverHandler.dbManager.getBooks(min, max);
+                                readLock.unlock();
+                                writer.println(toJsonBooks(books));
+                                break;
+                            case "a":
+                                writer.println("");
+                                break;
+                            default:
+                                break;
+                        }
                     default:
                         break;
                 }
@@ -89,7 +139,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private String toJsonAuthors(List<Author> authors){
+    private String toJsonAuthors(List<Author> authors) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(authors);
@@ -99,7 +149,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private String toJsonBooks(List<Book> books){
+    private String toJsonBooks(List<Book> books) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(books);

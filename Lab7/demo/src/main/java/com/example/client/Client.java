@@ -24,8 +24,8 @@ public class Client {
     private PrintWriter out;
     private BufferedReader in;
 
-    public Client(String host, int portId){
-         try {
+    public Client(String host, int portId) {
+        try {
             clientSocket = new Socket(host, portId);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -34,7 +34,7 @@ public class Client {
         }
     }
 
-    private void closeClient(){
+    private void closeClient() {
         try {
             clientSocket.close();
             in.close();
@@ -44,12 +44,12 @@ public class Client {
         }
     }
 
-    public void run(){
-        try{
+    public void run() {
+        try {
             while (clientSocket.isConnected() && !clientSocket.isClosed()) {
-                mainLoop(out, in);    
+                mainLoop(out, in);
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -78,9 +78,10 @@ public class Client {
                 " h - help;");
     }
 
-    private List<Author> parseAuthors(String json){
+    private List<Author> parseAuthors(String json) {
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Author>> authorRef = new TypeReference<List<Author>>() {};
+        TypeReference<List<Author>> authorRef = new TypeReference<List<Author>>() {
+        };
         try {
             return mapper.readValue(json, authorRef);
         } catch (JsonProcessingException e) {
@@ -89,9 +90,68 @@ public class Client {
         }
     }
 
-    private List<Book> parseBooks(String json){
+    private void sendAuthorsRequest() {
+        System.out.println("\n You are in author loading menu \n");
+        String input;
+        while (manager.getBool("Do you want to load anything?")) {
+            System.out
+                    .println("\n n - find by number of books;\n c - find authors whose names contain certian string;");
+            input = manager.getString("Enter Command");
+            switch (input) {
+                case "n":
+                    out.println("n");
+                    out.println(manager.getInt("Enter min number of books : "));
+                    out.println(manager.getInt("Enter max number of books : "));
+                    break;
+                case "c":
+                    out.println("c");
+                    out.println(manager.getString("Enter the string : "));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+    }
+
+    private void sendBooksRequest() {
+        System.out.println("\n You are in book loading menu \n");
+        String input;
+        while (manager.getBool("Do you want to load anything?")) {
+            System.out
+                    .println(
+                            "\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
+            input = manager.getString("Enter Command");
+            switch (input) {
+                case "n":
+                    out.println(input);
+                    out.println(manager.getString("Enter the string : "));
+                    break;
+                case "g":
+                    out.println(input);
+                    out.println(manager.getGenre("Enter the genre : "));
+                    break;
+                case "p":
+                    out.println(input);
+                    out.println(manager.getDouble("Enter min price : "));
+                    out.println(manager.getDouble("Enter max price : "));
+                    break;
+                    // case "a":
+                    // out.println(input);
+                    // return dbManager
+                    // .getBooksOfAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author
+                    // id : "));
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+    }
+
+    private List<Book> parseBooks(String json) {
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Book>> authorRef = new TypeReference<List<Book>>() {};
+        TypeReference<List<Book>> authorRef = new TypeReference<List<Book>>() {
+        };
         try {
             return mapper.readValue(json, authorRef);
         } catch (JsonProcessingException e) {
@@ -100,7 +160,7 @@ public class Client {
         }
     }
 
-    private void mainLoop(PrintWriter out, BufferedReader in) throws IOException{
+    private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         boolean working;
         input = manager.getString("Enter command : ");
@@ -117,22 +177,22 @@ public class Client {
                         case "sa":
                             out.println("sa");
                             authors = parseAuthors(in.readLine());
-                            if(authors == null){ break;}
-                            for(Author author : authors){
+                            if (authors == null) {
+                                break;
+                            }
+                            for (Author author : authors) {
                                 System.out.println(author.toString());
                             }
                             break;
                         case "sb":
                             out.println("sb");
                             books = parseBooks(in.readLine());
-                            if(books == null){ break;}
-                            for(Book book : books){
+                            if (books == null) {
+                                break;
+                            }
+                            for (Book book : books) {
                                 System.out.println(book.toString());
                             }
-                            // books = dbManager.getBooks();
-                            // for (Book book : books) {
-                            // System.out.println(book.toString());
-                            // }
                             break;
                         case "aa":
                             // dbManager.addAuthor(
@@ -154,6 +214,15 @@ public class Client {
                             // dbManager.getAuthorGenerator()));
                             break;
                         case "gap":
+                            out.println("gap");
+                            sendAuthorsRequest();
+                            authors = parseAuthors(in.readLine());
+                            if (authors == null) {
+                                break;
+                            }
+                            for (Author author : authors) {
+                                System.out.println(author.toString());
+                            }
                             // authors = getAuthorsByParamsDB();
                             // if (authors != null) {
                             // for (Author author : authors) {
@@ -162,6 +231,15 @@ public class Client {
                             // }
                             break;
                         case "gbp":
+                            out.println(input);
+                            sendBooksRequest();
+                            books = parseBooks(in.readLine());
+                            if (books == null) {
+                                break;
+                            }
+                            for (Book book : books) {
+                                System.out.println(book.toString());
+                            }
                             // books = getBooksByParamsDB();
                             // if (books != null) {
                             // for (Book book : books) {
