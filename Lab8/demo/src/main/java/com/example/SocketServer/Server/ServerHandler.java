@@ -26,9 +26,9 @@ public class ServerHandler {
         try {
             this.serverSocket = new ServerSocket(portId);
             dbManager = new DatabaseManager();
+            dbManager.initDB();
             parser = new MyParser(dbManager);
             parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
-            dbManager.initDB();
             listenForClients();
         } catch (IOException e) {
             System.out.println(e.getMessage());
