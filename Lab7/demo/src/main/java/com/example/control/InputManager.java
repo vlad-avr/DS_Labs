@@ -1,5 +1,6 @@
 package com.example.control;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.example.db_controller.IDGenerator;
@@ -32,6 +33,20 @@ public class InputManager {
             } else {
                 System.out.println("Invalid input: enter '+' for yes or '-' for no!");
             }
+        }
+    }
+
+    public String getID(List<String> IDs, String prompt){
+        System.out.println("Available IDs : \n");
+        System.out.println(IDs);
+        while (true) {
+            System.out.println(prompt);
+            String id = getLine();
+            if(IDs.contains(id)){
+                return id;
+            }else{
+                System.out.println(id + " does not exist!");
+            }            
         }
     }
 

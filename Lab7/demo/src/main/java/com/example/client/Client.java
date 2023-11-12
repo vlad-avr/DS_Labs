@@ -74,18 +74,6 @@ public class Client {
                 " h - help;");
     }
 
-    private List<Author> parseAuthors(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Author>> authorRef = new TypeReference<List<Author>>() {
-        };
-        try {
-            return mapper.readValue(json, authorRef);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
     private void sendAuthorsRequest() {
         System.out.println("\n You are in author loading menu \n");
         String input;
@@ -132,11 +120,11 @@ public class Client {
                     out.println(manager.getDouble("Enter min price : "));
                     out.println(manager.getDouble("Enter max price : "));
                     break;
-                    // case "a":
-                    // out.println(input);
-                    // return dbManager
-                    // .getBooksOfAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author
-                    // id : "));
+                // case "a":
+                // out.println(input);
+                // return dbManager
+                // .getBooksOfAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author
+                // id : "));
                 default:
                     System.out.println("Invalid command!");
                     break;
@@ -144,12 +132,66 @@ public class Client {
         }
     }
 
-    private List<Book> parseBooks(String json) {
+    private List<Author> parseAuthors(String json) {
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Book>> authorRef = new TypeReference<List<Book>>() {
+        TypeReference<List<Author>> ref = new TypeReference<List<Author>>() {
         };
         try {
-            return mapper.readValue(json, authorRef);
+            return mapper.readValue(json, ref);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    private Author parseAuthor(String json) {
+        if (json == "") {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<Author> ref = new TypeReference<Author>() {
+        };
+        try {
+            return mapper.readValue(json, ref);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    private Book parseBook(String json) {
+        if (json == "") {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<Book> ref = new TypeReference<Book>() {
+        };
+        try {
+            return mapper.readValue(json, ref);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    private List<String> parseIds(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<List<String>> ref = new TypeReference<List<String>>() {
+        };
+        try {
+            return mapper.readValue(json, ref);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    private List<Book> parseBooks(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<List<Book>> ref = new TypeReference<List<Book>>() {
+        };
+        try {
+            return mapper.readValue(json, ref);
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
             return null;
@@ -169,6 +211,9 @@ public class Client {
                     input = manager.getString("Enter command : ");
                     List<Author> authors;
                     List<Book> books;
+                    Author authorTmp;
+                    Book bookTmp;
+                    String ID;
                     switch (input) {
                         case "sa":
                             out.println("sa");
@@ -241,6 +286,12 @@ public class Client {
                             break;
                         case "ga":
                             out.println(input);
+                            ID = manager.getID(parseIds(in.readLine()), "Enter author ID : ");
+                            out.println(ID);
+                            authorTmp = parseAuthor(in.readLine());
+                            if (authorTmp != null) {
+                                System.out.println(authorTmp.toString());
+                            }
                             // System.out.println(dbManager
                             // .getAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author id :
                             // "),
@@ -248,6 +299,13 @@ public class Client {
                             // .toString());
                             break;
                         case "gb":
+                            out.println(input);
+                            ID = manager.getID(parseIds(in.readLine()), "Enter book ID : ");
+                            out.println(ID);
+                            bookTmp = parseBook(in.readLine());
+                            if (bookTmp != null) {
+                                System.out.println(bookTmp.toString());
+                            }
                             // System.out.println(dbManager
                             // .getBook(manager.getID(dbManager.getBookGenerator(), "Enter author id : "))
                             // .toString());

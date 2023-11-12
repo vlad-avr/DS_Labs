@@ -7,9 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.example.objects.Author;
 import com.example.objects.Book;
@@ -59,6 +56,9 @@ public class ClientHandler implements Runnable {
                 String input = reader.readLine();
                 List<Author> authors;
                 List<Book> books;
+                List<String> IDs;
+                Author author;
+                Book book;
                 String temp = "";
                 switch (input) {
                     case "sa":
@@ -123,8 +123,36 @@ public class ClientHandler implements Runnable {
                             default:
                                 break;
                         }
-                        case "ga":
-
+                    case "ga":
+                        serverHandler.readLock(serverHandler.getAuthorLock());
+                        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
+                        serverHandler.readUnlock(serverHandler.getAuthorLock());
+                        writer.println(toJsonIDs(IDs));
+                        temp = reader.readLine();
+                        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)) {
+                            serverHandler.readLock(serverHandler.getDBLock());
+                            author = serverHandler.dbManager.getAuthor(temp, true);
+                            serverHandler.readUnlock(serverHandler.getDBLock());
+                            writer.println(toJsonAuthor(author));
+                        } else {
+                            writer.println("");
+                        }
+                        break;
+                    case "gb":
+                        serverHandler.readLock(serverHandler.getBookLock());
+                        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
+                        serverHandler.readUnlock(serverHandler.getBookLock());
+                        writer.println(toJsonIDs(IDs));
+                        temp = reader.readLine();
+                        if (serverHandler.dbManager.getBookGenerator().exists(temp)) {
+                            serverHandler.readLock(serverHandler.getDBLock());
+                            book = serverHandler.dbManager.getBook(temp);
+                            serverHandler.readUnlock(serverHandler.getDBLock());
+                            writer.println(toJsonBook(book));
+                        } else {
+                            writer.println("");
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -132,6 +160,26 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             System.out.println(e.getMessage());
             closeClient();
+        }
+    }
+
+    private String toJsonAuthor(Author author) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(author);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    private String toJsonBook(Book book) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(book);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return "";
         }
     }
 
@@ -149,6 +197,16 @@ public class ClientHandler implements Runnable {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(books);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    private String toJsonIDs(List<String> IDs) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(IDs);
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
             return "";
