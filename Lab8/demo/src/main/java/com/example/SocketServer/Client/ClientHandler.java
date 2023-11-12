@@ -151,7 +151,7 @@ public class ClientHandler implements Runnable {
                             serverHandler.readUnlock(serverHandler.getDBLock());
                             writer.println(MyJsonParser.toJsonAuthor(author));
                         } else {
-                            writer.println("");
+                            writer.println("[]");
                         }
                         break;
                     case "gb":
@@ -166,13 +166,22 @@ public class ClientHandler implements Runnable {
                             serverHandler.readUnlock(serverHandler.getDBLock());
                             writer.println(MyJsonParser.toJsonBook(book));
                         } else {
-                            writer.println("");
+                            writer.println("[]");
                         }
                         break;
-                    case "aa":
+                    case "ai":
                         serverHandler.writeLock(serverHandler.getAuthorLock());
                         writer.println(serverHandler.dbManager.getAuthorGenerator().generateId());
                         serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        break;
+                    case "bi":
+                        serverHandler.writeLock(serverHandler.getBookLock());
+                        writer.println(serverHandler.dbManager.getBookGenerator().generateId());
+                        serverHandler.writeUnlock(serverHandler.getBookLock());
+                        break;
+                    case "aa":
+                        
+                        break;
                     default:
                         break;
                 }

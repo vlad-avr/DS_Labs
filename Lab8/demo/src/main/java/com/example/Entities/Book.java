@@ -1,7 +1,5 @@
 package com.example.Entities;
 
-import java.util.StringTokenizer;
-
 //import com.example.db_controller.IDGenerator;
 
 public class Book {
@@ -32,15 +30,6 @@ public class Book {
 
     //SPECIFICALLY FOR JSON
     public Book(){}
-
-    public Book(String bookString, boolean encoded){
-        StringTokenizer st = new StringTokenizer(bookString);
-        this.id = st.nextToken();
-        this.name = st.nextToken();
-        this.price = Double.parseDouble(st.nextToken());
-        this.genre = Book.Genre.valueOf(st.nextToken());
-        this.authorId = st.nextToken();
-    }
 
     public Book(String id) {
         this.id = id;

@@ -65,16 +65,21 @@ public class Client {
                 " h - help;");
     }
 
-    private Author createAuthor(String ID) {
+    private Author createAuthor(String Id) {
         System.out.println("\n You are in author creation menu\n");
-        Author author = new Author(ID);
+        Author author = new Author(Id);
         System.out.println("\n New author`s ID is " + author.getId());
         author.setFirstName(manager.getString("Enter firstname : "));
         author.setLastName(manager.getString("Enter last name : "));
         while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
+            out.println("bi");
             // author.addBook(createBook(bookGenerator, author.getId()));
         }
         return author;
+    }
+
+    private Book createBook(String Id, String authorId){
+
     }
 
     private void sendAuthorsRequest() {
@@ -168,8 +173,8 @@ public class Client {
                 }
                 break;
             case "aa":
-                out.println(input);
-                ID = in.readLine();
+                out.println("ai");
+                authorTmp = createAuthor(in.readLine());
                 // dbManager.addAuthor(
                 // createAuthor(dbManager.getAuthorGenerator(), dbManager.getBookGenerator()));
                 break;

@@ -18,17 +18,6 @@ public class Author {
     //SPECIFICALLY FOR JSON
     public Author(){}
 
-    // public Author(String authorString, boolean andBooks){
-    //     StringTokenizer st = new StringTokenizer(authorString);
-    //     this.ID = st.nextToken();
-    //     this.firstName = st.nextToken();
-    //     this.lastName = st.nextToken();
-    //     int N = Integer.parseInt(st.nextToken());
-    //     for(int i = 0; i < N; i++){
-    //         books.add(new Book(st.nextToken("\n"), true));
-    //     }
-    // }
-
     public Author(String ID){
         this.id = ID;
     }
