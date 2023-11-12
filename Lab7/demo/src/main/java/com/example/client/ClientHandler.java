@@ -17,6 +17,8 @@ import com.example.db_controller.DatabaseManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
 import com.example.server.ServerHandler;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ClientHandler implements Runnable {
 
@@ -56,44 +58,55 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        // help();
-        // while (socket.isConnected() && !socket.isClosed()) {
-        //     mainLoop();
-        // }
         Lock readLock = lock.readLock();
         Lock writeLock = lock.writeLock();
         try {
             while(socket.isConnected() && !socket.isClosed()){
                 String input = reader.readLine();
                 List<Author> authors;
+                List<Book> books; 
                 String toSend = "";
                 switch (input) {
                     case "sa":
                         readLock.lock();
                         authors = serverHandler.dbManager.getAuthors();
-                        JSONArray arr = new JSONArray(authors);
                         readLock.unlock();
-                        writer.println(encode(authors));
+                        writer.println(toJsonAuthors(authors));
+                        break;
+                    case "sb":
+                        readLock.lock();
+                        books = serverHandler.dbManager.getBooks();
+                        readLock.unlock();
+                        writer.println(toJsonBooks(books));
                         break;
                     default:
                         break;
                 }
             }
-            // String testString = reader.readLine();
-            // System.out.println("Client says : " + testString);
-            // writer.println("Сука юзер, сам iдi нахуй!");
         } catch (IOException e) {
             System.out.println(e.getMessage());
             closeClient();
         }
     }
 
-    // private String encode(List<Author> authors){
-    //     String res = String.valueOf(authors.size()) + " ";
-    //     for(Author author : authors){
-    //         res += author.encode() + "\t";
-    //     }
-    //     return res;
-    // }
-    
+    private String toJsonAuthors(List<Author> authors){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(authors);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    private String toJsonBooks(List<Book> books){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(books);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
 }

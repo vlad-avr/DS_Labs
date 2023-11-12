@@ -15,7 +15,7 @@ public class Book {
         biography
     }
 
-    private final String id;
+    private String id;
     private String name;
     private Double price;
     private Genre genre;
@@ -29,6 +29,9 @@ public class Book {
         this.genre = genre;
         this.authorId = authorId;
     }
+
+    //SPECIFICALLY FOR JSON
+    public Book(){}
 
     public Book(String bookString, boolean encoded){
         StringTokenizer st = new StringTokenizer(bookString);

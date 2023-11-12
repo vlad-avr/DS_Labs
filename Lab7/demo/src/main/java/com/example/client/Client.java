@@ -13,6 +13,10 @@ import java.util.StringTokenizer;
 import com.example.control.InputManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Client {
     private InputManager manager = new InputManager();
@@ -25,6 +29,16 @@ public class Client {
             clientSocket = new Socket(host, portId);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void closeClient(){
+        try {
+            clientSocket.close();
+            in.close();
+            out.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -64,22 +78,27 @@ public class Client {
                 " h - help;");
     }
 
-    // private List<Author> decodeAuthors(String toDecode){
-    //     List<Author> res = new ArrayList<>();
-    //     StringTokenizer st = new StringTokenizer(toDecode);
-    //     int n = Integer.parseInt(st.nextToken());
-    //     for(int i = 0; i < n; i++){
-    //         String s = st.nextToken("\t");
-    //         System.out.println(s);
-    //         res.add(new Author(s));
-    //     }
-    //     return res;
-    // }
+    private List<Author> parseAuthors(String json){
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<List<Author>> authorRef = new TypeReference<List<Author>>() {};
+        try {
+            return mapper.readValue(json, authorRef);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 
-    // private List<Book> decodeBooks(String toDecode){
-    //     List<Book> res = new ArrayList<>();
-    //     StringTokenizer st = new StringTokenizer(toDecode);
-    // }
+    private List<Book> parseBooks(String json){
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<List<Book>> authorRef = new TypeReference<List<Book>>() {};
+        try {
+            return mapper.readValue(json, authorRef);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException{
         String input;
@@ -93,16 +112,23 @@ public class Client {
                 while (working) {
                     input = manager.getString("Enter command : ");
                     List<Author> authors;
-                    // List<Book> books;
+                    List<Book> books;
                     switch (input) {
                         case "sa":
                             out.println("sa");
-                            authors = decodeAuthors(in.readLine());
+                            authors = parseAuthors(in.readLine());
+                            if(authors == null){ break;}
                             for(Author author : authors){
                                 System.out.println(author.toString());
                             }
                             break;
                         case "sb":
+                            out.println("sb");
+                            books = parseBooks(in.readLine());
+                            if(books == null){ break;}
+                            for(Book book : books){
+                                System.out.println(book.toString());
+                            }
                             // books = dbManager.getBooks();
                             // for (Book book : books) {
                             // System.out.println(book.toString());
@@ -274,6 +300,7 @@ public class Client {
             // }
             // break;
             case "e":
+                closeClient();
                 return;
             case "h":
                 help();

@@ -2,19 +2,21 @@ package com.example.objects;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class Author {
     private String firstName;
     private String lastName;
-    private final String ID;
+    private String id;
     private List<Book> books = new ArrayList<>();
 
     public Author(String firstName, String lastName, String ID){
         this.firstName = firstName;
         this.lastName = lastName;
-        this.ID = ID;
+        this.id = ID;
     }
+
+    //SPECIFICALLY FOR JSON
+    public Author(){}
 
     // public Author(String authorString, boolean andBooks){
     //     StringTokenizer st = new StringTokenizer(authorString);
@@ -28,7 +30,7 @@ public class Author {
     // }
 
     public Author(String ID){
-        this.ID = ID;
+        this.id = ID;
     }
 
 
@@ -67,11 +69,11 @@ public class Author {
     }
 
 	public String getId() {
-		return this.ID;
+		return this.id;
 	}
 
     public String toString(){
-        String res = "\nID : " + this.ID + "\nName : " + this.lastName + " " + this.firstName + "\nBooks :";
+        String res = "\nID : " + this.id + "\nName : " + this.lastName + " " + this.firstName + "\nBooks :";
         for(Book book : books){
             res += book.toString();
         }
