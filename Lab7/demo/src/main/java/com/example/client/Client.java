@@ -80,7 +80,7 @@ public class Client {
         author.setFirstName(manager.getString("Enter firstname : "));
         author.setLastName(manager.getString("Enter last name : "));
         while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
-            author.addBook(createBook(bookGenerator, author.getId()));
+            //author.addBook(createBook(bookGenerator, author.getId()));
         }
         return author;
     }

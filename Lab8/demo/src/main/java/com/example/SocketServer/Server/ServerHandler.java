@@ -8,11 +8,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.example.SocketServer.Client.ClientHandler;
 import com.example.dbManager.DatabaseManager;
+import com.example.dbManager.MyParser;
 
 
 public class ServerHandler {
     // private ServerDB serverDB;
     public DatabaseManager dbManager;
+    private MyParser parser;
     private ServerSocket serverSocket;
     private final int portId = 1234;
 
@@ -24,6 +26,8 @@ public class ServerHandler {
         try {
             this.serverSocket = new ServerSocket(portId);
             dbManager = new DatabaseManager();
+            parser = new MyParser(dbManager);
+            parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
             dbManager.initDB();
             listenForClients();
         } catch (IOException e) {
