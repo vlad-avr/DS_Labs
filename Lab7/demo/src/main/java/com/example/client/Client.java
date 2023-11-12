@@ -6,8 +6,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import com.example.control.InputManager;
+import com.example.objects.Author;
+import com.example.objects.Book;
 
 public class Client {
     private InputManager manager = new InputManager();
@@ -26,7 +31,13 @@ public class Client {
     }
 
     public void run(){
-        mainLoop(out, in);
+        try{
+            while (clientSocket.isConnected() && !clientSocket.isClosed()) {
+                mainLoop(out, in);    
+            }
+        }catch(IOException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void help() {
@@ -53,7 +64,24 @@ public class Client {
                 " h - help;");
     }
 
-    private void mainLoop(PrintWriter out, BufferedReader in) {
+    // private List<Author> decodeAuthors(String toDecode){
+    //     List<Author> res = new ArrayList<>();
+    //     StringTokenizer st = new StringTokenizer(toDecode);
+    //     int n = Integer.parseInt(st.nextToken());
+    //     for(int i = 0; i < n; i++){
+    //         String s = st.nextToken("\t");
+    //         System.out.println(s);
+    //         res.add(new Author(s));
+    //     }
+    //     return res;
+    // }
+
+    // private List<Book> decodeBooks(String toDecode){
+    //     List<Book> res = new ArrayList<>();
+    //     StringTokenizer st = new StringTokenizer(toDecode);
+    // }
+
+    private void mainLoop(PrintWriter out, BufferedReader in) throws IOException{
         String input;
         boolean working;
         input = manager.getString("Enter command : ");
@@ -64,14 +92,15 @@ public class Client {
                 working = true;
                 while (working) {
                     input = manager.getString("Enter command : ");
-                    // List<Author> authors;
+                    List<Author> authors;
                     // List<Book> books;
                     switch (input) {
                         case "sa":
-                            // authors = dbManager.getAuthors();
-                            // for (Author author : authors) {
-                            // System.out.println(author.toString());
-                            // }
+                            out.println("sa");
+                            authors = decodeAuthors(in.readLine());
+                            for(Author author : authors){
+                                System.out.println(author.toString());
+                            }
                             break;
                         case "sb":
                             // books = dbManager.getBooks();

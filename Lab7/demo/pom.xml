@@ -41,6 +41,11 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.43.0.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20231013</version>
+    </dependency>
 
   </dependencies>
   <build>

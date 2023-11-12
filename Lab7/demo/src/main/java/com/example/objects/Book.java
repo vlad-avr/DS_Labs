@@ -30,7 +30,7 @@ public class Book {
         this.authorId = authorId;
     }
 
-    public Book(String bookString){
+    public Book(String bookString, boolean encoded){
         StringTokenizer st = new StringTokenizer(bookString);
         this.id = st.nextToken();
         this.name = st.nextToken();
@@ -39,9 +39,9 @@ public class Book {
         this.authorId = st.nextToken();
     }
 
-    // public Book(String id) {
-    //     this.id = id;
-    // }
+    public Book(String id) {
+        this.id = id;
+    }
     
     public String getName() {
         return this.name;
@@ -83,7 +83,7 @@ public class Book {
         return "\n ID : " + this.id + "\n Name : " + this.name + "\n Price : " + this.price + " $ \n Genre : " + this.genre;
     }
 
-    public String encode(){
-        return this.id + " " + this.name + " " + this.price + " " + this.genre + " " + this.authorId;
-    }
+    // public String encode(){
+    //     return this.id + " " + this.name + " " + this.price + " " + this.genre + " " + this.authorId;
+    // }
 }

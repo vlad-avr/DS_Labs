@@ -16,16 +16,16 @@ public class Author {
         this.ID = ID;
     }
 
-    public Author(String authorString, boolean andBooks){
-        StringTokenizer st = new StringTokenizer(authorString);
-        this.ID = st.nextToken();
-        this.firstName = st.nextToken();
-        this.lastName = st.nextToken();
-        int N = Integer.parseInt(st.nextToken());
-        for(int i = 0; i < N; i++){
-            books.add(new Book(st.nextToken("\n")));
-        }
-    }
+    // public Author(String authorString, boolean andBooks){
+    //     StringTokenizer st = new StringTokenizer(authorString);
+    //     this.ID = st.nextToken();
+    //     this.firstName = st.nextToken();
+    //     this.lastName = st.nextToken();
+    //     int N = Integer.parseInt(st.nextToken());
+    //     for(int i = 0; i < N; i++){
+    //         books.add(new Book(st.nextToken("\n"), true));
+    //     }
+    // }
 
     public Author(String ID){
         this.ID = ID;
@@ -78,11 +78,11 @@ public class Author {
         return res;
     }
 
-    public String encode(){
-        String encoded = this.ID + " " + this.firstName + " " + this.lastName + " " + this.books.size();
-        for(Book book : books){
-            encoded += " " + book.encode() + "\n";
-        }
-        return encoded;
-    }
+    // public String encode(){
+    //     String encoded = this.ID + " " + this.firstName + " " + this.lastName + " " + this.books.size();
+    //     for(Book book : books){
+    //         encoded += " " + book.encode() + "\n";
+    //     }
+    //     return encoded;
+    // }
 }
