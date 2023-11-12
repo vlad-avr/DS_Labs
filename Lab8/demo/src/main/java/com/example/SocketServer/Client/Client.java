@@ -201,8 +201,6 @@ public class Client {
                 bookTmp = createBook(ID, authorId);
                 out.println("ab");
                 out.println(MyJsonParser.toJsonBook(bookTmp));
-                // dbManager.addBook(
-                // createBook(dbManager.getBookGenerator(), dbManager.getAuthorGenerator()));
                 break;
             case "ua":
                 // dbManager.updateAuthor(updateAuthor(dbManager.getAuthor(

@@ -213,11 +213,15 @@ public class ClientHandler implements Runnable {
                         }
                         break;
                     case "ab":
+                        serverHandler.writeLock(serverHandler.getAuthorLock());
                         serverHandler.writeLock(serverHandler.getBookLock());
                         serverHandler.writeLock(serverHandler.getDBLock());
-                        serverHandler.dbManager.addBook(MyJsonParser.parseBook(reader.readLine()));
+                        book = MyJsonParser.parseBook(reader.readLine());
+                        serverHandler.dbManager.addBook(book);
+                        serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
                         serverHandler.writeUnlock(serverHandler.getDBLock());
                         serverHandler.writeUnlock(serverHandler.getBookLock());
+                        serverHandler.writeUnlock(serverHandler.getAuthorLock());
                         break;
                     default:
                         break;
