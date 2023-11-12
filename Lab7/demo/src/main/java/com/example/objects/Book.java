@@ -1,5 +1,7 @@
 package com.example.objects;
 
+import java.util.StringTokenizer;
+
 //import com.example.db_controller.IDGenerator;
 
 public class Book {
@@ -28,9 +30,18 @@ public class Book {
         this.authorId = authorId;
     }
 
-    public Book(String id) {
-        this.id = id;
+    public Book(String bookString){
+        StringTokenizer st = new StringTokenizer(bookString);
+        this.id = st.nextToken();
+        this.name = st.nextToken();
+        this.price = Double.parseDouble(st.nextToken());
+        this.genre = Book.Genre.valueOf(st.nextToken());
+        this.authorId = st.nextToken();
     }
+
+    // public Book(String id) {
+    //     this.id = id;
+    // }
     
     public String getName() {
         return this.name;
@@ -70,5 +81,9 @@ public class Book {
 
     public String toString(){
         return "\n ID : " + this.id + "\n Name : " + this.name + "\n Price : " + this.price + " $ \n Genre : " + this.genre;
+    }
+
+    public String encode(){
+        return this.id + " " + this.name + " " + this.price + " " + this.genre + " " + this.authorId;
     }
 }
