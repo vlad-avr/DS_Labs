@@ -125,7 +125,7 @@ public class ClientHandler implements Runnable {
                                 if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
                                     serverHandler.readLock(serverHandler.getDBLock());
                                     books = serverHandler.dbManager.getBooksOfAuthor(temp);
-                                    serverHandler.readUnlock(serverHandler.getAuthorLock());
+                                    serverHandler.readUnlock(serverHandler.getDBLock());
                                     writer.println(MyJsonParser.toJsonBooks(books));
                                 }else{
                                     writer.println("");
