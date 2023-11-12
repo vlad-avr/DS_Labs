@@ -98,6 +98,13 @@ public class IDGenerator {
         }
     }
 
+    public boolean isReserved(String Id){
+        if(reservedIds.contains(Id)){
+            return true;
+        }
+        return false;
+    }
+
     public void releaseId(String Id){
         if(reservedIds.contains(Id)){
             reservedIds.remove(Id);

@@ -89,7 +89,7 @@ public class Client {
         System.out.println("\n You are in book creation menu\n");
         Book book = new Book(Id);
         book.setAuthor(authorId);
-        System.out.println("\n New author`s ID is " + book.getId() + " and its author is " + book.getAuthor());
+        System.out.println("\n New book`s ID is " + book.getId() + " and its author is " + book.getAuthor());
         book.setName(manager.getString("Enter name : "));
         book.setPrice(manager.getDouble("Enter price : "));
         book.setGenre(manager.getGenre("Enter genre : "));
@@ -194,7 +194,7 @@ public class Client {
                 break;
             case "ab":
                 out.println("rai");
-                String authorId = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID");
+                String authorId = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
                 out.println(authorId);
                 out.println("bi");
                 ID = in.readLine();
@@ -238,12 +238,14 @@ public class Client {
                 // }
                 break;
             case "da":
-                // dbManager.deleteAuthor(
-                // manager.getID(dbManager.getAuthorGenerator(), "Enter author id : "));
+                out.println("da");
+                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
+                out.println(ID);
                 break;
             case "db":
-                // dbManager.deleteBook(manager.getID(dbManager.getBookGenerator(), "Enter book
-                // id : "));
+                out.println("db");
+                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter book ID : ");
+                out.println(ID);
                 break;
             case "ga":
                 out.println(input);

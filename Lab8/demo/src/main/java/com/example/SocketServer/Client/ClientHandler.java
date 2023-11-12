@@ -13,7 +13,6 @@ import com.example.Entities.Book;
 import com.example.SocketServer.Server.ServerHandler;
 import com.example.jsonParser.MyJsonParser;
 
-
 public class ClientHandler implements Runnable {
 
     private Socket socket;
@@ -75,70 +74,70 @@ public class ClientHandler implements Runnable {
                         writer.println(MyJsonParser.toJsonBooks(books));
                         break;
                     // case "gap":
-                    //     switch (reader.readLine()) {
-                    //         case "n":
-                    //             int min = Integer.parseInt(reader.readLine());
-                    //             int max = Integer.parseInt(reader.readLine());
-                    //             serverHandler.readLock(serverHandler.getDBLock());
-                    //             authors = serverHandler.dbManager.getAuthors(min, max);
-                    //             serverHandler.readUnlock(serverHandler.getDBLock());
-                    //             writer.println(MyJsonParser.toJsonAuthors(authors));
-                    //             break;
-                    //         case "c":
-                    //             temp = reader.readLine();
-                    //             serverHandler.readLock(serverHandler.getDBLock());
-                    //             authors = serverHandler.dbManager.getAuthors(temp);
-                    //             serverHandler.readUnlock(serverHandler.getDBLock());
-                    //             writer.println(MyJsonParser.toJsonAuthors(authors));
-                    //             break;
-                    //         default:
-                    //             System.out.println("UKNOWN");
-                    //             break;
-                    //     }
+                    // switch (reader.readLine()) {
+                    // case "n":
+                    // int min = Integer.parseInt(reader.readLine());
+                    // int max = Integer.parseInt(reader.readLine());
+                    // serverHandler.readLock(serverHandler.getDBLock());
+                    // authors = serverHandler.dbManager.getAuthors(min, max);
+                    // serverHandler.readUnlock(serverHandler.getDBLock());
+                    // writer.println(MyJsonParser.toJsonAuthors(authors));
+                    // break;
+                    // case "c":
+                    // temp = reader.readLine();
+                    // serverHandler.readLock(serverHandler.getDBLock());
+                    // authors = serverHandler.dbManager.getAuthors(temp);
+                    // serverHandler.readUnlock(serverHandler.getDBLock());
+                    // writer.println(MyJsonParser.toJsonAuthors(authors));
+                    // break;
+                    // default:
+                    // System.out.println("UKNOWN");
+                    // break;
+                    // }
                     // case "gbp":
-                    //     switch (reader.readLine()) {
-                    //         case "n":
-                    //             temp = reader.readLine();
-                    //             serverHandler.readLock(serverHandler.getDBLock());
-                    //             books = serverHandler.dbManager.getBooks(temp);
-                    //             serverHandler.readUnlock(serverHandler.getDBLock());
-                    //             writer.println(MyJsonParser.toJsonBooks(books));
-                    //             break;
-                    //         case "g":
-                    //             temp = reader.readLine();
-                    //             serverHandler.readLock(serverHandler.getDBLock());
-                    //             books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
-                    //             serverHandler.readUnlock(serverHandler.getDBLock());
-                    //             System.out.println(books.get(0).toString());
-                    //             writer.println(MyJsonParser.toJsonBooks(books));
-                    //             break;
-                    //         case "p":
-                    //             double min = Double.parseDouble(reader.readLine());
-                    //             double max = Double.parseDouble(reader.readLine());
-                    //             serverHandler.readLock(serverHandler.getDBLock());
-                    //             books = serverHandler.dbManager.getBooks(min, max);
-                    //             serverHandler.readUnlock(serverHandler.getDBLock());
-                    //             writer.println(MyJsonParser.toJsonBooks(books));
-                    //             break;
-                    //         case "a":
-                    //             serverHandler.readLock(serverHandler.getAuthorLock());
-                    //             IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
-                    //             serverHandler.readUnlock(serverHandler.getAuthorLock()); 
-                    //             writer.println(MyJsonParser.toJsonIDs(IDs));
-                    //             temp = reader.readLine();
-                    //             System.out.println(temp);
-                    //             if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
-                    //                 serverHandler.readLock(serverHandler.getDBLock());
-                    //                 books = serverHandler.dbManager.getBooksOfAuthor(temp);
-                    //                 serverHandler.readUnlock(serverHandler.getDBLock());
-                    //                 writer.println(MyJsonParser.toJsonBooks(books));
-                    //             }else{
-                    //                 writer.println("");
-                    //             }
-                    //             break;
-                    //         default:
-                    //             break;
-                    //     }
+                    // switch (reader.readLine()) {
+                    // case "n":
+                    // temp = reader.readLine();
+                    // serverHandler.readLock(serverHandler.getDBLock());
+                    // books = serverHandler.dbManager.getBooks(temp);
+                    // serverHandler.readUnlock(serverHandler.getDBLock());
+                    // writer.println(MyJsonParser.toJsonBooks(books));
+                    // break;
+                    // case "g":
+                    // temp = reader.readLine();
+                    // serverHandler.readLock(serverHandler.getDBLock());
+                    // books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
+                    // serverHandler.readUnlock(serverHandler.getDBLock());
+                    // System.out.println(books.get(0).toString());
+                    // writer.println(MyJsonParser.toJsonBooks(books));
+                    // break;
+                    // case "p":
+                    // double min = Double.parseDouble(reader.readLine());
+                    // double max = Double.parseDouble(reader.readLine());
+                    // serverHandler.readLock(serverHandler.getDBLock());
+                    // books = serverHandler.dbManager.getBooks(min, max);
+                    // serverHandler.readUnlock(serverHandler.getDBLock());
+                    // writer.println(MyJsonParser.toJsonBooks(books));
+                    // break;
+                    // case "a":
+                    // serverHandler.readLock(serverHandler.getAuthorLock());
+                    // IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
+                    // serverHandler.readUnlock(serverHandler.getAuthorLock());
+                    // writer.println(MyJsonParser.toJsonIDs(IDs));
+                    // temp = reader.readLine();
+                    // System.out.println(temp);
+                    // if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
+                    // serverHandler.readLock(serverHandler.getDBLock());
+                    // books = serverHandler.dbManager.getBooksOfAuthor(temp);
+                    // serverHandler.readUnlock(serverHandler.getDBLock());
+                    // writer.println(MyJsonParser.toJsonBooks(books));
+                    // }else{
+                    // writer.println("");
+                    // }
+                    // break;
+                    // default:
+                    // break;
+                    // }
                     case "ga":
                         serverHandler.readLock(serverHandler.getAuthorLock());
                         IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
@@ -194,7 +193,7 @@ public class ClientHandler implements Runnable {
                         serverHandler.readUnlock(serverHandler.getAuthorLock());
                         writer.println(MyJsonParser.toJsonIDs(IDs));
                         temp = reader.readLine();
-                        if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
+                        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)) {
                             serverHandler.writeLock(serverHandler.getAuthorLock());
                             serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
                             serverHandler.writeUnlock(serverHandler.getAuthorLock());
@@ -206,7 +205,7 @@ public class ClientHandler implements Runnable {
                         serverHandler.readUnlock(serverHandler.getBookLock());
                         writer.println(MyJsonParser.toJsonIDs(IDs));
                         temp = reader.readLine();
-                        if(serverHandler.dbManager.getBookGenerator().exists(temp)){
+                        if (serverHandler.dbManager.getBookGenerator().exists(temp)) {
                             serverHandler.writeLock(serverHandler.getBookLock());
                             serverHandler.dbManager.getBookGenerator().reserveId(temp);
                             serverHandler.writeUnlock(serverHandler.getBookLock());
@@ -223,6 +222,40 @@ public class ClientHandler implements Runnable {
                         serverHandler.writeUnlock(serverHandler.getBookLock());
                         serverHandler.writeUnlock(serverHandler.getAuthorLock());
                         break;
+                    case "da":
+                        serverHandler.readLock(serverHandler.getAuthorLock());
+                        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
+                        serverHandler.readUnlock(serverHandler.getAuthorLock());
+                        writer.println(MyJsonParser.toJsonIDs(IDs));
+                        temp = reader.readLine();
+                        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)
+                                && !serverHandler.dbManager.getAuthorGenerator().isReserved(temp)) {
+                            serverHandler.writeLock(serverHandler.getAuthorLock());
+                            serverHandler.writeLock(serverHandler.getBookLock());
+                            serverHandler.writeLock(serverHandler.getDBLock());
+                            serverHandler.dbManager.deleteAuthor(temp);
+                            serverHandler.writeUnlock(serverHandler.getDBLock());
+                            serverHandler.writeUnlock(serverHandler.getBookLock());
+                            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        }
+                        break;
+                    case "db":
+                        serverHandler.readLock(serverHandler.getBookLock());
+                        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
+                        serverHandler.readUnlock(serverHandler.getBookLock());
+                        writer.println(MyJsonParser.toJsonIDs(IDs));
+                        temp = reader.readLine();
+                        if (serverHandler.dbManager.getBookGenerator().exists(temp)
+                                && !serverHandler.dbManager.getBookGenerator().isReserved(temp)) {
+                            serverHandler.writeLock(serverHandler.getAuthorLock());
+                            serverHandler.writeLock(serverHandler.getBookLock());
+                            serverHandler.writeLock(serverHandler.getDBLock());
+                            serverHandler.dbManager.deleteBook(temp);
+                            serverHandler.writeUnlock(serverHandler.getDBLock());
+                            serverHandler.writeUnlock(serverHandler.getBookLock());
+                            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -232,7 +265,5 @@ public class ClientHandler implements Runnable {
             closeClient();
         }
     }
-
-    
 
 }
