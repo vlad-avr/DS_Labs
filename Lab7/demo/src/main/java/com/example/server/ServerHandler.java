@@ -7,16 +7,22 @@ import java.net.Socket;
 import com.example.client.ClientHandler;
 import com.example.db_controller.DatabaseManager;
 // import com.example.xml_parser.MyParser;
+import com.example.xml_parser.MyParser;
 
 public class ServerHandler {
-    //private ServerDB serverDB;
+    // private ServerDB serverDB;
+    private DatabaseManager dbManager;
+    private MyParser parser;
     private ServerSocket serverSocket;
     private final int portId = 1234;
 
     public ServerHandler() {
         try {
             this.serverSocket = new ServerSocket(portId);
-            //serverDB = new ServerDB();
+            dbManager = new DatabaseManager();
+            parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd",
+                    dbManager);
+            parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
             listenForClients();
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -24,7 +30,7 @@ public class ServerHandler {
         }
     }
 
-    public void run(){
+    public void run() {
         listenForClients();
     }
 
