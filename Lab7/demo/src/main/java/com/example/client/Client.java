@@ -7,12 +7,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 
+import com.example.JsonParser.MyJsonParser;
 import com.example.control.InputManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Client {
     private InputManager manager = new InputManager();
@@ -132,72 +130,6 @@ public class Client {
         }
     }
 
-    private List<Author> parseAuthors(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Author>> ref = new TypeReference<List<Author>>() {
-        };
-        try {
-            return mapper.readValue(json, ref);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    private Author parseAuthor(String json) {
-        if (json == "") {
-            return null;
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<Author> ref = new TypeReference<Author>() {
-        };
-        try {
-            return mapper.readValue(json, ref);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    private Book parseBook(String json) {
-        if (json == "") {
-            return null;
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<Book> ref = new TypeReference<Book>() {
-        };
-        try {
-            return mapper.readValue(json, ref);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    private List<String> parseIds(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<String>> ref = new TypeReference<List<String>>() {
-        };
-        try {
-            return mapper.readValue(json, ref);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    private List<Book> parseBooks(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Book>> ref = new TypeReference<List<Book>>() {
-        };
-        try {
-            return mapper.readValue(json, ref);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         boolean working;
@@ -217,7 +149,7 @@ public class Client {
                     switch (input) {
                         case "sa":
                             out.println("sa");
-                            authors = parseAuthors(in.readLine());
+                            authors = MyJsonParser.parseAuthors(in.readLine());
                             if (authors == null) {
                                 break;
                             }
@@ -227,7 +159,7 @@ public class Client {
                             break;
                         case "sb":
                             out.println("sb");
-                            books = parseBooks(in.readLine());
+                            books = MyJsonParser.parseBooks(in.readLine());
                             if (books == null) {
                                 break;
                             }
@@ -259,7 +191,7 @@ public class Client {
                         case "gap":
                             out.println("gap");
                             sendAuthorsRequest();
-                            authors = parseAuthors(in.readLine());
+                            authors = MyJsonParser.parseAuthors(in.readLine());
                             if (authors == null) {
                                 break;
                             }
@@ -270,7 +202,7 @@ public class Client {
                         case "gbp":
                             out.println(input);
                             sendBooksRequest();
-                            books = parseBooks(in.readLine());
+                            books = MyJsonParser.parseBooks(in.readLine());
                             if (books == null) {
                                 break;
                             }
@@ -288,18 +220,18 @@ public class Client {
                             break;
                         case "ga":
                             out.println(input);
-                            ID = manager.getID(parseIds(in.readLine()), "Enter author ID : ");
+                            ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author ID : ");
                             out.println(ID);
-                            authorTmp = parseAuthor(in.readLine());
+                            authorTmp = MyJsonParser.parseAuthor(in.readLine());
                             if (authorTmp != null) {
                                 System.out.println(authorTmp.toString());
                             }
                             break;
                         case "gb":
                             out.println(input);
-                            ID = manager.getID(parseIds(in.readLine()), "Enter book ID : ");
+                            ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter book ID : ");
                             out.println(ID);
-                            bookTmp = parseBook(in.readLine());
+                            bookTmp = MyJsonParser.parseBook(in.readLine());
                             if (bookTmp != null) {
                                 System.out.println(bookTmp.toString());
                             }
