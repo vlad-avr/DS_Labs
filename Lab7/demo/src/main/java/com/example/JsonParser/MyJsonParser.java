@@ -80,7 +80,7 @@ public class MyJsonParser {
         try {
             return mapper.writeValueAsString(author);
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR : " + e.getMessage());
             return "";
         }
     }
@@ -90,7 +90,7 @@ public class MyJsonParser {
         try {
             return mapper.writeValueAsString(book);
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR : " + e.getMessage());
             return "";
         }
     }
@@ -100,7 +100,7 @@ public class MyJsonParser {
         try {
             return mapper.writeValueAsString(authors);
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR : " + e.getMessage());
             return "";
         }
     }
@@ -110,7 +110,7 @@ public class MyJsonParser {
         try {
             return mapper.writeValueAsString(books);
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR : " + e.getMessage());
             return "";
         }
     }
@@ -120,7 +120,7 @@ public class MyJsonParser {
         try {
             return mapper.writeValueAsString(IDs);
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR : " + e.getMessage());
             return "";
         }
     }

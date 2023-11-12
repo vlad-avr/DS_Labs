@@ -75,7 +75,7 @@ public class Client {
     private void sendAuthorsRequest() {
         System.out.println("\n You are in author loading menu \n");
         String input;
-        while (manager.getBool("Do you want to load anything?")) {
+        while (true) {
             System.out
                     .println("\n n - find by number of books;\n c - find authors whose names contain certian string;");
             input = manager.getString("Enter Command");
@@ -84,11 +84,11 @@ public class Client {
                     out.println("n");
                     out.println(manager.getInt("Enter min number of books : "));
                     out.println(manager.getInt("Enter max number of books : "));
-                    break;
+                    return;
                 case "c":
                     out.println("c");
                     out.println(manager.getString("Enter the string : "));
-                    break;
+                    return;
                 default:
                     System.out.println("Invalid command!");
                     break;
@@ -99,7 +99,7 @@ public class Client {
     private void sendBooksRequest() {
         System.out.println("\n You are in book loading menu \n");
         String input;
-        while (manager.getBool("Do you want to load anything?")) {
+        while (true) {
             System.out
                     .println(
                             "\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
@@ -108,16 +108,16 @@ public class Client {
                 case "n":
                     out.println(input);
                     out.println(manager.getString("Enter the string : "));
-                    break;
+                    return;
                 case "g":
                     out.println(input);
                     out.println(manager.getGenre("Enter the genre : "));
-                    break;
+                    return;
                 case "p":
                     out.println(input);
                     out.println(manager.getDouble("Enter min price : "));
                     out.println(manager.getDouble("Enter max price : "));
-                    break;
+                    return;
                 case "a":
                     out.println(input);
                     try {
@@ -125,7 +125,7 @@ public class Client {
                     } catch (IOException e) {
                         System.out.println(e.getMessage());
                     }
-                    break;
+                    return;
                 default:
                     System.out.println("Invalid command!");
                     break;
@@ -194,7 +194,9 @@ public class Client {
                         case "gap":
                             out.println("gap");
                             sendAuthorsRequest();
-                            authors = MyJsonParser.parseAuthors(in.readLine());
+                            String tmp = in.readLine();
+                            System.out.println(tmp);
+                            authors = MyJsonParser.parseAuthors(tmp);
                             if (authors == null) {
                                 break;
                             }

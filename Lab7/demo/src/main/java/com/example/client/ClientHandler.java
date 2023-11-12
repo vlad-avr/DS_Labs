@@ -53,6 +53,7 @@ public class ClientHandler implements Runnable {
         try {
             while (socket.isConnected() && !socket.isClosed()) {
                 String input = reader.readLine();
+                writer.flush();
                 List<Author> authors;
                 List<Book> books;
                 List<String> IDs;
@@ -90,6 +91,7 @@ public class ClientHandler implements Runnable {
                                 writer.println(MyJsonParser.toJsonAuthors(authors));
                                 break;
                             default:
+                                System.out.println("UKNOWN");
                                 break;
                         }
                     case "gbp":
@@ -106,6 +108,7 @@ public class ClientHandler implements Runnable {
                                 serverHandler.readLock(serverHandler.getDBLock());
                                 books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
                                 serverHandler.readUnlock(serverHandler.getDBLock());
+                                System.out.println(books.get(0).toString());
                                 writer.println(MyJsonParser.toJsonBooks(books));
                                 break;
                             case "p":
@@ -122,6 +125,7 @@ public class ClientHandler implements Runnable {
                                 serverHandler.readUnlock(serverHandler.getAuthorLock()); 
                                 writer.println(MyJsonParser.toJsonIDs(IDs));
                                 temp = reader.readLine();
+                                System.out.println(temp);
                                 if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
                                     serverHandler.readLock(serverHandler.getDBLock());
                                     books = serverHandler.dbManager.getBooksOfAuthor(temp);
