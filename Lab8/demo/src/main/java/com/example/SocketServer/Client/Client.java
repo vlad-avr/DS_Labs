@@ -189,28 +189,28 @@ public class Client {
                 // dbManager.getAuthorGenerator()));
                 break;
             case "gap":
-                out.println("gap");
-                sendAuthorsRequest();
-                String tmp = in.readLine();
-                System.out.println(tmp);
-                authors = MyJsonParser.parseAuthors(tmp);
-                if (authors == null) {
-                    break;
-                }
-                for (Author author : authors) {
-                    System.out.println(author.toString());
-                }
+                // out.println("gap");
+                // sendAuthorsRequest();
+                // String tmp = in.readLine();
+                // System.out.println(tmp);
+                // authors = MyJsonParser.parseAuthors(tmp);
+                // if (authors == null) {
+                //     break;
+                // }
+                // for (Author author : authors) {
+                //     System.out.println(author.toString());
+                // }
                 break;
             case "gbp":
-                out.println(input);
-                sendBooksRequest();
-                books = MyJsonParser.parseBooks(in.readLine());
-                if (books == null) {
-                    break;
-                }
-                for (Book book : books) {
-                    System.out.println(book.toString());
-                }
+                // out.println(input);
+                // sendBooksRequest();
+                // books = MyJsonParser.parseBooks(in.readLine());
+                // if (books == null) {
+                //     break;
+                // }
+                // for (Book book : books) {
+                //     System.out.println(book.toString());
+                // }
                 break;
             case "da":
                 // dbManager.deleteAuthor(

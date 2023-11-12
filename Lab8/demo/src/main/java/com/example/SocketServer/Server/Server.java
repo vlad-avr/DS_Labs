@@ -7,5 +7,4 @@ public class Server {
         ServerHandler server = new ServerHandler();
         server.run();
     }
-
 }
