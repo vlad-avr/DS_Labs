@@ -39,7 +39,7 @@ public class ServerHandler {
             try {
                 Socket socket = serverSocket.accept();
                 System.out.println("\n A new Client has connected!\n");
-                ClientHandler handler = new ClientHandler(socket);
+                ClientHandler handler = new ClientHandler(socket, dbManager);
 
                 Thread thr = new Thread(handler);
                 thr.start();
