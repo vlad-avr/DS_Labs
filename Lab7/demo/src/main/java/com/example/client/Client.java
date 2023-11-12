@@ -3,19 +3,15 @@ package com.example.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import com.example.control.InputManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Client {
@@ -223,12 +219,6 @@ public class Client {
                             for (Author author : authors) {
                                 System.out.println(author.toString());
                             }
-                            // authors = getAuthorsByParamsDB();
-                            // if (authors != null) {
-                            // for (Author author : authors) {
-                            // System.out.println(author.toString());
-                            // }
-                            // }
                             break;
                         case "gbp":
                             out.println(input);
@@ -240,12 +230,6 @@ public class Client {
                             for (Book book : books) {
                                 System.out.println(book.toString());
                             }
-                            // books = getBooksByParamsDB();
-                            // if (books != null) {
-                            // for (Book book : books) {
-                            // System.out.println(book.toString());
-                            // }
-                            // }
                             break;
                         case "da":
                             // dbManager.deleteAuthor(
@@ -256,6 +240,7 @@ public class Client {
                             // id : "));
                             break;
                         case "ga":
+                            out.println(input);
                             // System.out.println(dbManager
                             // .getAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author id :
                             // "),

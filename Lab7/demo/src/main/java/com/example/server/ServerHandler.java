@@ -3,6 +3,8 @@ package com.example.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.example.client.ClientHandler;
 import com.example.db_controller.DatabaseManager;
@@ -15,6 +17,10 @@ public class ServerHandler {
     private MyParser parser;
     private ServerSocket serverSocket;
     private final int portId = 1234;
+
+    private ReadWriteLock dbLock = new ReentrantReadWriteLock();
+    private ReadWriteLock bookLock = new ReentrantReadWriteLock();
+    private ReadWriteLock authorLock = new ReentrantReadWriteLock();
 
     public ServerHandler() {
         try {
@@ -29,6 +35,34 @@ public class ServerHandler {
             System.out.println(e.getMessage());
             closeServer();
         }
+    }
+
+    public ReadWriteLock getDBLock(){
+        return this.dbLock;
+    }
+
+    public ReadWriteLock getBookLock(){
+        return this.bookLock;
+    }
+
+    public ReadWriteLock getAuthorLock(){
+        return this.authorLock;
+    }
+
+    public void writeLock(ReadWriteLock lock){
+        lock.writeLock().lock();
+    }
+
+    public void writeUnlock(ReadWriteLock lock){
+        lock.writeLock().unlock();
+    }
+
+    public void readLock(ReadWriteLock lock){
+        lock.readLock().lock();
+    }
+
+    public void readUnlock(ReadWriteLock lock){
+        lock.readLock().unlock();
     }
 
     public void run() {

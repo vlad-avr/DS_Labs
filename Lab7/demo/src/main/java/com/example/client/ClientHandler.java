@@ -11,9 +11,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.json.JSONArray;
-
-import com.example.db_controller.DatabaseManager;
 import com.example.objects.Author;
 import com.example.objects.Book;
 import com.example.server.ServerHandler;
@@ -22,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ClientHandler implements Runnable {
 
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
@@ -58,8 +54,6 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        Lock readLock = lock.readLock();
-        Lock writeLock = lock.writeLock();
         try {
             while (socket.isConnected() && !socket.isClosed()) {
                 String input = reader.readLine();
@@ -68,15 +62,15 @@ public class ClientHandler implements Runnable {
                 String temp = "";
                 switch (input) {
                     case "sa":
-                        readLock.lock();
+                        serverHandler.readLock(serverHandler.getDBLock());
                         authors = serverHandler.dbManager.getAuthors();
-                        readLock.unlock();
+                        serverHandler.readUnlock(serverHandler.getDBLock());
                         writer.println(toJsonAuthors(authors));
                         break;
                     case "sb":
-                        readLock.lock();
+                        serverHandler.readLock(serverHandler.getDBLock());
                         books = serverHandler.dbManager.getBooks();
-                        readLock.unlock();
+                        serverHandler.readUnlock(serverHandler.getDBLock());
                         writer.println(toJsonBooks(books));
                         break;
                     case "gap":
@@ -84,16 +78,16 @@ public class ClientHandler implements Runnable {
                             case "n":
                                 int min = Integer.parseInt(reader.readLine());
                                 int max = Integer.parseInt(reader.readLine());
-                                readLock.lock();
+                                serverHandler.readLock(serverHandler.getDBLock());
                                 authors = serverHandler.dbManager.getAuthors(min, max);
-                                readLock.unlock();
+                                serverHandler.readUnlock(serverHandler.getDBLock());
                                 writer.println(toJsonAuthors(authors));
                                 break;
                             case "c":
                                 temp = reader.readLine();
-                                readLock.lock();
+                                serverHandler.readLock(serverHandler.getDBLock());
                                 authors = serverHandler.dbManager.getAuthors(temp);
-                                readLock.unlock();
+                                serverHandler.readUnlock(serverHandler.getDBLock());
                                 writer.println(toJsonAuthors(authors));
                                 break;
                             default:
@@ -103,24 +97,24 @@ public class ClientHandler implements Runnable {
                         switch (reader.readLine()) {
                             case "n":
                                 temp = reader.readLine();
-                                readLock.lock();
+                                serverHandler.readLock(serverHandler.getDBLock());
                                 books = serverHandler.dbManager.getBooks(temp);
-                                readLock.unlock();
+                                serverHandler.readUnlock(serverHandler.getDBLock());
                                 writer.println(toJsonBooks(books));
                                 break;
                             case "g":
                                 temp = reader.readLine();
-                                readLock.lock();
+                                serverHandler.readLock(serverHandler.getDBLock());
                                 books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
-                                readLock.unlock();
+                                serverHandler.readUnlock(serverHandler.getDBLock());
                                 writer.println(toJsonBooks(books));
                                 break;
                             case "p":
                                 double min = Double.parseDouble(reader.readLine());
                                 double max = Double.parseDouble(reader.readLine());
-                                readLock.lock();
+                                serverHandler.readLock(serverHandler.getDBLock());
                                 books = serverHandler.dbManager.getBooks(min, max);
-                                readLock.unlock();
+                                serverHandler.readUnlock(serverHandler.getDBLock());
                                 writer.println(toJsonBooks(books));
                                 break;
                             case "a":
@@ -129,6 +123,8 @@ public class ClientHandler implements Runnable {
                             default:
                                 break;
                         }
+                        case "ga":
+
                     default:
                         break;
                 }
