@@ -10,6 +10,7 @@ public class IDGenerator {
     // "ID" is ID Format
     private final String idFormat;
     private List<String> idRecord = new ArrayList<>();
+    private List<String> temporalCollector = new ArrayList<>();
 
     public IDGenerator(String idFormat) {
         this.idFormat = idFormat + "-";
@@ -48,12 +49,14 @@ public class IDGenerator {
         int Id = 1;
         if(idRecord.size() > 0){
             if(Id < getValue(idRecord.get(0))){
-                addId(idFormat + Id);
+                //addId(idFormat + Id);
+                temporalCollector.add(idFormat + Id);
                 return idFormat + Id;
             }
             for(int i = 1; i < idRecord.size(); i++){
-                if(getValue(idRecord.get(i)) - getValue(idRecord.get(i-1)) > 1){
-                    addId(idFormat + (getValue(idRecord.get(i-1)) + 1));
+                if(getValue(idRecord.get(i)) - getValue(idRecord.get(i-1)) > 1 && !temporalCollector.contains(idFormat + (getValue(idRecord.get(i-1)) + 1))){
+                    //addId(idFormat + (getValue(idRecord.get(i-1)) + 1));
+                    temporalCollector.add(idFormat + (getValue(idRecord.get(i-1)) + 1));
                     return idFormat + (getValue(idRecord.get(i-1)) + 1);
                 }else{
                     Id = getValue(idRecord.get(i));
@@ -61,13 +64,17 @@ public class IDGenerator {
             }
         }
         Id++;
-        addId(idFormat + Id);
+        //addId(idFormat + Id);
+        temporalCollector.add(idFormat + Id);
         return idFormat + Id;
     }
 
     public void addId(String Id){
         if (!idRecord.contains(Id)) {
             idRecord.add(Id);
+            if(temporalCollector.contains(Id)){
+                temporalCollector.remove(Id);
+            }
             sort();
         } else {
             System.out.println("\nThis ID already exists!");
@@ -83,7 +90,7 @@ public class IDGenerator {
     }
 
     public boolean exists(String Id) {
-        if (idRecord.contains(Id)) {
+        if (idRecord.contains(Id) || temporalCollector.contains(Id)) {
             return true;
         }
         return false;

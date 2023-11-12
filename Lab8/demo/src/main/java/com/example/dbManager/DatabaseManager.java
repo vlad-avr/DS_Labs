@@ -110,7 +110,7 @@ public class DatabaseManager {
             for (Book book : books) {
                 addBook(book);
             }
-            // authorsIdGenerator.addId(author.getId());
+            authorsIdGenerator.addId(author.getId());
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -125,7 +125,7 @@ public class DatabaseManager {
             statement.setString(4, book.getGenre());
             statement.setString(5, book.getAuthor());
             statement.executeUpdate();
-            // booksIdGenerator.addId(book.getId());
+            booksIdGenerator.addId(book.getId());
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }

@@ -53,11 +53,11 @@ public class MyParser {
             switch (qName) {
                 case "author":
                     dbManager.addAuthor(curAuthor);
-                    dbManager.getAuthorGenerator().addId(curAuthor.getId());
+                    //dbManager.getAuthorGenerator().addId(curAuthor.getId());
                     break;
                 case "book":
                     curBook.setAuthor(curAuthor.getId());
-                    dbManager.getBookGenerator().addId(curBook.getId());
+                    //dbManager.getBookGenerator().addId(curBook.getId());
                     curAuthor.addBook(curBook);
                     break;
                 case "name":
