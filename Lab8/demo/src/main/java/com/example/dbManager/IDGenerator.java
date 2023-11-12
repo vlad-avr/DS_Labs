@@ -11,6 +11,7 @@ public class IDGenerator {
     private final String idFormat;
     private List<String> idRecord = new ArrayList<>();
     private List<String> temporalCollector = new ArrayList<>();
+    private List<String> reservedIds = new ArrayList<>();
 
     public IDGenerator(String idFormat) {
         this.idFormat = idFormat + "-";
@@ -48,7 +49,7 @@ public class IDGenerator {
     public String generateId(){
         int Id = 1;
         if(idRecord.size() > 0){
-            if(Id < getValue(idRecord.get(0))){
+            if(Id < getValue(idRecord.get(0)) && !temporalCollector.contains(idFormat + Id)){
                 //addId(idFormat + Id);
                 temporalCollector.add(idFormat + Id);
                 return idFormat + Id;
@@ -65,6 +66,9 @@ public class IDGenerator {
         }
         Id++;
         //addId(idFormat + Id);
+        while (temporalCollector.contains(idFormat + Id)) {
+            Id++;
+        }
         temporalCollector.add(idFormat + Id);
         return idFormat + Id;
     }
@@ -81,11 +85,30 @@ public class IDGenerator {
         }
     }
 
+    public void reserveId(String Id){
+        if(reservedIds.contains(Id)){
+            System.out.println(Id + " is already reserved by other client!");
+            return;
+        }else{
+            if(idRecord.contains(Id)){
+                reservedIds.add(Id);
+            }else{
+                System.out.println("This Id does not exist!");
+            }
+        }
+    }
+
+    public void releaseId(String Id){
+        if(reservedIds.contains(Id)){
+            reservedIds.remove(Id);
+        }
+    }
+
     public void removeId(String Id) {
-        if (idRecord.contains(Id)) {
+        if (idRecord.contains(Id) && !reservedIds.contains(Id)) {
             idRecord.remove(Id);
         } else {
-            System.out.println("\nThis ID does not exist!");
+            System.out.println("\nThis ID does not exist or it is reserved by other client!");
         }
     }
 

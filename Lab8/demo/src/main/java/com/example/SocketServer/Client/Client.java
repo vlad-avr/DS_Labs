@@ -17,6 +17,7 @@ public class Client {
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
+    private boolean working = true;
 
     public Client(String host, int portId) {
         try {
@@ -40,12 +41,13 @@ public class Client {
 
     public void run() {
         try {
-            while (clientSocket.isConnected() && !clientSocket.isClosed()) {
+            while (clientSocket.isConnected() && !clientSocket.isClosed() && working) {
                 mainLoop(out, in);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        closeClient();
     }
 
     private void helpActions() {
@@ -73,13 +75,25 @@ public class Client {
         author.setLastName(manager.getString("Enter last name : "));
         while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
             out.println("bi");
-            // author.addBook(createBook(bookGenerator, author.getId()));
+            try {
+                author.addBook(createBook(in.readLine(), author.getId()));
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                System.out.println("Which means that you can`t add a book");
+            }
         }
         return author;
     }
 
     private Book createBook(String Id, String authorId){
-
+        System.out.println("\n You are in book creation menu\n");
+        Book book = new Book(Id);
+        book.setAuthor(authorId);
+        System.out.println("\n New author`s ID is " + book.getId() + " and its author is " + book.getAuthor());
+        book.setName(manager.getString("Enter name : "));
+        book.setPrice(manager.getDouble("Enter price : "));
+        book.setGenre(manager.getGenre("Enter genre : "));
+        return book;
     }
 
     private void sendAuthorsRequest() {
@@ -175,10 +189,18 @@ public class Client {
             case "aa":
                 out.println("ai");
                 authorTmp = createAuthor(in.readLine());
-                // dbManager.addAuthor(
-                // createAuthor(dbManager.getAuthorGenerator(), dbManager.getBookGenerator()));
+                out.println("aa");
+                out.println(MyJsonParser.toJsonAuthor(authorTmp));
                 break;
             case "ab":
+                out.println("rai");
+                String authorId = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID");
+                out.println(authorId);
+                out.println("bi");
+                ID = in.readLine();
+                bookTmp = createBook(ID, authorId);
+                out.println("ab");
+                out.println(MyJsonParser.toJsonBook(bookTmp));
                 // dbManager.addBook(
                 // createBook(dbManager.getBookGenerator(), dbManager.getAuthorGenerator()));
                 break;
@@ -248,7 +270,8 @@ public class Client {
                 break;
             case "e":
                 System.out.println("\nYou stopped working with DB\n");
-                closeClient();
+                working = false;
+                //closeClient();
                 break;
             default:
                 System.out.println("Invalid command!");

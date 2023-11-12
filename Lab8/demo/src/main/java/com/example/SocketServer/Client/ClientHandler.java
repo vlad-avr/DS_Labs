@@ -180,7 +180,44 @@ public class ClientHandler implements Runnable {
                         serverHandler.writeUnlock(serverHandler.getBookLock());
                         break;
                     case "aa":
-                        
+                        serverHandler.writeLock(serverHandler.getAuthorLock());
+                        serverHandler.writeLock(serverHandler.getBookLock());
+                        serverHandler.writeLock(serverHandler.getDBLock());
+                        serverHandler.dbManager.addAuthor(MyJsonParser.parseAuthor(reader.readLine()));
+                        serverHandler.writeUnlock(serverHandler.getDBLock());
+                        serverHandler.writeUnlock(serverHandler.getBookLock());
+                        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        break;
+                    case "rai":
+                        serverHandler.readLock(serverHandler.getAuthorLock());
+                        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
+                        serverHandler.readUnlock(serverHandler.getAuthorLock());
+                        writer.println(MyJsonParser.toJsonIDs(IDs));
+                        temp = reader.readLine();
+                        if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
+                            serverHandler.writeLock(serverHandler.getAuthorLock());
+                            serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
+                            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        }
+                        break;
+                    case "rbi":
+                        serverHandler.readLock(serverHandler.getBookLock());
+                        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
+                        serverHandler.readUnlock(serverHandler.getBookLock());
+                        writer.println(MyJsonParser.toJsonIDs(IDs));
+                        temp = reader.readLine();
+                        if(serverHandler.dbManager.getBookGenerator().exists(temp)){
+                            serverHandler.writeLock(serverHandler.getBookLock());
+                            serverHandler.dbManager.getBookGenerator().reserveId(temp);
+                            serverHandler.writeUnlock(serverHandler.getBookLock());
+                        }
+                        break;
+                    case "ab":
+                        serverHandler.writeLock(serverHandler.getBookLock());
+                        serverHandler.writeLock(serverHandler.getDBLock());
+                        serverHandler.dbManager.addBook(MyJsonParser.parseBook(reader.readLine()));
+                        serverHandler.writeUnlock(serverHandler.getDBLock());
+                        serverHandler.writeUnlock(serverHandler.getBookLock());
                         break;
                     default:
                         break;
