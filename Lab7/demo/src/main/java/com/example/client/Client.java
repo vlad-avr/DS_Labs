@@ -118,11 +118,14 @@ public class Client {
                     out.println(manager.getDouble("Enter min price : "));
                     out.println(manager.getDouble("Enter max price : "));
                     break;
-                // case "a":
-                // out.println(input);
-                // return dbManager
-                // .getBooksOfAuthor(manager.getID(dbManager.getAuthorGenerator(), "Enter author
-                // id : "));
+                case "a":
+                    out.println(input);
+                    try {
+                        out.println(manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author id : "));
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
                 default:
                     System.out.println("Invalid command!");
                     break;

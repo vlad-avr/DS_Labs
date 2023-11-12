@@ -117,7 +117,19 @@ public class ClientHandler implements Runnable {
                                 writer.println(MyJsonParser.toJsonBooks(books));
                                 break;
                             case "a":
-                                writer.println("");
+                                serverHandler.readLock(serverHandler.getAuthorLock());
+                                IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
+                                serverHandler.readUnlock(serverHandler.getAuthorLock()); 
+                                writer.println(MyJsonParser.toJsonIDs(IDs));
+                                temp = reader.readLine();
+                                if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
+                                    serverHandler.readLock(serverHandler.getDBLock());
+                                    books = serverHandler.dbManager.getBooksOfAuthor(temp);
+                                    serverHandler.readUnlock(serverHandler.getAuthorLock());
+                                    writer.println(MyJsonParser.toJsonBooks(books));
+                                }else{
+                                    writer.println("");
+                                }
                                 break;
                             default:
                                 break;
