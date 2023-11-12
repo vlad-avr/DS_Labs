@@ -168,6 +168,10 @@ public class ClientHandler implements Runnable {
                             writer.println("");
                         }
                         break;
+                    case "aa":
+                        serverHandler.writeLock(serverHandler.getAuthorLock());
+                        writer.println(serverHandler.dbManager.getAuthorGenerator().generateId());
+                        serverHandler.writeUnlock(serverHandler.getAuthorLock());
                     default:
                         break;
                 }

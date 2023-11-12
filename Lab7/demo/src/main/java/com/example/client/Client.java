@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.example.JsonParser.MyJsonParser;
 import com.example.control.InputManager;
+import com.example.db_controller.IDGenerator;
 import com.example.objects.Author;
 import com.example.objects.Book;
 
@@ -70,6 +71,18 @@ public class Client {
                 " db - delete book;\n" +
                 " e - exit current environment;\n" +
                 " h - help;");
+    }
+
+    private Author createAuthor(String ID) {
+        System.out.println("\n You are in author creation menu\n");
+        Author author = new Author(ID);
+        System.out.println("\n New author`s ID is " + author.getId());
+        author.setFirstName(manager.getString("Enter firstname : "));
+        author.setLastName(manager.getString("Enter last name : "));
+        while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
+            author.addBook(createBook(bookGenerator, author.getId()));
+        }
+        return author;
     }
 
     private void sendAuthorsRequest() {
