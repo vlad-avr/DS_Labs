@@ -12,10 +12,10 @@ import com.example.xml_parser.MyParser;
 //"D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Dynamic.xml"
 
 public class Controller {
-    DatabaseManager dbManager = new DatabaseManager();
-    MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd",
+    private DatabaseManager dbManager = new DatabaseManager();
+    private MyParser parser = new MyParser("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Schema.xsd",
             dbManager);
-    InputManager manager = new InputManager();
+    private InputManager manager = new InputManager();
 
     public void start() {
         dbManager.destroyDB();
