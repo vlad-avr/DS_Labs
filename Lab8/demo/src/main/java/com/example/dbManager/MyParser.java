@@ -54,6 +54,14 @@ public class MyParser {
         return null;
     }
 
+    public boolean tryOpen(String path){
+        File file = new File(path);
+        if(file.exists() && file.canWrite() && file.canRead()){
+            return true;
+        }
+        return false;
+    }
+
     public void writeXML(String xmlPath, List<Author> list){
         try {
             XMLStreamWriter out = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(new File(xmlPath)), "utf-8"));

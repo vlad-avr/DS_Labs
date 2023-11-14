@@ -341,6 +341,16 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void uploadFromXml() throws IOException{
+        serverHandler.loadToDB(MyJsonParser.parseAuthors(reader.readLine()));
+    }
+
+    private void loadToXml(){
+        serverHandler.readLock(serverHandler.getDBLock());
+        writer.println(serverHandler.dbManager.getAuthors());
+        serverHandler.readUnlock(serverHandler.getDBLock());
+    }
+
     @Override
     public void run() {
         try {

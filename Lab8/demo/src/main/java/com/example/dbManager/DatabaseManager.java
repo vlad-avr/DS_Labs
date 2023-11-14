@@ -12,7 +12,6 @@ import java.util.List;
 import com.example.Entities.Author;
 import com.example.Entities.Book;
 
-
 public class DatabaseManager {
     private final String db_url = "jdbc:sqlite:D:\\Java\\DS_Labs\\Lab8\\demo\\src\\main\\java\\com\\example\\Database\\library.db";
     IDGenerator booksIdGenerator = new IDGenerator("B");
@@ -100,6 +99,9 @@ public class DatabaseManager {
     }
 
     public void addAuthor(Author author) {
+        if (!authorsIdGenerator.idIsValid(author.getId())) {
+            return;
+        }
         String sql = "INSERT INTO authors (id, firstname, lastname) VALUES (?, ?, ?)";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(sql)) {
             statement.setString(1, author.getId());
@@ -108,7 +110,13 @@ public class DatabaseManager {
             statement.executeUpdate();
             List<Book> books = author.getBooks();
             for (Book book : books) {
-                addBook(book);
+                if (booksIdGenerator.idIsValid(book.getId())) {
+                    if (booksIdGenerator.exists(book.getId())) {
+                        updateBook(book);
+                    } else {
+                        addBook(book);
+                    }
+                }
             }
             authorsIdGenerator.addId(author.getId());
         } catch (SQLException exception) {
@@ -131,13 +139,29 @@ public class DatabaseManager {
         }
     }
 
-    public void updateAuthor(Author author) {
+    public void updateAuthor(Author author){
+        updateAuthor(author, false);
+    }
+
+    public void updateAuthor(Author author, boolean andBooks) {
         String str = "UPDATE authors SET firstname = ?, lastname = ? WHERE id = ?";
         try (Connection con = connect(); PreparedStatement statement = con.prepareStatement(str)) {
             statement.setString(1, author.getFirstName());
             statement.setString(2, author.getLastName());
             statement.setString(3, author.getId());
             statement.executeUpdate();
+            if (andBooks) {
+                List<Book> books = author.getBooks();
+                for (Book book : books) {
+                    if (booksIdGenerator.idIsValid(book.getId())) {
+                        if (booksIdGenerator.exists(book.getId())) {
+                            updateBook(book);
+                        } else {
+                            addBook(book);
+                        }
+                    }
+                }
+            }
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }

@@ -38,23 +38,40 @@ public class ServerHandler {
         }
     }
 
-    private void loadData(){
-        List<Author> authors = parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
-        if(authors == null){
+    public void loadToDB(List<Author> authors) {
+        for (Author author : authors) {
+            writeLock(dbLock);
+            writeLock(authorLock);
+            writeLock(bookLock);
+            if (dbManager.getAuthorGenerator().exists(author.getId())) {
+                dbManager.updateAuthor(author, true);
+            } else {
+                dbManager.addAuthor(author);
+            }
+            writeUnlock(bookLock);
+            writeUnlock(authorLock);
+            writeUnlock(dbLock);
+        }
+    }
+
+    private void loadData() {
+        List<Author> authors = parser
+                .parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
+        if (authors == null) {
             return;
         }
         boolean valid = true;
-        for(Author author : authors){
-            if(dbManager.getAuthorGenerator().idIsValid(author.getId())){
-               for(Book book : author.getBooks()){
-                    if(!dbManager.getBookGenerator().idIsValid(book.getId())){
+        for (Author author : authors) {
+            if (dbManager.getAuthorGenerator().idIsValid(author.getId())) {
+                for (Book book : author.getBooks()) {
+                    if (!dbManager.getBookGenerator().idIsValid(book.getId())) {
                         valid = false;
                     }
-               } 
-            }else{
+                }
+            } else {
                 valid = false;
             }
-            if(valid){
+            if (valid) {
                 dbManager.addAuthor(author);
             }
             valid = true;

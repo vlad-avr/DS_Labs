@@ -360,12 +360,27 @@ public class Client {
         }
     }
 
-    private void loadToXml(){
-
+    private void loadToXml() throws IOException{
+        //D:\\Java\\DS_Labs\\Lab8\\demo\\src\\main\\java\\com\\example\\XMLs\\Example.xml
+        String path = manager.getString("Enter path to XML file : ");
+        if(!parser.tryOpen(path)){
+            System.out.println(" Unable to open file");
+            return;
+        }
+        out.println("lx");
+        List<Author> authors = MyJsonParser.parseAuthors(in.readLine());
+        parser.writeXML(path, authors);
     }
 
     private void uploadFromXml(){
-
+        String path = manager.getString("Enter path to XML file : ");
+        if(!parser.tryOpen(path)){
+            System.out.println(" Unable to open file");
+            return;
+        }
+        out.println("ux");
+        List<Author> authors = parser.parseSAX(path);
+        out.println(MyJsonParser.toJsonAuthors(authors));
     }
 
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
