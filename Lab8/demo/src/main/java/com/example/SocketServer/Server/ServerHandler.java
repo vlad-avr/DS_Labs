@@ -3,9 +3,11 @@ package com.example.SocketServer.Server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.example.Entities.Author;
 import com.example.SocketServer.Client.ClientHandler;
 import com.example.dbManager.DatabaseManager;
 import com.example.dbManager.MyParser;
@@ -27,12 +29,22 @@ public class ServerHandler {
             this.serverSocket = new ServerSocket(portId);
             dbManager = new DatabaseManager();
             dbManager.initDB();
-            parser = new MyParser(dbManager);
-            parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
+            parser = new MyParser();
+            loadData();
             listenForClients();
         } catch (IOException e) {
             System.out.println(e.getMessage());
             closeServer();
+        }
+    }
+
+    private void loadData(){
+        List<Author> authors = parser.parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
+        if(authors == null){
+            return;
+        }
+        for(Author author : authors){
+            dbManager.addAuthor(author);
         }
     }
 
