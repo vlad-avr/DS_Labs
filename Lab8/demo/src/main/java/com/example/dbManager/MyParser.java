@@ -1,7 +1,11 @@
 package com.example.dbManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +13,10 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -46,8 +54,38 @@ public class MyParser {
         return null;
     }
 
-    public void writeXML(String xmlPath){
-
+    public void writeXML(String xmlPath, List<Author> list){
+        try {
+            XMLStreamWriter out = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(new File(xmlPath)), "utf-8"));
+            out.writeStartDocument();
+            out.writeStartElement("list");
+            for(Author author : list){
+                out.writeStartElement("author");
+                out.writeAttribute("id", author.getId());
+                out.writeAttribute("firstname", author.getFirstName());
+                out.writeAttribute("lastname", author.getLastName());
+                List<Book> books = author.getBooks();
+                for(Book book : books){
+                    out.writeStartElement("book");
+                    out.writeAttribute("id", book.getId());
+                    out.writeStartElement("name");
+                    out.writeCData(book.getName());
+                    out.writeEndElement();
+                    out.writeStartElement("price");
+                    out.writeCData(String.valueOf(book.getPrice()));
+                    out.writeEndElement();
+                    out.writeStartElement("genre");
+                    out.writeCData(book.getGenre());
+                    out.writeEndElement();
+                    out.writeEndElement();
+                }
+                out.writeEndDocument();
+            }
+            out.writeEndElement();
+            out.writeEndDocument();
+        } catch (FileNotFoundException | XMLStreamException | FactoryConfigurationError | UnsupportedEncodingException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private boolean validateXml(String xmlPath) {

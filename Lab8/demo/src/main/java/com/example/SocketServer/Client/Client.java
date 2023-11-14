@@ -10,6 +10,7 @@ import java.util.List;
 import com.example.Entities.Author;
 import com.example.Entities.Book;
 import com.example.InputManager.InputManager;
+import com.example.dbManager.MyParser;
 import com.example.jsonParser.MyJsonParser;
 
 public class Client {
@@ -18,6 +19,7 @@ public class Client {
     private PrintWriter out;
     private BufferedReader in;
     private boolean working = true;
+    private MyParser parser = new MyParser();
 
     public Client(String host, int portId) {
         try {
@@ -358,6 +360,14 @@ public class Client {
         }
     }
 
+    private void loadToXml(){
+
+    }
+
+    private void uploadFromXml(){
+
+    }
+
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         input = manager.getString("Enter command : ");
@@ -403,6 +413,12 @@ public class Client {
                 break;
             case "gb":
                 getBook();
+                break;
+            case "lx":
+                loadToXml();
+                break;
+            case "ux":
+                uploadFromXml();
                 break;
             case "h":
                 helpActions();
