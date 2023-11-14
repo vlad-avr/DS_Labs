@@ -98,7 +98,11 @@ public class DatabaseManager {
         }
     }
 
-    public void addAuthor(Author author) {
+    public void addAuthor(Author author){
+        addAuthor(author, false);
+    }
+
+    public void addAuthor(Author author, boolean checkBooks) {
         if (!authorsIdGenerator.idIsValid(author.getId())) {
             return;
         }
@@ -110,12 +114,16 @@ public class DatabaseManager {
             statement.executeUpdate();
             List<Book> books = author.getBooks();
             for (Book book : books) {
-                if (booksIdGenerator.idIsValid(book.getId())) {
-                    if (booksIdGenerator.exists(book.getId())) {
-                        updateBook(book);
-                    } else {
-                        addBook(book);
+                if (checkBooks) {
+                    if (booksIdGenerator.idIsValid(book.getId())) {
+                        if (booksIdGenerator.exists(book.getId())) {
+                            updateBook(book);
+                        } else {
+                            addBook(book);
+                        }
                     }
+                } else {
+                    addBook(book);
                 }
             }
             authorsIdGenerator.addId(author.getId());
@@ -139,7 +147,7 @@ public class DatabaseManager {
         }
     }
 
-    public void updateAuthor(Author author){
+    public void updateAuthor(Author author) {
         updateAuthor(author, false);
     }
 

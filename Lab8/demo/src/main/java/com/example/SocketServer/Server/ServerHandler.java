@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.example.Entities.Author;
-import com.example.Entities.Book;
 import com.example.SocketServer.Client.ClientHandler;
 import com.example.dbManager.DatabaseManager;
 import com.example.dbManager.MyParser;
@@ -46,7 +45,7 @@ public class ServerHandler {
             if (dbManager.getAuthorGenerator().exists(author.getId())) {
                 dbManager.updateAuthor(author, true);
             } else {
-                dbManager.addAuthor(author);
+                dbManager.addAuthor(author, true);
             }
             writeUnlock(bookLock);
             writeUnlock(authorLock);
@@ -60,21 +59,8 @@ public class ServerHandler {
         if (authors == null) {
             return;
         }
-        boolean valid = true;
         for (Author author : authors) {
-            if (dbManager.getAuthorGenerator().idIsValid(author.getId())) {
-                for (Book book : author.getBooks()) {
-                    if (!dbManager.getBookGenerator().idIsValid(book.getId())) {
-                        valid = false;
-                    }
-                }
-            } else {
-                valid = false;
-            }
-            if (valid) {
-                dbManager.addAuthor(author);
-            }
-            valid = true;
+            dbManager.addAuthor(author);
         }
     }
 
