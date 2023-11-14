@@ -142,10 +142,10 @@ public class ClientHandler implements Runnable {
         if (checker) {
             writer.println(temp);
             genBookID();
+            Book book = MyJsonParser.parseBook(reader.readLine());
             serverHandler.writeLock(serverHandler.getAuthorLock());
             serverHandler.writeLock(serverHandler.getBookLock());
             serverHandler.writeLock(serverHandler.getDBLock());
-            Book book = MyJsonParser.parseBook(reader.readLine());
             serverHandler.dbManager.addBook(book);
             serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
             serverHandler.writeUnlock(serverHandler.getDBLock());
@@ -197,14 +197,16 @@ public class ClientHandler implements Runnable {
         boolean checker = serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
         serverHandler.writeUnlock(serverHandler.getAuthorLock());
         if (checker) {
-            writer.println(temp);
-            genBookID();
+            serverHandler.readLock(serverHandler.getDBLock());
+            Author author = serverHandler.dbManager.getAuthor(temp, true);
+            serverHandler.readUnlock(serverHandler.getDBLock());
+            writer.println(MyJsonParser.toJsonAuthor(author));
+            author = MyJsonParser.parseAuthor(reader.readLine());
             serverHandler.writeLock(serverHandler.getAuthorLock());
             serverHandler.writeLock(serverHandler.getBookLock());
             serverHandler.writeLock(serverHandler.getDBLock());
-            Book book = MyJsonParser.parseBook(reader.readLine());
-            serverHandler.dbManager.addBook(book);
-            serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
+            serverHandler.dbManager.updateAuthor(author);
+            serverHandler.dbManager.getAuthorGenerator().releaseId(author.getId());
             serverHandler.writeUnlock(serverHandler.getDBLock());
             serverHandler.writeUnlock(serverHandler.getBookLock());
             serverHandler.writeUnlock(serverHandler.getAuthorLock());

@@ -96,6 +96,29 @@ public class Client {
         return book;
     }
 
+    private Book modifyBook(Book book){
+        System.out.println("\n You are in book modification menu\n");
+        while (manager.getBool("Do you want change something? ")) {
+            System.out.println("n - change name;\n p - change price;\n g - change genre;");
+            String input = manager.getString("Enter command : ");
+            switch (input) {
+                case "n":
+                    book.setName(manager.getString("Enter namr : "));
+                    break;
+                case "p":
+                    book.setPrice(manager.getDouble("Enter price : "));
+                    break;
+                case "g":
+                    book.setGenre(manager.getGenre("Enter genre"));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return book;
+    }
+
     private Author modifyAuthor(Author author) {
         System.out.println("\n You are in author modification menu\n");
         while (manager.getBool("Do you want change something? ")) {
@@ -264,16 +287,22 @@ public class Client {
         }
     }
 
-    private void updateBook() {
-
+    private void updateBook() throws IOException {
+        out.println("ub");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author Id : ");
+        out.println(ID);
+        String temp = in.readLine();
+        if (temp != "") {
+            Book bookTmp = MyJsonParser.parseBook(temp);
+            out.println(modifyBook(bookTmp));
+        } else {
+            System.out.println("This id is already reserved by other client!");
+        }
     }
 
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         input = manager.getString("Enter command : ");
-        Author authorTmp;
-        String ID;
-        String temp;
         switch (input) {
             case "sa":
                 showAuthors();
@@ -291,10 +320,7 @@ public class Client {
                 updateAuthor();
                 break;
             case "ub":
-                // dbManager.updateBook(updateBook(
-                // dbManager.getBook(
-                // manager.getID(dbManager.getBookGenerator(), "Enter book ID : ")),
-                // dbManager.getAuthorGenerator()));
+                updateBook();
                 break;
             case "gap":
                 // out.println("gap");
