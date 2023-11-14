@@ -73,7 +73,7 @@ public class Client {
         System.out.println("\n New author`s ID is " + author.getId());
         author.setFirstName(manager.getString("Enter firstname : "));
         author.setLastName(manager.getString("Enter last name : "));
-        while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no?")) {
+        while (manager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no)?")) {
             out.println("bi");
             try {
                 author.addBook(createBook(in.readLine(), author.getId()));
