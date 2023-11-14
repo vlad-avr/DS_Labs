@@ -168,37 +168,29 @@ public class Client {
     private void sendBooksRequest() {
         System.out.println("\n You are in book loading menu \n");
         String input;
-        while (true) {
-            System.out
-                    .println(
-                            "\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;\n a - find books of certain author");
-            input = manager.getString("Enter Command");
-            switch (input) {
-                case "n":
-                    out.println(input);
-                    out.println(manager.getString("Enter the string : "));
-                    return;
-                case "g":
-                    out.println(input);
-                    out.println(manager.getGenre("Enter the genre : "));
-                    return;
-                case "p":
-                    out.println(input);
-                    out.println(manager.getDouble("Enter min price : "));
-                    out.println(manager.getDouble("Enter max price : "));
-                    return;
-                case "a":
-                    out.println(input);
-                    try {
-                        out.println(manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author id : "));
-                    } catch (IOException e) {
-                        System.out.println(e.getMessage());
-                    }
-                    return;
-                default:
-                    System.out.println("Invalid command!");
-                    break;
-            }
+        System.out
+                .println(
+                        "\n p - find by price;\n n - find books which names contain certian string;\n g - find books of certain genre;");
+        input = manager.getString("Enter Command");
+        switch (input) {
+            case "n":
+                out.println(input);
+                out.println(manager.getString("Enter the string : "));
+                return;
+            case "g":
+                out.println(input);
+                out.println(manager.getGenre("Enter the genre : "));
+                return;
+            case "p":
+                out.println(input);
+                out.println(manager.getDouble("Enter min price : "));
+                out.println(manager.getDouble("Enter max price : "));
+                return;
+            default:
+                System.out.println("Invalid command!");
+                out.println("");
+                return;
+
         }
     }
 
@@ -336,6 +328,19 @@ public class Client {
         }
     }
 
+    private void getBooksByParams() throws IOException {
+        out.println("gbp");
+        sendBooksRequest();
+        String tmp = in.readLine();
+        if (tmp.equals("")) {
+            return;
+        }
+        List<Book> books = MyJsonParser.parseBooks(tmp);
+        for (Book book : books) {
+            System.out.println(book.toString());
+        }
+    }
+
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         input = manager.getString("Enter command : ");
@@ -365,15 +370,7 @@ public class Client {
                 getAuthorsByParams();
                 break;
             case "gbp":
-                // out.println(input);
-                // sendBooksRequest();
-                // books = MyJsonParser.parseBooks(in.readLine());
-                // if (books == null) {
-                // break;
-                // }
-                // for (Book book : books) {
-                // System.out.println(book.toString());
-                // }
+                getBooksByParams();
                 break;
             case "da":
                 deleteAuthor();

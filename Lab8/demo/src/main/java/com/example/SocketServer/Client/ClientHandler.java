@@ -295,6 +295,36 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void getBooksByParams() throws IOException{
+        switch (reader.readLine()) {
+            case "p":
+                double min = Double.parseDouble(reader.readLine());
+                double max = Double.parseDouble(reader.readLine());
+                serverHandler.readLock(serverHandler.getDBLock());
+                List<Book> books = serverHandler.dbManager.getBooks(min, max);
+                serverHandler.readUnlock(serverHandler.getDBLock());
+                writer.println(MyJsonParser.toJsonBooks(books));
+                break;
+            case "n":
+                String temp = reader.readLine();
+                serverHandler.readLock(serverHandler.getDBLock());
+                books = serverHandler.dbManager.getBooks(temp);
+                serverHandler.readUnlock(serverHandler.getDBLock());
+                writer.println(MyJsonParser.toJsonBooks(books));
+                break;
+            case "g":
+                temp = reader.readLine();
+                serverHandler.readLock(serverHandler.getDBLock());
+                books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
+                serverHandler.readUnlock(serverHandler.getDBLock());
+                writer.println(MyJsonParser.toJsonBooks(books));
+                break;
+            default:
+                writer.println("");
+                return;
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -311,50 +341,9 @@ public class ClientHandler implements Runnable {
                     case "gap":
                         getAuthorsByParams();
                         break;
-                    // case "gbp":
-                    // switch (reader.readLine()) {
-                    // case "n":
-                    // temp = reader.readLine();
-                    // serverHandler.readLock(serverHandler.getDBLock());
-                    // books = serverHandler.dbManager.getBooks(temp);
-                    // serverHandler.readUnlock(serverHandler.getDBLock());
-                    // writer.println(MyJsonParser.toJsonBooks(books));
-                    // break;
-                    // case "g":
-                    // temp = reader.readLine();
-                    // serverHandler.readLock(serverHandler.getDBLock());
-                    // books = serverHandler.dbManager.getBooks(Book.Genre.valueOf(temp));
-                    // serverHandler.readUnlock(serverHandler.getDBLock());
-                    // System.out.println(books.get(0).toString());
-                    // writer.println(MyJsonParser.toJsonBooks(books));
-                    // break;
-                    // case "p":
-                    // double min = Double.parseDouble(reader.readLine());
-                    // double max = Double.parseDouble(reader.readLine());
-                    // serverHandler.readLock(serverHandler.getDBLock());
-                    // books = serverHandler.dbManager.getBooks(min, max);
-                    // serverHandler.readUnlock(serverHandler.getDBLock());
-                    // writer.println(MyJsonParser.toJsonBooks(books));
-                    // break;
-                    // case "a":
-                    // serverHandler.readLock(serverHandler.getAuthorLock());
-                    // IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
-                    // serverHandler.readUnlock(serverHandler.getAuthorLock());
-                    // writer.println(MyJsonParser.toJsonIDs(IDs));
-                    // temp = reader.readLine();
-                    // System.out.println(temp);
-                    // if(serverHandler.dbManager.getAuthorGenerator().exists(temp)){
-                    // serverHandler.readLock(serverHandler.getDBLock());
-                    // books = serverHandler.dbManager.getBooksOfAuthor(temp);
-                    // serverHandler.readUnlock(serverHandler.getDBLock());
-                    // writer.println(MyJsonParser.toJsonBooks(books));
-                    // }else{
-                    // writer.println("");
-                    // }
-                    // break;
-                    // default:
-                    // break;
-                    // }
+                    case "gbp":
+                        getBooksByParams();
+                        break;
                     case "ga":
                         getAuthor();
                         break;
