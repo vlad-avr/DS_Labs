@@ -87,10 +87,11 @@ public class MyParser {
                     out.writeEndElement();
                     out.writeEndElement();
                 }
-                out.writeEndDocument();
+                out.writeEndElement();
             }
             out.writeEndElement();
             out.writeEndDocument();
+            out.close();
         } catch (FileNotFoundException | XMLStreamException | FactoryConfigurationError | UnsupportedEncodingException e) {
             System.out.println(e.getMessage());
         }
