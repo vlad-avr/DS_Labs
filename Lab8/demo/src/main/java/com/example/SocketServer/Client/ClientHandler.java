@@ -215,6 +215,31 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void updateBook() throws IOException{
+        sendBookIds();
+        String temp = reader.readLine();
+        serverHandler.writeLock(serverHandler.getBookLock());
+        boolean checker = serverHandler.dbManager.getBookGenerator().reserveId(temp);
+        serverHandler.writeUnlock(serverHandler.getBookLock());
+        if (checker) {
+            serverHandler.readLock(serverHandler.getDBLock());
+            Book book = serverHandler.dbManager.getBook(temp);
+            serverHandler.readUnlock(serverHandler.getDBLock());
+            writer.println(MyJsonParser.toJsonBook(book));
+            book = MyJsonParser.parseBook(reader.readLine());
+            serverHandler.writeLock(serverHandler.getAuthorLock());
+            serverHandler.writeLock(serverHandler.getBookLock());
+            serverHandler.writeLock(serverHandler.getDBLock());
+            serverHandler.dbManager.updateBook(book);
+            serverHandler.dbManager.getAuthorGenerator().releaseId(book.getId());
+            serverHandler.writeUnlock(serverHandler.getDBLock());
+            serverHandler.writeUnlock(serverHandler.getBookLock());
+            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        } else {
+            writer.println("");
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -313,6 +338,8 @@ public class ClientHandler implements Runnable {
                         break;
                     case "ua":
                         updateAuthor();
+                    case "ub":
+                        updateBook();
                     default:
                         break;
                 }

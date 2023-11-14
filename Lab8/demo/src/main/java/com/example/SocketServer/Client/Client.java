@@ -281,7 +281,7 @@ public class Client {
         String temp = in.readLine();
         if (temp != "") {
             Author authorTmp = MyJsonParser.parseAuthor(temp);
-            out.println(modifyAuthor(authorTmp));
+            out.println(MyJsonParser.toJsonAuthor(modifyAuthor(authorTmp)));
         } else {
             System.out.println("This id is already reserved by other client!");
         }
@@ -294,7 +294,7 @@ public class Client {
         String temp = in.readLine();
         if (temp != "") {
             Book bookTmp = MyJsonParser.parseBook(temp);
-            out.println(modifyBook(bookTmp));
+            out.println(MyJsonParser.toJsonBook(modifyBook(bookTmp)));
         } else {
             System.out.println("This id is already reserved by other client!");
         }
