@@ -61,6 +61,7 @@ public class Client {
                 " ab - add book;\n" +
                 " ua - update author;\n" +
                 " ub - update book;\n" +
+                " ca - change author;\n" +
                 " da - delete author;\n" +
                 " db - delete book;\n" +
                 " e - exit current environment;\n" +
@@ -96,7 +97,7 @@ public class Client {
         return book;
     }
 
-    private Book modifyBook(Book book){
+    private Book modifyBook(Book book) {
         System.out.println("\n You are in book modification menu\n");
         System.out.println("Current state : \n" + book);
         while (manager.getBool("Do you want change something? ")) {
@@ -302,6 +303,28 @@ public class Client {
         }
     }
 
+    private void changeAuthor() throws IOException {
+        out.println("ca");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter book Id : ");
+        out.println(ID);
+        String temp = in.readLine();
+        if (temp != "") {
+            Book bookTmp = MyJsonParser.parseBook(temp);
+            String newAuthorId = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author Id : ");
+            out.println(newAuthorId);
+            newAuthorId = in.readLine();
+            if (newAuthorId != "") {
+                bookTmp.setAuthor(newAuthorId);
+                out.println(MyJsonParser.toJsonBook(bookTmp));
+            }
+            else{
+                System.out.println("The author is already reserved by other client!");
+            }
+        } else {
+            System.out.println("This id is already reserved by other client!");
+        }
+    }
+
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         input = manager.getString("Enter command : ");
@@ -323,6 +346,9 @@ public class Client {
                 break;
             case "ub":
                 updateBook();
+                break;
+            case "ca":
+                changeAuthor();
                 break;
             case "gap":
                 // out.println("gap");

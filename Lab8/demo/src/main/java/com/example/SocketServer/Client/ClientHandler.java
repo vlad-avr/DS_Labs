@@ -190,7 +190,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private void updateAuthor() throws IOException{
+    private void updateAuthor() throws IOException {
         sendAuthorIds();
         String temp = reader.readLine();
         serverHandler.writeLock(serverHandler.getAuthorLock());
@@ -213,7 +213,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private void updateBook() throws IOException{
+    private void updateBook() throws IOException {
         sendBookIds();
         String temp = reader.readLine();
         serverHandler.writeLock(serverHandler.getBookLock());
@@ -231,6 +231,42 @@ public class ClientHandler implements Runnable {
             serverHandler.dbManager.getBookGenerator().releaseId(book.getId());
             serverHandler.writeUnlock(serverHandler.getBookLock());
             serverHandler.writeUnlock(serverHandler.getDBLock());
+        } else {
+            writer.println("");
+        }
+    }
+
+    private void changeAuthor() throws IOException {
+        sendBookIds();
+        String temp = reader.readLine();
+        serverHandler.writeLock(serverHandler.getBookLock());
+        boolean checker = serverHandler.dbManager.getBookGenerator().reserveId(temp);
+        serverHandler.writeUnlock(serverHandler.getBookLock());
+        if (checker) {
+            serverHandler.readLock(serverHandler.getDBLock());
+            Book book = serverHandler.dbManager.getBook(temp);
+            serverHandler.readUnlock(serverHandler.getDBLock());
+            writer.println(MyJsonParser.toJsonBook(book));
+            sendAuthorIds();
+            temp = reader.readLine();
+            serverHandler.writeLock(serverHandler.getAuthorLock());
+            checker = serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
+            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+            if (checker) {
+                writer.println(temp);
+                book = MyJsonParser.parseBook(reader.readLine());
+                serverHandler.writeLock(serverHandler.getDBLock());
+                serverHandler.writeLock(serverHandler.getAuthorLock());
+                serverHandler.writeLock(serverHandler.getBookLock());
+                serverHandler.dbManager.updateBook(book);
+                serverHandler.dbManager.getBookGenerator().releaseId(book.getId());
+                serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
+                serverHandler.writeUnlock(serverHandler.getBookLock());
+                serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                serverHandler.writeUnlock(serverHandler.getDBLock());
+            } else {
+                writer.println("");
+            }
         } else {
             writer.println("");
         }
@@ -337,6 +373,9 @@ public class ClientHandler implements Runnable {
                         break;
                     case "ub":
                         updateBook();
+                        break;
+                    case "ca":
+                        changeAuthor();
                         break;
                     default:
                         break;
