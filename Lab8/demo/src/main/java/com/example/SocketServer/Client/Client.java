@@ -145,24 +145,23 @@ public class Client {
     private void sendAuthorsRequest() {
         System.out.println("\n You are in author loading menu \n");
         String input;
-        while (true) {
-            System.out
-                    .println("\n n - find by number of books;\n c - find authors whose names contain certian string;");
-            input = manager.getString("Enter Command");
-            switch (input) {
-                case "n":
-                    out.println("n");
-                    out.println(manager.getInt("Enter min number of books : "));
-                    out.println(manager.getInt("Enter max number of books : "));
-                    return;
-                case "c":
-                    out.println("c");
-                    out.println(manager.getString("Enter the string : "));
-                    return;
-                default:
-                    System.out.println("Invalid command!");
-                    break;
-            }
+        System.out
+                .println("\n n - find by number of books;\n c - find authors whose names contain certian string;");
+        input = manager.getString("Enter Command");
+        switch (input) {
+            case "n":
+                out.println("n");
+                out.println(manager.getInt("Enter min number of books : "));
+                out.println(manager.getInt("Enter max number of books : "));
+                return;
+            case "c":
+                out.println("c");
+                out.println(manager.getString("Enter the string : "));
+                return;
+            default:
+                System.out.println("Invalid command!");
+                out.println("");
+                return;
         }
     }
 
@@ -316,12 +315,24 @@ public class Client {
             if (newAuthorId != "") {
                 bookTmp.setAuthor(newAuthorId);
                 out.println(MyJsonParser.toJsonBook(bookTmp));
-            }
-            else{
+            } else {
                 System.out.println("The author is already reserved by other client!");
             }
         } else {
             System.out.println("This id is already reserved by other client!");
+        }
+    }
+
+    private void getAuthorsByParams() throws IOException {
+        out.println("gap");
+        sendAuthorsRequest();
+        String tmp = in.readLine();
+        if (tmp.equals("")) {
+            return;
+        }
+        List<Author> authors = MyJsonParser.parseAuthors(tmp);
+        for (Author author : authors) {
+            System.out.println(author.toString());
         }
     }
 
@@ -351,17 +362,7 @@ public class Client {
                 changeAuthor();
                 break;
             case "gap":
-                // out.println("gap");
-                // sendAuthorsRequest();
-                // String tmp = in.readLine();
-                // System.out.println(tmp);
-                // authors = MyJsonParser.parseAuthors(tmp);
-                // if (authors == null) {
-                // break;
-                // }
-                // for (Author author : authors) {
-                // System.out.println(author.toString());
-                // }
+                getAuthorsByParams();
                 break;
             case "gbp":
                 // out.println(input);

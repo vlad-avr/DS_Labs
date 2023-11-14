@@ -272,6 +272,29 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void getAuthorsByParams() throws IOException {
+        switch (reader.readLine()) {
+            case "n":
+                int min = Integer.parseInt(reader.readLine());
+                int max = Integer.parseInt(reader.readLine());
+                serverHandler.readLock(serverHandler.getDBLock());
+                List<Author> authors = serverHandler.dbManager.getAuthors(min, max);
+                serverHandler.readUnlock(serverHandler.getDBLock());
+                writer.println(MyJsonParser.toJsonAuthors(authors));
+                break;
+            case "c":
+                String temp = reader.readLine();
+                serverHandler.readLock(serverHandler.getDBLock());
+                authors = serverHandler.dbManager.getAuthors(temp);
+                serverHandler.readUnlock(serverHandler.getDBLock());
+                writer.println(MyJsonParser.toJsonAuthors(authors));
+                break;
+            default:
+                writer.println("");
+                return;
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -285,27 +308,9 @@ public class ClientHandler implements Runnable {
                     case "sb":
                         showBooks();
                         break;
-                    // case "gap":
-                    // switch (reader.readLine()) {
-                    // case "n":
-                    // int min = Integer.parseInt(reader.readLine());
-                    // int max = Integer.parseInt(reader.readLine());
-                    // serverHandler.readLock(serverHandler.getDBLock());
-                    // authors = serverHandler.dbManager.getAuthors(min, max);
-                    // serverHandler.readUnlock(serverHandler.getDBLock());
-                    // writer.println(MyJsonParser.toJsonAuthors(authors));
-                    // break;
-                    // case "c":
-                    // temp = reader.readLine();
-                    // serverHandler.readLock(serverHandler.getDBLock());
-                    // authors = serverHandler.dbManager.getAuthors(temp);
-                    // serverHandler.readUnlock(serverHandler.getDBLock());
-                    // writer.println(MyJsonParser.toJsonAuthors(authors));
-                    // break;
-                    // default:
-                    // System.out.println("UKNOWN");
-                    // break;
-                    // }
+                    case "gap":
+                        getAuthorsByParams();
+                        break;
                     // case "gbp":
                     // switch (reader.readLine()) {
                     // case "n":
