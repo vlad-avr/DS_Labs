@@ -98,12 +98,13 @@ public class Client {
 
     private Book modifyBook(Book book){
         System.out.println("\n You are in book modification menu\n");
+        System.out.println("Current state : \n" + book);
         while (manager.getBool("Do you want change something? ")) {
-            System.out.println("n - change name;\n p - change price;\n g - change genre;");
+            System.out.println(" n - change name;\n p - change price;\n g - change genre;");
             String input = manager.getString("Enter command : ");
             switch (input) {
                 case "n":
-                    book.setName(manager.getString("Enter namr : "));
+                    book.setName(manager.getString("Enter name : "));
                     break;
                 case "p":
                     book.setPrice(manager.getDouble("Enter price : "));
@@ -121,6 +122,7 @@ public class Client {
 
     private Author modifyAuthor(Author author) {
         System.out.println("\n You are in author modification menu\n");
+        System.out.println("Current state : \n" + author);
         while (manager.getBool("Do you want change something? ")) {
             System.out.println(" f - change firstname;\n l - change lastname;");
             String input = manager.getString("Enter command : ");
@@ -289,7 +291,7 @@ public class Client {
 
     private void updateBook() throws IOException {
         out.println("ub");
-        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author Id : ");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter book Id : ");
         out.println(ID);
         String temp = in.readLine();
         if (temp != "") {

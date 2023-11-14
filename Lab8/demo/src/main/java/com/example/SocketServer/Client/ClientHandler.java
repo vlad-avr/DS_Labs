@@ -202,14 +202,12 @@ public class ClientHandler implements Runnable {
             serverHandler.readUnlock(serverHandler.getDBLock());
             writer.println(MyJsonParser.toJsonAuthor(author));
             author = MyJsonParser.parseAuthor(reader.readLine());
-            serverHandler.writeLock(serverHandler.getAuthorLock());
-            serverHandler.writeLock(serverHandler.getBookLock());
             serverHandler.writeLock(serverHandler.getDBLock());
+            serverHandler.writeLock(serverHandler.getAuthorLock());
             serverHandler.dbManager.updateAuthor(author);
             serverHandler.dbManager.getAuthorGenerator().releaseId(author.getId());
-            serverHandler.writeUnlock(serverHandler.getDBLock());
-            serverHandler.writeUnlock(serverHandler.getBookLock());
             serverHandler.writeUnlock(serverHandler.getAuthorLock());
+            serverHandler.writeUnlock(serverHandler.getDBLock());
         } else {
             writer.println("");
         }
@@ -227,14 +225,12 @@ public class ClientHandler implements Runnable {
             serverHandler.readUnlock(serverHandler.getDBLock());
             writer.println(MyJsonParser.toJsonBook(book));
             book = MyJsonParser.parseBook(reader.readLine());
-            serverHandler.writeLock(serverHandler.getAuthorLock());
-            serverHandler.writeLock(serverHandler.getBookLock());
             serverHandler.writeLock(serverHandler.getDBLock());
+            serverHandler.writeLock(serverHandler.getBookLock());
             serverHandler.dbManager.updateBook(book);
-            serverHandler.dbManager.getAuthorGenerator().releaseId(book.getId());
-            serverHandler.writeUnlock(serverHandler.getDBLock());
+            serverHandler.dbManager.getBookGenerator().releaseId(book.getId());
             serverHandler.writeUnlock(serverHandler.getBookLock());
-            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+            serverHandler.writeUnlock(serverHandler.getDBLock());
         } else {
             writer.println("");
         }
