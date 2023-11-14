@@ -334,8 +334,10 @@ public class ClientHandler implements Runnable {
                         break;
                     case "ua":
                         updateAuthor();
+                        break;
                     case "ub":
                         updateBook();
+                        break;
                     default:
                         break;
                 }
