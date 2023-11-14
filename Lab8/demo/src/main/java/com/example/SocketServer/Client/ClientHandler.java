@@ -400,6 +400,12 @@ public class ClientHandler implements Runnable {
                     case "gba":
                         getBooksOfAuthor();
                         break;
+                    case "lx":
+                        loadToXml();
+                        break;
+                    case "ux":
+                        uploadFromXml();
+                        break;
                     default:
                         break;
                 }
