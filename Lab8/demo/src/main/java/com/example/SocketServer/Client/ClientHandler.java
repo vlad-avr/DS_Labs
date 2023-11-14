@@ -190,6 +190,29 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void updateAuthor() throws IOException{
+        sendAuthorIds();
+        String temp = reader.readLine();
+        serverHandler.writeLock(serverHandler.getAuthorLock());
+        boolean checker = serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
+        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        if (checker) {
+            writer.println(temp);
+            genBookID();
+            serverHandler.writeLock(serverHandler.getAuthorLock());
+            serverHandler.writeLock(serverHandler.getBookLock());
+            serverHandler.writeLock(serverHandler.getDBLock());
+            Book book = MyJsonParser.parseBook(reader.readLine());
+            serverHandler.dbManager.addBook(book);
+            serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
+            serverHandler.writeUnlock(serverHandler.getDBLock());
+            serverHandler.writeUnlock(serverHandler.getBookLock());
+            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        } else {
+            writer.println("");
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -274,12 +297,6 @@ public class ClientHandler implements Runnable {
                     case "gb":
                         getBook();
                         break;
-                    case "ai":
-                        genAuthorID();
-                        break;
-                    case "bi":
-                        genBookID();
-                        break;
                     case "aa":
                         addAuthor();
                         break;
@@ -292,6 +309,8 @@ public class ClientHandler implements Runnable {
                     case "db":
                         deleteBook();
                         break;
+                    case "ua":
+                        updateAuthor();
                     default:
                         break;
                 }

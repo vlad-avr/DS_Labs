@@ -96,7 +96,7 @@ public class Client {
         return book;
     }
 
-    private Author updateAuthor(Author author){
+    private Author modifyAuthor(Author author) {
         System.out.println("\n You are in author modification menu\n");
         while (manager.getBool("Do you want change something? ")) {
             System.out.println(" f - change firstname;\n l - change lastname;");
@@ -177,65 +177,118 @@ public class Client {
         }
     }
 
+    private void showAuthors() throws IOException {
+        out.println("sa");
+        List<Author> authors = MyJsonParser.parseAuthors(in.readLine());
+        if (authors == null) {
+            return;
+        }
+        for (Author author : authors) {
+            System.out.println(author.toString());
+        }
+    }
+
+    private void showBooks() throws IOException {
+        out.println("sb");
+        List<Book> books = MyJsonParser.parseBooks(in.readLine());
+        if (books == null) {
+            return;
+        }
+        for (Book book : books) {
+            System.out.println(book.toString());
+        }
+    }
+
+    private void addAuthor() throws IOException {
+        out.println("aa");
+        Author authorTmp = createAuthor(in.readLine());
+        out.println(MyJsonParser.toJsonAuthor(authorTmp));
+    }
+
+    private void addBook() throws IOException {
+        out.println("ab");
+        String authorId = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
+        out.println(authorId);
+        authorId = in.readLine();
+        if (authorId != "") {
+            String ID = in.readLine();
+            Book bookTmp = createBook(ID, authorId);
+            out.println(MyJsonParser.toJsonBook(bookTmp));
+        } else {
+            System.out.println("This id is already reserved by other client!");
+        }
+    }
+
+    private void deleteAuthor() throws IOException {
+        out.println("da");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
+        out.println(ID);
+    }
+
+    private void deleteBook() throws IOException {
+        out.println("db");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter book ID : ");
+        out.println(ID);
+    }
+
+    private void getAuthor() throws IOException {
+        out.println("ga");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author ID : ");
+        out.println(ID);
+        Author authorTmp = MyJsonParser.parseAuthor(in.readLine());
+        if (authorTmp != null) {
+            System.out.println(authorTmp.toString());
+        }
+    }
+
+    private void getBook() throws IOException {
+        out.println("gb");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter book ID : ");
+        out.println(ID);
+        Book bookTmp = MyJsonParser.parseBook(in.readLine());
+        if (bookTmp != null) {
+            System.out.println(bookTmp.toString());
+        }
+    }
+
+    private void updateAuthor() throws IOException {
+        out.println("ua");
+        String ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author Id : ");
+        out.println(ID);
+        String temp = in.readLine();
+        if (temp != "") {
+            Author authorTmp = MyJsonParser.parseAuthor(temp);
+            out.println(modifyAuthor(authorTmp));
+        } else {
+            System.out.println("This id is already reserved by other client!");
+        }
+    }
+
+    private void updateBook() {
+
+    }
+
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         input = manager.getString("Enter command : ");
-        List<Author> authors;
-        List<Book> books;
         Author authorTmp;
-        Book bookTmp;
         String ID;
         String temp;
         switch (input) {
             case "sa":
-                out.println("sa");
-                authors = MyJsonParser.parseAuthors(in.readLine());
-                if (authors == null) {
-                    break;
-                }
-                for (Author author : authors) {
-                    System.out.println(author.toString());
-                }
+                showAuthors();
                 break;
             case "sb":
-                out.println("sb");
-                books = MyJsonParser.parseBooks(in.readLine());
-                if (books == null) {
-                    break;
-                }
-                for (Book book : books) {
-                    System.out.println(book.toString());
-                }
+                showBooks();
                 break;
             case "aa":
-                out.println("aa");
-                authorTmp = createAuthor(in.readLine());
-                out.println(MyJsonParser.toJsonAuthor(authorTmp));
+                addAuthor();
                 break;
             case "ab":
-                out.println("ab");
-                String authorId = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
-                out.println(authorId);
-                authorId = in.readLine();
-                if (authorId != "") {
-                    ID = in.readLine();
-                    bookTmp = createBook(ID, authorId);
-                    out.println(MyJsonParser.toJsonBook(bookTmp));
-                }else{
-                    System.out.println("This id is already reserved by other client!");
-                }
+                addBook();
                 break;
             case "ua":
-                out.println("ua");
-                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author Id : ");
-                out.println(ID);
-                temp = in.readLine();
-                if(temp != ""){
-                    authorTmp = MyJsonParser.parseAuthor(temp);
-                    out.println(updateAuthor(authorTmp));
-                }else{
-                    System.out.println("This id is already reserved by other client!");
-                }
+                updateAuthor();
                 break;
             case "ub":
                 // dbManager.updateBook(updateBook(
@@ -268,32 +321,16 @@ public class Client {
                 // }
                 break;
             case "da":
-                out.println("da");
-                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
-                out.println(ID);
+                deleteAuthor();
                 break;
             case "db":
-                out.println("db");
-                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter book ID : ");
-                out.println(ID);
+                deleteBook();
                 break;
             case "ga":
-                out.println(input);
-                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author ID : ");
-                out.println(ID);
-                authorTmp = MyJsonParser.parseAuthor(in.readLine());
-                if (authorTmp != null) {
-                    System.out.println(authorTmp.toString());
-                }
+                getAuthor();
                 break;
             case "gb":
-                out.println(input);
-                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter book ID : ");
-                out.println(ID);
-                bookTmp = MyJsonParser.parseBook(in.readLine());
-                if (bookTmp != null) {
-                    System.out.println(bookTmp.toString());
-                }
+                getBook();
                 break;
             case "h":
                 helpActions();
