@@ -347,7 +347,7 @@ public class ClientHandler implements Runnable {
 
     private void loadToXml(){
         serverHandler.readLock(serverHandler.getDBLock());
-        writer.println(serverHandler.dbManager.getAuthors());
+        writer.println(MyJsonParser.toJsonAuthors(serverHandler.dbManager.getAuthors()));
         serverHandler.readUnlock(serverHandler.getDBLock());
     }
 

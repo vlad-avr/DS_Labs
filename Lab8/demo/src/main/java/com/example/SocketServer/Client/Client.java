@@ -68,6 +68,8 @@ public class Client {
                 " gba - get books of certain author;\n" +
                 " da - delete author;\n" +
                 " db - delete book;\n" +
+                " lx - load data from DB to XML;\n" +
+                " ux - upload data from XML to DB;\n" +  
                 " e - exit current environment;\n" +
                 " h - help;");
     }
