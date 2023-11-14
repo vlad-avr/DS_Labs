@@ -46,6 +46,10 @@ public class MyParser {
         return null;
     }
 
+    public void writeXML(String xmlPath){
+
+    }
+
     private boolean validateXml(String xmlPath) {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

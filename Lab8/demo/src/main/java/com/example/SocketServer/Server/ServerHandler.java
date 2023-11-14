@@ -8,10 +8,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.example.Entities.Author;
+import com.example.Entities.Book;
 import com.example.SocketServer.Client.ClientHandler;
 import com.example.dbManager.DatabaseManager;
 import com.example.dbManager.MyParser;
-
 
 public class ServerHandler {
     // private ServerDB serverDB;
@@ -43,36 +43,49 @@ public class ServerHandler {
         if(authors == null){
             return;
         }
+        boolean valid = true;
         for(Author author : authors){
-            dbManager.addAuthor(author);
+            if(dbManager.getAuthorGenerator().idIsValid(author.getId())){
+               for(Book book : author.getBooks()){
+                    if(!dbManager.getBookGenerator().idIsValid(book.getId())){
+                        valid = false;
+                    }
+               } 
+            }else{
+                valid = false;
+            }
+            if(valid){
+                dbManager.addAuthor(author);
+            }
+            valid = true;
         }
     }
 
-    public ReadWriteLock getDBLock(){
+    public ReadWriteLock getDBLock() {
         return this.dbLock;
     }
 
-    public ReadWriteLock getBookLock(){
+    public ReadWriteLock getBookLock() {
         return this.bookLock;
     }
 
-    public ReadWriteLock getAuthorLock(){
+    public ReadWriteLock getAuthorLock() {
         return this.authorLock;
     }
 
-    public void writeLock(ReadWriteLock lock){
+    public void writeLock(ReadWriteLock lock) {
         lock.writeLock().lock();
     }
 
-    public void writeUnlock(ReadWriteLock lock){
+    public void writeUnlock(ReadWriteLock lock) {
         lock.writeLock().unlock();
     }
 
-    public void readLock(ReadWriteLock lock){
+    public void readLock(ReadWriteLock lock) {
         lock.readLock().lock();
     }
 
-    public void readUnlock(ReadWriteLock lock){
+    public void readUnlock(ReadWriteLock lock) {
         lock.readLock().unlock();
     }
 

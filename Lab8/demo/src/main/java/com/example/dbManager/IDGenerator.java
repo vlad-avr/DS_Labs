@@ -17,6 +17,14 @@ public class IDGenerator {
         this.idFormat = idFormat + "-";
     }
 
+    public boolean idIsValid(String Id){
+        if(getValue(Id) != -1 && Id.substring(0, Id.indexOf("-") + 1).equals(idFormat)){
+            return true;
+            
+        }
+        return false;
+    }
+
     public void sort() {
         Collections.sort(idRecord, new Comparator<String>() {
             @Override
@@ -42,7 +50,7 @@ public class IDGenerator {
             return Integer.parseInt(ID.substring(ID.lastIndexOf('-')+1, ID.length()));
         }catch(NumberFormatException e){
             System.out.println(e.getMessage());
-            return 0;
+            return -1;
         }
     }
 
