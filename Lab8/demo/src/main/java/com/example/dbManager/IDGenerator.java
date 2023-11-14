@@ -85,25 +85,27 @@ public class IDGenerator {
         }
     }
 
-    public void reserveId(String Id){
+    public boolean reserveId(String Id){
         if(reservedIds.contains(Id)){
             System.out.println(Id + " is already reserved by other client!");
-            return;
+            return false;
         }else{
             if(idRecord.contains(Id)){
                 reservedIds.add(Id);
+                return true;
             }else{
                 System.out.println("This Id does not exist!");
+                return false;
             }
         }
     }
 
-    public boolean isReserved(String Id){
-        if(reservedIds.contains(Id)){
-            return true;
-        }
-        return false;
-    }
+    // public boolean isReserved(String Id){
+    //     if(reservedIds.contains(Id)){
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     public void releaseId(String Id){
         if(reservedIds.contains(Id)){
@@ -112,8 +114,11 @@ public class IDGenerator {
     }
 
     public void removeId(String Id) {
-        if (idRecord.contains(Id) && !reservedIds.contains(Id)) {
+        if (idRecord.contains(Id)) {
             idRecord.remove(Id);
+            if(reservedIds.contains(Id)){
+                reservedIds.remove(Id);
+            }
         } else {
             System.out.println("\nThis ID does not exist or it is reserved by other client!");
         }

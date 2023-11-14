@@ -48,30 +48,160 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void genBookID() {
+        serverHandler.writeLock(serverHandler.getBookLock());
+        writer.println(serverHandler.dbManager.getBookGenerator().generateId());
+        serverHandler.writeUnlock(serverHandler.getBookLock());
+    }
+
+    private void genAuthorID() {
+        serverHandler.writeLock(serverHandler.getAuthorLock());
+        writer.println(serverHandler.dbManager.getAuthorGenerator().generateId());
+        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+    }
+
+    private void showAuthors() {
+        List<Author> authors;
+        serverHandler.readLock(serverHandler.getDBLock());
+        authors = serverHandler.dbManager.getAuthors();
+        serverHandler.readUnlock(serverHandler.getDBLock());
+        writer.println(MyJsonParser.toJsonAuthors(authors));
+    }
+
+    private void showBooks() {
+        List<Book> books;
+        serverHandler.readLock(serverHandler.getDBLock());
+        books = serverHandler.dbManager.getBooks();
+        serverHandler.readUnlock(serverHandler.getDBLock());
+        writer.println(MyJsonParser.toJsonBooks(books));
+    }
+
+    private void sendAuthorIds() {
+        List<String> IDs;
+        serverHandler.readLock(serverHandler.getAuthorLock());
+        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
+        serverHandler.readUnlock(serverHandler.getAuthorLock());
+        writer.println(MyJsonParser.toJsonIDs(IDs));
+    }
+
+    private void sendBookIds() {
+        List<String> IDs;
+        serverHandler.readLock(serverHandler.getBookLock());
+        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
+        serverHandler.readUnlock(serverHandler.getBookLock());
+        writer.println(MyJsonParser.toJsonIDs(IDs));
+    }
+
+    private void getBook() throws IOException {
+        sendBookIds();
+        String temp = reader.readLine();
+        if (serverHandler.dbManager.getBookGenerator().exists(temp)) {
+            serverHandler.readLock(serverHandler.getDBLock());
+            Book book = serverHandler.dbManager.getBook(temp);
+            serverHandler.readUnlock(serverHandler.getDBLock());
+            writer.println(MyJsonParser.toJsonBook(book));
+        } else {
+            writer.println("[]");
+        }
+    }
+
+    private void getAuthor() throws IOException {
+        sendAuthorIds();
+        String temp = reader.readLine();
+        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)) {
+            serverHandler.readLock(serverHandler.getDBLock());
+            Author author = serverHandler.dbManager.getAuthor(temp, true);
+            serverHandler.readUnlock(serverHandler.getDBLock());
+            writer.println(MyJsonParser.toJsonAuthor(author));
+        } else {
+            writer.println("[]");
+        }
+    }
+
+    private void addAuthor() throws IOException {
+        genAuthorID();
+        String temp;
+        while ((temp = reader.readLine()).equals("bi")) {
+            genBookID();
+        }
+        serverHandler.writeLock(serverHandler.getAuthorLock());
+        serverHandler.writeLock(serverHandler.getBookLock());
+        serverHandler.writeLock(serverHandler.getDBLock());
+        serverHandler.dbManager.addAuthor(MyJsonParser.parseAuthor(temp));
+        serverHandler.writeUnlock(serverHandler.getDBLock());
+        serverHandler.writeUnlock(serverHandler.getBookLock());
+        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+    }
+
+    private void addBook() throws IOException {
+        sendAuthorIds();
+        String temp = reader.readLine();
+        serverHandler.writeLock(serverHandler.getAuthorLock());
+        boolean checker = serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
+        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        if (checker) {
+            writer.println(temp);
+            genBookID();
+            serverHandler.writeLock(serverHandler.getAuthorLock());
+            serverHandler.writeLock(serverHandler.getBookLock());
+            serverHandler.writeLock(serverHandler.getDBLock());
+            Book book = MyJsonParser.parseBook(reader.readLine());
+            serverHandler.dbManager.addBook(book);
+            serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
+            serverHandler.writeUnlock(serverHandler.getDBLock());
+            serverHandler.writeUnlock(serverHandler.getBookLock());
+            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        } else {
+            writer.println("");
+        }
+    }
+
+    private void deleteBook() throws IOException {
+        sendBookIds();
+        String temp = reader.readLine();
+        serverHandler.writeLock(serverHandler.getBookLock());
+        boolean checker = serverHandler.dbManager.getBookGenerator().reserveId(temp);
+        serverHandler.writeUnlock(serverHandler.getBookLock());
+        if (checker) {
+            serverHandler.writeLock(serverHandler.getAuthorLock());
+            serverHandler.writeLock(serverHandler.getBookLock());
+            serverHandler.writeLock(serverHandler.getDBLock());
+            serverHandler.dbManager.deleteBook(temp);
+            serverHandler.writeUnlock(serverHandler.getDBLock());
+            serverHandler.writeUnlock(serverHandler.getBookLock());
+            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        }
+    }
+
+    private void deleteAuthor() throws IOException {
+        sendAuthorIds();
+        String temp = reader.readLine();
+        serverHandler.writeLock(serverHandler.getAuthorLock());
+        boolean checker = serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
+        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        if (checker) {
+            serverHandler.writeLock(serverHandler.getAuthorLock());
+            serverHandler.writeLock(serverHandler.getBookLock());
+            serverHandler.writeLock(serverHandler.getDBLock());
+            serverHandler.dbManager.deleteAuthor(temp);
+            serverHandler.writeUnlock(serverHandler.getDBLock());
+            serverHandler.writeUnlock(serverHandler.getBookLock());
+            serverHandler.writeUnlock(serverHandler.getAuthorLock());
+        }
+    }
+
     @Override
     public void run() {
         try {
             while (socket.isConnected() && !socket.isClosed()) {
                 String input = reader.readLine();
                 writer.flush();
-                List<Author> authors;
-                List<Book> books;
-                List<String> IDs;
-                Author author;
-                Book book;
-                String temp = "";
                 switch (input) {
                     case "sa":
-                        serverHandler.readLock(serverHandler.getDBLock());
-                        authors = serverHandler.dbManager.getAuthors();
-                        serverHandler.readUnlock(serverHandler.getDBLock());
-                        writer.println(MyJsonParser.toJsonAuthors(authors));
+                        showAuthors();
                         break;
                     case "sb":
-                        serverHandler.readLock(serverHandler.getDBLock());
-                        books = serverHandler.dbManager.getBooks();
-                        serverHandler.readUnlock(serverHandler.getDBLock());
-                        writer.println(MyJsonParser.toJsonBooks(books));
+                        showBooks();
                         break;
                     // case "gap":
                     // switch (reader.readLine()) {
@@ -139,122 +269,28 @@ public class ClientHandler implements Runnable {
                     // break;
                     // }
                     case "ga":
-                        serverHandler.readLock(serverHandler.getAuthorLock());
-                        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
-                        serverHandler.readUnlock(serverHandler.getAuthorLock());
-                        writer.println(MyJsonParser.toJsonIDs(IDs));
-                        temp = reader.readLine();
-                        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)) {
-                            serverHandler.readLock(serverHandler.getDBLock());
-                            author = serverHandler.dbManager.getAuthor(temp, true);
-                            serverHandler.readUnlock(serverHandler.getDBLock());
-                            writer.println(MyJsonParser.toJsonAuthor(author));
-                        } else {
-                            writer.println("[]");
-                        }
+                        getAuthor();
                         break;
                     case "gb":
-                        serverHandler.readLock(serverHandler.getBookLock());
-                        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
-                        serverHandler.readUnlock(serverHandler.getBookLock());
-                        writer.println(MyJsonParser.toJsonIDs(IDs));
-                        temp = reader.readLine();
-                        if (serverHandler.dbManager.getBookGenerator().exists(temp)) {
-                            serverHandler.readLock(serverHandler.getDBLock());
-                            book = serverHandler.dbManager.getBook(temp);
-                            serverHandler.readUnlock(serverHandler.getDBLock());
-                            writer.println(MyJsonParser.toJsonBook(book));
-                        } else {
-                            writer.println("[]");
-                        }
+                        getBook();
                         break;
                     case "ai":
-                        serverHandler.writeLock(serverHandler.getAuthorLock());
-                        writer.println(serverHandler.dbManager.getAuthorGenerator().generateId());
-                        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        genAuthorID();
                         break;
                     case "bi":
-                        serverHandler.writeLock(serverHandler.getBookLock());
-                        writer.println(serverHandler.dbManager.getBookGenerator().generateId());
-                        serverHandler.writeUnlock(serverHandler.getBookLock());
+                        genBookID();
                         break;
                     case "aa":
-                        serverHandler.writeLock(serverHandler.getAuthorLock());
-                        serverHandler.writeLock(serverHandler.getBookLock());
-                        serverHandler.writeLock(serverHandler.getDBLock());
-                        serverHandler.dbManager.addAuthor(MyJsonParser.parseAuthor(reader.readLine()));
-                        serverHandler.writeUnlock(serverHandler.getDBLock());
-                        serverHandler.writeUnlock(serverHandler.getBookLock());
-                        serverHandler.writeUnlock(serverHandler.getAuthorLock());
-                        break;
-                    case "rai":
-                        serverHandler.readLock(serverHandler.getAuthorLock());
-                        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
-                        serverHandler.readUnlock(serverHandler.getAuthorLock());
-                        writer.println(MyJsonParser.toJsonIDs(IDs));
-                        temp = reader.readLine();
-                        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)) {
-                            serverHandler.writeLock(serverHandler.getAuthorLock());
-                            serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
-                            serverHandler.writeUnlock(serverHandler.getAuthorLock());
-                        }
-                        break;
-                    case "rbi":
-                        serverHandler.readLock(serverHandler.getBookLock());
-                        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
-                        serverHandler.readUnlock(serverHandler.getBookLock());
-                        writer.println(MyJsonParser.toJsonIDs(IDs));
-                        temp = reader.readLine();
-                        if (serverHandler.dbManager.getBookGenerator().exists(temp)) {
-                            serverHandler.writeLock(serverHandler.getBookLock());
-                            serverHandler.dbManager.getBookGenerator().reserveId(temp);
-                            serverHandler.writeUnlock(serverHandler.getBookLock());
-                        }
+                        addAuthor();
                         break;
                     case "ab":
-                        serverHandler.writeLock(serverHandler.getAuthorLock());
-                        serverHandler.writeLock(serverHandler.getBookLock());
-                        serverHandler.writeLock(serverHandler.getDBLock());
-                        book = MyJsonParser.parseBook(reader.readLine());
-                        serverHandler.dbManager.addBook(book);
-                        serverHandler.dbManager.getAuthorGenerator().releaseId(book.getAuthor());
-                        serverHandler.writeUnlock(serverHandler.getDBLock());
-                        serverHandler.writeUnlock(serverHandler.getBookLock());
-                        serverHandler.writeUnlock(serverHandler.getAuthorLock());
+                        addBook();
                         break;
                     case "da":
-                        serverHandler.readLock(serverHandler.getAuthorLock());
-                        IDs = serverHandler.dbManager.getAuthorGenerator().getIDs();
-                        serverHandler.readUnlock(serverHandler.getAuthorLock());
-                        writer.println(MyJsonParser.toJsonIDs(IDs));
-                        temp = reader.readLine();
-                        if (serverHandler.dbManager.getAuthorGenerator().exists(temp)
-                                && !serverHandler.dbManager.getAuthorGenerator().isReserved(temp)) {
-                            serverHandler.writeLock(serverHandler.getAuthorLock());
-                            serverHandler.writeLock(serverHandler.getBookLock());
-                            serverHandler.writeLock(serverHandler.getDBLock());
-                            serverHandler.dbManager.deleteAuthor(temp);
-                            serverHandler.writeUnlock(serverHandler.getDBLock());
-                            serverHandler.writeUnlock(serverHandler.getBookLock());
-                            serverHandler.writeUnlock(serverHandler.getAuthorLock());
-                        }
+                        deleteAuthor();
                         break;
                     case "db":
-                        serverHandler.readLock(serverHandler.getBookLock());
-                        IDs = serverHandler.dbManager.getBookGenerator().getIDs();
-                        serverHandler.readUnlock(serverHandler.getBookLock());
-                        writer.println(MyJsonParser.toJsonIDs(IDs));
-                        temp = reader.readLine();
-                        if (serverHandler.dbManager.getBookGenerator().exists(temp)
-                                && !serverHandler.dbManager.getBookGenerator().isReserved(temp)) {
-                            serverHandler.writeLock(serverHandler.getAuthorLock());
-                            serverHandler.writeLock(serverHandler.getBookLock());
-                            serverHandler.writeLock(serverHandler.getDBLock());
-                            serverHandler.dbManager.deleteBook(temp);
-                            serverHandler.writeUnlock(serverHandler.getDBLock());
-                            serverHandler.writeUnlock(serverHandler.getBookLock());
-                            serverHandler.writeUnlock(serverHandler.getAuthorLock());
-                        }
+                        deleteBook();
                         break;
                     default:
                         break;

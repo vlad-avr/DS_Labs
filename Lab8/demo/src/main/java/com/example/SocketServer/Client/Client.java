@@ -31,9 +31,9 @@ public class Client {
 
     private void closeClient() {
         try {
-            clientSocket.close();
             in.close();
             out.close();
+            clientSocket.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -85,7 +85,7 @@ public class Client {
         return author;
     }
 
-    private Book createBook(String Id, String authorId){
+    private Book createBook(String Id, String authorId) {
         System.out.println("\n You are in book creation menu\n");
         Book book = new Book(Id);
         book.setAuthor(authorId);
@@ -94,6 +94,26 @@ public class Client {
         book.setPrice(manager.getDouble("Enter price : "));
         book.setGenre(manager.getGenre("Enter genre : "));
         return book;
+    }
+
+    private Author updateAuthor(Author author){
+        System.out.println("\n You are in author modification menu\n");
+        while (manager.getBool("Do you want change something? ")) {
+            System.out.println(" f - change firstname;\n l - change lastname;");
+            String input = manager.getString("Enter command : ");
+            switch (input) {
+                case "f":
+                    author.setFirstName(manager.getString("Enter firstname : "));
+                    break;
+                case "l":
+                    author.setLastName(manager.getString("Enter lastname : "));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return author;
     }
 
     private void sendAuthorsRequest() {
@@ -165,6 +185,7 @@ public class Client {
         Author authorTmp;
         Book bookTmp;
         String ID;
+        String temp;
         switch (input) {
             case "sa":
                 out.println("sa");
@@ -187,25 +208,34 @@ public class Client {
                 }
                 break;
             case "aa":
-                out.println("ai");
-                authorTmp = createAuthor(in.readLine());
                 out.println("aa");
+                authorTmp = createAuthor(in.readLine());
                 out.println(MyJsonParser.toJsonAuthor(authorTmp));
                 break;
             case "ab":
-                out.println("rai");
+                out.println("ab");
                 String authorId = manager.getID(MyJsonParser.parseIds(in.readLine()), " Enter author ID : ");
                 out.println(authorId);
-                out.println("bi");
-                ID = in.readLine();
-                bookTmp = createBook(ID, authorId);
-                out.println("ab");
-                out.println(MyJsonParser.toJsonBook(bookTmp));
+                authorId = in.readLine();
+                if (authorId != "") {
+                    ID = in.readLine();
+                    bookTmp = createBook(ID, authorId);
+                    out.println(MyJsonParser.toJsonBook(bookTmp));
+                }else{
+                    System.out.println("This id is already reserved by other client!");
+                }
                 break;
             case "ua":
-                // dbManager.updateAuthor(updateAuthor(dbManager.getAuthor(
-                // manager.getID(dbManager.getAuthorGenerator(), "Enter author ID : "),
-                // false)));
+                out.println("ua");
+                ID = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author Id : ");
+                out.println(ID);
+                temp = in.readLine();
+                if(temp != ""){
+                    authorTmp = MyJsonParser.parseAuthor(temp);
+                    out.println(updateAuthor(authorTmp));
+                }else{
+                    System.out.println("This id is already reserved by other client!");
+                }
                 break;
             case "ub":
                 // dbManager.updateBook(updateBook(
@@ -220,10 +250,10 @@ public class Client {
                 // System.out.println(tmp);
                 // authors = MyJsonParser.parseAuthors(tmp);
                 // if (authors == null) {
-                //     break;
+                // break;
                 // }
                 // for (Author author : authors) {
-                //     System.out.println(author.toString());
+                // System.out.println(author.toString());
                 // }
                 break;
             case "gbp":
@@ -231,10 +261,10 @@ public class Client {
                 // sendBooksRequest();
                 // books = MyJsonParser.parseBooks(in.readLine());
                 // if (books == null) {
-                //     break;
+                // break;
                 // }
                 // for (Book book : books) {
-                //     System.out.println(book.toString());
+                // System.out.println(book.toString());
                 // }
                 break;
             case "da":
@@ -271,7 +301,7 @@ public class Client {
             case "e":
                 System.out.println("\nYou stopped working with DB\n");
                 working = false;
-                //closeClient();
+                // closeClient();
                 break;
             default:
                 System.out.println("Invalid command!");
