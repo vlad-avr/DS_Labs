@@ -41,6 +41,7 @@ public class Client {
 
     public void run() {
         try {
+            helpActions();
             while (clientSocket.isConnected() && !clientSocket.isClosed() && working) {
                 mainLoop(out, in);
             }
@@ -62,6 +63,7 @@ public class Client {
                 " ua - update author;\n" +
                 " ub - update book;\n" +
                 " ca - change author;\n" +
+                " gba - get books of certain author;\n" +
                 " da - delete author;\n" +
                 " db - delete book;\n" +
                 " e - exit current environment;\n" +
@@ -341,6 +343,21 @@ public class Client {
         }
     }
 
+    private void getBooksOfAuthor() throws IOException{
+        out.println("gba");
+        String tmp = manager.getID(MyJsonParser.parseIds(in.readLine()), "Enter author id : ");
+        out.println(tmp);
+        tmp = in.readLine();
+        if(tmp.equals("")){
+            System.out.println("Unable to reach the author ot his books (either deleted or corrupted data)");
+            return;
+        }
+        List<Book> books = MyJsonParser.parseBooks(tmp);
+        for(Book book : books){
+            System.out.println(book.toString());
+        }
+    }
+
     private void mainLoop(PrintWriter out, BufferedReader in) throws IOException {
         String input;
         input = manager.getString("Enter command : ");
@@ -371,6 +388,9 @@ public class Client {
                 break;
             case "gbp":
                 getBooksByParams();
+                break;
+            case "gba":
+                getBooksOfAuthor();
                 break;
             case "da":
                 deleteAuthor();

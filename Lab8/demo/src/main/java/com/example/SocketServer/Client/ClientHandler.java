@@ -295,7 +295,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private void getBooksByParams() throws IOException{
+    private void getBooksByParams() throws IOException {
         switch (reader.readLine()) {
             case "p":
                 double min = Double.parseDouble(reader.readLine());
@@ -322,6 +322,22 @@ public class ClientHandler implements Runnable {
             default:
                 writer.println("");
                 return;
+        }
+    }
+
+    private void getBooksOfAuthor() throws IOException {
+        sendAuthorIds();
+        String tmp = reader.readLine();
+        serverHandler.readLock(serverHandler.getAuthorLock());
+        boolean checker = serverHandler.dbManager.getAuthorGenerator().exists(tmp);
+        serverHandler.readUnlock(serverHandler.getAuthorLock());
+        if (checker) {
+            serverHandler.readLock(serverHandler.getDBLock());
+            List<Book> books = serverHandler.dbManager.getBooksOfAuthor(tmp);
+            serverHandler.readUnlock(serverHandler.getDBLock());
+            writer.println(MyJsonParser.toJsonBooks(books));
+        } else {
+            writer.println("");
         }
     }
 
@@ -370,6 +386,9 @@ public class ClientHandler implements Runnable {
                         break;
                     case "ca":
                         changeAuthor();
+                        break;
+                    case "gba":
+                        getBooksOfAuthor();
                         break;
                     default:
                         break;
