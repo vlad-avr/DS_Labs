@@ -442,9 +442,9 @@ public class Client {
                 break;
             case "e":
                 System.out.println("\nYou stopped working with DB\n");
+                out.println("e");
                 working = false;
-                // closeClient();
-                break;
+                return;
             default:
                 System.out.println("Invalid command!");
                 break;

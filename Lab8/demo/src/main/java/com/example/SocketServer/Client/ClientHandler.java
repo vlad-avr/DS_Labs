@@ -406,6 +406,9 @@ public class ClientHandler implements Runnable {
                     case "ux":
                         uploadFromXml();
                         break;
+                    case "e":
+                        closeClient();
+                        return;
                     default:
                         break;
                 }
