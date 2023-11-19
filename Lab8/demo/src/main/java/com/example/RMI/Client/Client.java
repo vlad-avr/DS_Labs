@@ -209,7 +209,7 @@ public class Client {
             boolean authorReserved = dbRemote.reserveAuthor(newAuthor);
             if(authorReserved){
                 book.setAuthor(newAuthor);
-                dbRemote.updateBook(book);
+                dbRemote.updateBookAuthor(book);
                 return;
             }
             System.out.println("Unable to acquire lock on author with id " + newAuthor);

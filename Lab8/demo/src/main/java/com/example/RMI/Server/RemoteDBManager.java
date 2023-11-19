@@ -226,7 +226,7 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
         bookLock.writeLock().lock();
         dbLock.writeLock().lock();
         manager.deleteAuthor(Id);
-        dbLock.writeLock().lock();
+        dbLock.writeLock().unlock();
         bookLock.writeLock().unlock();
         authorLock.writeLock().unlock();
     }
@@ -256,5 +256,5 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
             dbLock.writeLock().unlock();
         }
     }
-    
+
 }
