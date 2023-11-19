@@ -8,10 +8,13 @@ import com.example.Entities.Author;
 import com.example.Entities.Book;
 import com.example.InputManager.InputManager;
 import com.example.RMI.Server.RemoteDBManagerInterface;
+import com.example.dbManager.MyParser;
 
 public class Client {
     private RemoteDBManagerInterface dbRemote;
     private InputManager inputManager = new InputManager();
+    private MyParser parser = new MyParser();
+
     public Client(){
         try{
             dbRemote = (RemoteDBManagerInterface) Naming.lookup("rmi://localhost:1234/DB");
@@ -249,6 +252,27 @@ public class Client {
         System.out.println("Unable to acquire lock on book with id " + Id);
     }
 
+    private void loadToXML() throws RemoteException{
+        //D:\\Java\\DS_Labs\\Lab8\\demo\\src\\main\\java\\com\\example\\XMLs\\Example.xml
+        String path = inputManager.getString("Enter path to XML file : ");
+        if(!parser.tryOpen(path)){
+            System.out.println(" Unable to open file");
+            return;
+        }
+        List<Author> authors = dbRemote.getAuthors();
+        parser.writeXML(path, authors);
+    }
+
+    private void uploadFromXML() throws RemoteException{
+        String path = inputManager.getString("Enter path to XML file : ");
+        if(!parser.tryOpen(path)){
+            System.out.println(" Unable to open file");
+            return;
+        }
+        List<Author> authors = parser.parseSAX(path);
+        dbRemote.uploadFromXML(authors);
+    }
+
     private void helpActions() {
         System.out.println("\n sa - show authors;\n" +
                 " sb - show books;\n" +
@@ -317,6 +341,12 @@ public class Client {
                     break;
                 case "db":
                     deleteBook();
+                    break;
+                case "lx":
+                    loadToXML();
+                    break;
+                case "ux":
+                    uploadFromXML();
                     break;
                 case "h":
                     helpActions();

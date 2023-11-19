@@ -239,5 +239,22 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
         dbLock.writeLock().unlock();
         bookLock.writeLock().unlock();
     }
+
+    @Override
+    public void uploadFromXML(List<Author> authors) throws RemoteException {
+        for (Author author : authors) {
+            dbLock.writeLock().lock();
+            authorLock.writeLock().lock();
+            bookLock.writeLock().lock();
+            if (manager.getAuthorGenerator().exists(author.getId())) {
+                manager.updateAuthor(author, true);
+            } else {
+                manager.addAuthor(author, true);
+            }
+            bookLock.writeLock().unlock();
+            authorLock.writeLock().unlock();
+            dbLock.writeLock().unlock();
+        }
+    }
     
 }

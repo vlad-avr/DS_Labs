@@ -36,4 +36,6 @@ public interface RemoteDBManagerInterface extends Remote{
     public String generateBookId() throws RemoteException;
     public boolean reserveAuthor(String Id) throws RemoteException;
     public boolean reserveBook(String Id) throws RemoteException;
+
+    public void uploadFromXML(List<Author> authors) throws RemoteException;
 }
