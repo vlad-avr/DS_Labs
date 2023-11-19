@@ -89,6 +89,11 @@ public class Client {
         }
     }
 
+    private void getBooksOfAuthor() throws RemoteException{
+        String id = inputManager.getID(dbRemote.getAuthorIds(), "Enter author id : ");
+        showBooks(dbRemote.getBooksOfAuthor(id));
+    }
+
     private void helpActions() {
         System.out.println("\n sa - show authors;\n" +
                 " sb - show books;\n" +
@@ -127,6 +132,9 @@ public class Client {
                     break;
                 case "gbp":
                     getBooksByParams();
+                    break;
+                case "gba":
+                    getBooksOfAuthor();
                     break;
                 case "h":
                     helpActions();

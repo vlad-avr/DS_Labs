@@ -94,5 +94,45 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
         dbLock.readLock().unlock();
         return books;
     }
+
+    @Override
+    public List<String> getAuthorIds() throws RemoteException {
+        authorLock.readLock().lock();
+        List<String> Ids = manager.getAuthorGenerator().getIDs();
+        authorLock.readLock().unlock();
+        return Ids;
+    }
+
+    @Override
+    public List<String> getBookIds() throws RemoteException {
+        bookLock.readLock().lock();
+        List<String> Ids = manager.getBookGenerator().getIDs();
+        bookLock.readLock().unlock();
+        return Ids;
+    }
+
+    @Override
+    public String generateAuthorId() throws RemoteException {
+        authorLock.writeLock().lock();
+        String Id = manager.getAuthorGenerator().generateId();
+        authorLock.writeLock().unlock();
+        return Id;
+    }
+
+    @Override
+    public String generateBookId() throws RemoteException {
+        bookLock.writeLock().lock();
+        String Id = manager.getBookGenerator().generateId();
+        bookLock.writeLock().unlock();
+        return Id;
+    }
+
+    @Override
+    public List<Book> getBooksOfAuthor(String authorId) throws RemoteException {
+        dbLock.readLock().lock();
+        List<Book> books = manager.getBooksOfAuthor(authorId);
+        dbLock.readLock().unlock();
+        return books;
+    }
     
 }
