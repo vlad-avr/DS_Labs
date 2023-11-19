@@ -46,6 +46,24 @@ public class Client {
         showBooks(dbRemote.getBooks());
     }
 
+    private void getAuthor() throws RemoteException{
+        Author author = dbRemote.getAuthor(inputManager.getID(dbRemote.getAuthorIds(), "Enter author Id : "));
+        if(author != null){
+            System.out.println(author.toString());
+            return;
+        }
+        System.out.println("Author with this Id no longer exists!");
+    }
+
+    private void getBook() throws RemoteException{
+        Book book = dbRemote.getBook(inputManager.getID(dbRemote.getBookIds(), "Enter book Id : "));
+        if(book != null){
+            System.out.println(book.toString());
+            return;
+        }
+        System.out.println("Book with this Id no longer exists!");
+    }
+
     private void getAuthorsByParams() throws RemoteException{
         System.out.println("\n You are in author loading menu \n");
         String input;
@@ -167,6 +185,12 @@ public class Client {
                     break;
                 case "gba":
                     getBooksOfAuthor();
+                    break;
+                case "ga":
+                    getAuthor();
+                    break;
+                case "gb":
+                    getBook();
                     break;
                 case "aa":
                     addAuthor();
