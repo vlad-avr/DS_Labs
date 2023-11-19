@@ -89,6 +89,38 @@ public class Client {
         }
     }
 
+    private Author createAuthor(String Id) throws RemoteException{
+        System.out.println("\n You are in author creation menu\n");
+        Author author = new Author(Id);
+        System.out.println("\n New author`s ID is " + author.getId());
+        author.setFirstName(inputManager.getString("Enter firstname : "));
+        author.setLastName(inputManager.getString("Enter last name : "));
+        while (inputManager.getBool("Do you want to add a book for this author ('+' for yes and '-' for no)?")) {
+            author.addBook(createBook(dbRemote.generateBookId(), author.getId()));
+        }
+        return author;
+    }
+
+    private Book createBook(String Id, String authorId){
+        System.out.println("\n You are in book creation menu\n");
+        Book book = new Book(Id);
+        book.setAuthor(authorId);
+        System.out.println("\n New book`s ID is " + book.getId() + " and its author is " + book.getAuthor());
+        book.setName(inputManager.getString("Enter name : "));
+        book.setPrice(inputManager.getDouble("Enter price : "));
+        book.setGenre(inputManager.getGenre("Enter genre : "));
+        return book;
+    }
+
+    private void addAuthor() throws RemoteException{
+        dbRemote.addAuthor(createAuthor(dbRemote.generateAuthorId()));
+    }
+
+    private void addBook() throws RemoteException{
+        String authorId = inputManager.getID(dbRemote.getAuthorIds(), "Enter author Id : ");
+        dbRemote.addBook(createBook(dbRemote.generateBookId() , authorId));
+    }
+
     private void getBooksOfAuthor() throws RemoteException{
         String id = inputManager.getID(dbRemote.getAuthorIds(), "Enter author id : ");
         showBooks(dbRemote.getBooksOfAuthor(id));
@@ -135,6 +167,12 @@ public class Client {
                     break;
                 case "gba":
                     getBooksOfAuthor();
+                    break;
+                case "aa":
+                    addAuthor();
+                    break;
+                case "ab":
+                    addBook();
                     break;
                 case "h":
                     helpActions();

@@ -12,6 +12,10 @@ public interface RemoteDBManagerInterface extends Remote{
     public List<Author> getAuthors() throws RemoteException;
     public List<Author> getAuthors(int min, int max) throws RemoteException;
     public List<Author> getAuthors(String toContain) throws RemoteException;
+
+    public void addAuthor(Author author) throws RemoteException;
+    
+    public void addBook(Book book) throws RemoteException;
     
     public List<Book> getBooks() throws RemoteException;
     public List<Book> getBooks(String toContain) throws RemoteException;
@@ -23,4 +27,6 @@ public interface RemoteDBManagerInterface extends Remote{
     public List<String> getBookIds() throws RemoteException;
     public String generateAuthorId() throws RemoteException;
     public String generateBookId() throws RemoteException;
+    public boolean reserveAuthor(String Id) throws RemoteException;
+    public boolean reserveBook(String Id) throws RemoteException;
 }
