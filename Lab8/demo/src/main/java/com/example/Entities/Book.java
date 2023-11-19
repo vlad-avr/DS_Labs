@@ -1,8 +1,10 @@
 package com.example.Entities;
 
+import java.io.Serializable;
+
 //import com.example.db_controller.IDGenerator;
 
-public class Book {
+public class Book implements Serializable{
 
     public static enum Genre {
         horror,
