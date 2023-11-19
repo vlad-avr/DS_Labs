@@ -130,6 +130,73 @@ public class Client {
         return book;
     }
 
+    private Author modifyAuthor(Author author){
+        System.out.println("\n You are in author modification menu\n");
+        System.out.println("Current state : \n" + author);
+        while (inputManager.getBool("Do you want change something? ")) {
+            System.out.println(" f - change firstname;\n l - change lastname;");
+            String input = inputManager.getString("Enter command : ");
+            switch (input) {
+                case "f":
+                    author.setFirstName(inputManager.getString("Enter firstname : "));
+                    break;
+                case "l":
+                    author.setLastName(inputManager.getString("Enter lastname : "));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return author;
+    }
+
+    private Book modifyBook(Book book){
+        System.out.println("\n You are in book modification menu\n");
+        System.out.println("Current state : \n" + book);
+        while (inputManager.getBool("Do you want change something? ")) {
+            System.out.println(" n - change name;\n p - change price;\n g - change genre;");
+            String input = inputManager.getString("Enter command : ");
+            switch (input) {
+                case "n":
+                    book.setName(inputManager.getString("Enter name : "));
+                    break;
+                case "p":
+                    book.setPrice(inputManager.getDouble("Enter price : "));
+                    break;
+                case "g":
+                    book.setGenre(inputManager.getGenre("Enter genre"));
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+                    break;
+            }
+        }
+        return book;
+    }
+
+    private void updateAuthor() throws RemoteException{
+        String Id = inputManager.getID(dbRemote.getAuthorIds(), "Enter author Id : ");
+        boolean reserved = dbRemote.reserveAuthor(Id);
+        if(reserved){
+            Author author = modifyAuthor(dbRemote.getAuthor(Id));
+            dbRemote.updateAuthor(author);
+            return;
+        }
+        System.out.println("Unable to acquire lock on author with Id " + Id);
+    }
+
+    private void updateBook() throws RemoteException{
+        String Id = inputManager.getID(dbRemote.getBookIds(), "Enter book Id : ");
+        boolean reserved = dbRemote.reserveBook(Id);
+        if(reserved){
+            Book book = modifyBook(dbRemote.getBook(Id));
+            dbRemote.updateBook(book);
+            return;
+        }
+        System.out.println("Unable to acquire lock on book with Id " + Id);
+    }
+
     private void addAuthor() throws RemoteException{
         dbRemote.addAuthor(createAuthor(dbRemote.generateAuthorId()));
     }
@@ -197,6 +264,12 @@ public class Client {
                     break;
                 case "ab":
                     addBook();
+                    break;
+                case "ua":
+                    updateAuthor();
+                    break;
+                case "ub":
+                    updateBook();
                     break;
                 case "h":
                     helpActions();

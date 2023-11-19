@@ -15,6 +15,7 @@ public interface RemoteDBManagerInterface extends Remote{
     public Author getAuthor(String Id) throws RemoteException;
 
     public void addAuthor(Author author) throws RemoteException;
+    public void updateAuthor(Author author) throws RemoteException;
     
     public List<Book> getBooks() throws RemoteException;
     public List<Book> getBooks(String toContain) throws RemoteException;
@@ -24,6 +25,7 @@ public interface RemoteDBManagerInterface extends Remote{
     public Book getBook(String Id) throws RemoteException;
 
     public void addBook(Book book) throws RemoteException;
+    public void updateBook(Book book) throws RemoteException;
 
     public List<String> getAuthorIds() throws RemoteException;
     public List<String> getBookIds() throws RemoteException;

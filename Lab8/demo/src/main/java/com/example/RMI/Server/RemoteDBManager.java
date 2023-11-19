@@ -186,5 +186,25 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
         bookLock.readLock().unlock();
         return book;
     }
+
+    @Override
+    public void updateAuthor(Author author) throws RemoteException {
+        dbLock.writeLock().lock();
+        manager.updateAuthor(author);
+        dbLock.writeLock().unlock();
+        authorLock.writeLock().lock();
+        manager.getAuthorGenerator().releaseId(author.getId());
+        authorLock.writeLock().unlock();
+    }
+
+    @Override
+    public void updateBook(Book book) throws RemoteException {
+        dbLock.writeLock().lock();
+        manager.updateBook(book);
+        dbLock.writeLock().unlock();
+        bookLock.writeLock().lock();
+        manager.getBookGenerator().releaseId(book.getId());
+        bookLock.writeLock().unlock();
+    }
     
 }
