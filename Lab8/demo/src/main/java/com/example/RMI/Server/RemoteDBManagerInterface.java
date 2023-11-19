@@ -15,6 +15,6 @@ public interface RemoteDBManagerInterface extends Remote{
     
     public List<Book> getBooks() throws RemoteException;
     public List<Book> getBooks(String toContain) throws RemoteException;
-    public List<Book> getBooks(float min, float max) throws RemoteException;
+    public List<Book> getBooks(double min, double max) throws RemoteException;
     public List<Book> getBooks(Genre genre) throws RemoteException;
 }

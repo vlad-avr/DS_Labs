@@ -80,7 +80,7 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
     }
 
     @Override
-    public List<Book> getBooks(float min, float max) {
+    public List<Book> getBooks(double min, double max) {
         dbLock.readLock().lock();
         List<Book> books = manager.getBooks(min, max);
         dbLock.readLock().unlock();
