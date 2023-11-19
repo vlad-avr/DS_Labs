@@ -229,6 +229,26 @@ public class Client {
         showBooks(dbRemote.getBooksOfAuthor(id));
     }
 
+    private void deleteAuthor() throws RemoteException{
+        String Id = inputManager.getID(dbRemote.getAuthorIds(), "Enter author Id : ");
+        boolean reserved = dbRemote.reserveAuthor(Id);
+        if(reserved){
+            dbRemote.deleteAuthor(Id);
+            return;
+        }
+        System.out.println("Unable to acquire lock on author with id " + Id);
+    }
+
+    private void deleteBook() throws RemoteException{
+        String Id = inputManager.getID(dbRemote.getBookIds(), "Enter book Id : ");
+        boolean reserved = dbRemote.reserveBook(Id);
+        if(reserved){
+            dbRemote.deleteBook(Id);
+            return;
+        }
+        System.out.println("Unable to acquire lock on book with id " + Id);
+    }
+
     private void helpActions() {
         System.out.println("\n sa - show authors;\n" +
                 " sb - show books;\n" +
@@ -291,6 +311,12 @@ public class Client {
                     break;
                 case "ca":
                     changeAuthor();
+                    break;
+                case "da":
+                    deleteAuthor();
+                    break;
+                case "db":
+                    deleteBook();
                     break;
                 case "h":
                     helpActions();
