@@ -10,13 +10,10 @@ public class Server {
 
     private final int port = 1234;
 
-    public Server(){
-        initAndListen();
-    }
-
-    private void initAndListen(){
+    public void initAndListen(){
         try{
             RemoteDBManager dbManager = new RemoteDBManager(new DatabaseManager());
+            UnicastRemoteObject.unexportObject(dbManager, true);
             RemoteDBManagerInterface mgrInterface = (RemoteDBManagerInterface) UnicastRemoteObject.exportObject(dbManager, 0);
 
             LocateRegistry.createRegistry(port);
