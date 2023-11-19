@@ -18,7 +18,7 @@ public class Server {
 
             LocateRegistry.createRegistry(port);
 
-            Naming.rebind("DB", mgrInterface);
+            Naming.rebind("rmi://localhost:1234/DB", mgrInterface);
 
             System.out.println("SERVER ONLINE : awaiting clients` requests");
 

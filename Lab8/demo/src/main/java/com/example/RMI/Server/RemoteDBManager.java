@@ -10,10 +10,12 @@ import com.example.Entities.Author;
 import com.example.Entities.Book;
 import com.example.Entities.Book.Genre;
 import com.example.dbManager.DatabaseManager;
+import com.example.dbManager.MyParser;
 
 public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBManagerInterface{
 
     private DatabaseManager manager;
+    private MyParser parser = new MyParser();
     private ReadWriteLock bookLock = new ReentrantReadWriteLock();
     private ReadWriteLock authorLock = new ReentrantReadWriteLock();
     private ReadWriteLock dbLock = new ReentrantReadWriteLock();
@@ -23,6 +25,18 @@ public class RemoteDBManager extends UnicastRemoteObject implements RemoteDBMana
     public RemoteDBManager(DatabaseManager manager) throws RemoteException{
         this.manager = manager;
         manager.initDB();
+        loadData();
+    }
+
+    private void loadData() {
+        List<Author> authors = parser
+                .parseSAX("D:\\Java\\DS_Labs\\Lab7\\demo\\src\\main\\java\\resources\\xml\\Data.xml");
+        if (authors == null) {
+            return;
+        }
+        for (Author author : authors) {
+            manager.addAuthor(author);
+        }
     }
 
     @Override
