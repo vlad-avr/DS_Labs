@@ -8,7 +8,7 @@ public class Server {
     public Server(){
         try {
             // Create a connection factory
-            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:8161");
 
             // Create a connection
             Connection connection = connectionFactory.createConnection();
