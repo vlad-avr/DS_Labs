@@ -21,7 +21,7 @@ public class ClientHandler implements Runnable {
         this.mySession = session;
         this.serverHandler = server;
         try {
-            myQueue = session.createQueue("Client " + ID);
+            myQueue = session.createQueue("Client" + ID);
             this.producer = session.createProducer(myQueue);
             this.consumer = session.createConsumer(myQueue);
         } catch (JMSException e) {

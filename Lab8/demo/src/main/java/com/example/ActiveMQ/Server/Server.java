@@ -89,6 +89,7 @@ public class Server {
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue destination = session.createQueue("main");
         MessageConsumer consumer = session.createConsumer(destination);
+        MessageProducer producer = session.createProducer(destination);
         int clientCounter = 0;
         boolean working = true;
         while(working){
@@ -97,6 +98,7 @@ public class Server {
                 working = false;
             }
             if(res.equals("c")){
+                producer.send(session.createTextMessage(String.valueOf(clientCounter)));
                 Thread thr = new Thread(new ClientHandler(session, clientCounter, this));
                 thr.start();
                 System.out.println("New Client " + clientCounter + " has joined!");
