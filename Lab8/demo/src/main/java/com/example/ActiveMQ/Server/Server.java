@@ -1,5 +1,6 @@
 package com.example.ActiveMQ.Server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -19,42 +20,13 @@ public class Server {
     private ReadWriteLock dbLock = new ReentrantReadWriteLock();
     private ReadWriteLock bookLock = new ReentrantReadWriteLock();
     private ReadWriteLock authorLock = new ReentrantReadWriteLock();
+    private List<String> clientNames = new ArrayList<>();
+    private Connection connection;
+    private Session session;
 
-    public Server(){
+    public Server() {
         dbManager.initDB();
         loadData();
-        try {
-            // Create a connection factory
-            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
-
-            // Create a connection
-            Connection connection = connectionFactory.createConnection();
-            connection.start();
-
-            // Create a session
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-            // Create a topic
-            Queue destination = session.createQueue("myQueue");
-
-            // Create a producer
-            MessageProducer producer = session.createProducer(destination);
-
-            // Create a message
-            TextMessage message = session.createTextMessage("Hello, Clients!");
-
-            // Send the message to the topic
-            producer.send(message);
-
-            System.out.println("Message sent to the topic");
-
-            // Close resources
-            producer.close();
-            session.close();
-            connection.close();
-        } catch (JMSException e) {
-            e.printStackTrace();
-        }
     }
 
     private void loadData() {
@@ -110,6 +82,31 @@ public class Server {
 
     public void readUnlock(ReadWriteLock lock) {
         lock.readLock().unlock();
+    }
+
+    private void listenForClients() throws JMSException {
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+        Connection connection = connectionFactory.createConnection();
+        connection.start();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Queue destination = session.createQueue("main");
+        MessageConsumer consumer = session.createConsumer(destination);
+        int clientCounter = 0;
+        boolean working = true;
+        while(working){
+            String res = ((TextMessage)consumer.receive()).getText();
+            if(res.equals("e")){
+                working = false;
+            }
+            if(res.equals("c")){
+                Thread thr = new Thread(new ClientHandler(session, clientCounter, this));
+                thr.start();
+                System.out.println("New Client " + clientCounter + " has joined!");
+            }
+        }
+        consumer.close();
+        session.close();
+        connection.close();
     }
 
 }

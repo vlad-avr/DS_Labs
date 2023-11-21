@@ -118,14 +118,14 @@ public class ClientHandler implements Runnable {
 
     private void addBook() throws IOException, JMSException {
         sendAuthorIds();
-        String temp = ((TextMessage)consumer.receive()).getText();
+        String temp = ((TextMessage) consumer.receive()).getText();
         serverHandler.writeLock(serverHandler.getAuthorLock());
         boolean checker = serverHandler.dbManager.getAuthorGenerator().reserveId(temp);
         serverHandler.writeUnlock(serverHandler.getAuthorLock());
         if (checker) {
             producer.send(mySession.createTextMessage(temp));
             genBookID();
-            Book book = MyJsonParser.parseBook(((TextMessage)consumer.receive()).getText());
+            Book book = MyJsonParser.parseBook(((TextMessage) consumer.receive()).getText());
             serverHandler.writeLock(serverHandler.getAuthorLock());
             serverHandler.writeLock(serverHandler.getBookLock());
             serverHandler.writeLock(serverHandler.getDBLock());
@@ -400,6 +400,9 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             work();
+            producer.close();
+            consumer.close();
+            mySession.close();
         } catch (JMSException | IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
