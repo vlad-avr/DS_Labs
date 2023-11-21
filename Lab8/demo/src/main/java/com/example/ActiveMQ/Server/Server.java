@@ -20,7 +20,7 @@ public class Server {
     private ReadWriteLock bookLock = new ReentrantReadWriteLock();
     private ReadWriteLock authorLock = new ReentrantReadWriteLock();
     private Connection connection;
-    private Session session;
+    //private Session session;
 
     public Server() {
         dbManager.initDB();
@@ -86,8 +86,8 @@ public class Server {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
         connection = connectionFactory.createConnection();
         connection.start();
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Queue destination = session.createQueue("main");
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Destination destination = session.createQueue("main");
         MessageConsumer consumer = session.createConsumer(destination);
         MessageProducer producer = session.createProducer(destination);
         int clientCounter = 0;
@@ -101,11 +101,13 @@ public class Server {
                 producer.send(session.createTextMessage(String.valueOf(clientCounter)));
                 Thread thr = new Thread(new ClientHandler(session, clientCounter, this));
                 thr.start();
-                clientCounter++;
                 System.out.println("New Client " + clientCounter + " has joined!");
+                clientCounter++;
+                
             }
         }
         consumer.close();
+        producer.close();
         session.close();
         connection.close();
     }

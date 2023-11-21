@@ -54,8 +54,11 @@ public class Client {
 
     private void run(String qName) {
         try {
+            System.out.println("A");
             Queue q = session.createQueue(qName);
+            System.out.println("A");
             producer = session.createProducer(q);
+            System.out.println("A");
             consumer = session.createConsumer(q);
             helpActions();
             while (working) {
