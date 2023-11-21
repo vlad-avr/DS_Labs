@@ -101,6 +101,7 @@ public class Server {
                 producer.send(session.createTextMessage(String.valueOf(clientCounter)));
                 Thread thr = new Thread(new ClientHandler(session, clientCounter, this));
                 thr.start();
+                clientCounter++;
                 System.out.println("New Client " + clientCounter + " has joined!");
             }
         }
