@@ -1,8 +1,6 @@
 package com.example.ActiveMQ.Client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.jms.*;
@@ -12,6 +10,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import com.example.Entities.Author;
 import com.example.Entities.Book;
 import com.example.InputManager.InputManager;
+import com.example.dbManager.MyParser;
 import com.example.jsonParser.MyJsonParser;
 
 public class Client {
@@ -22,8 +21,9 @@ public class Client {
     private MessageProducer producer;
     private InputManager manager = new InputManager();
     private boolean working = true;
-
-    public Client() {
+    private MyParser parser = new MyParser();
+    
+    public void init(){
         try {
             // Create a connection factory
             ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
@@ -52,7 +52,7 @@ public class Client {
         }
     }
 
-    public void run(String qName) {
+    private void run(String qName) {
         try {
             Queue q = session.createQueue(qName);
             producer = session.createProducer(q);
@@ -265,71 +265,71 @@ public class Client {
         producer.send(session.createTextMessage(ID));
     }
 
-    private void getAuthor() throws IOException {
-        out.println("ga");
+    private void getAuthor() throws IOException, JMSException {
+        producer.send(session.createTextMessage("ga"));
         String ID = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                 "Enter author ID : ");
-        out.println(ID);
+        producer.send(session.createTextMessage(ID));
         Author authorTmp = MyJsonParser.parseAuthor(((TextMessage) consumer.receive()).getText());
         if (authorTmp != null) {
             System.out.println(authorTmp.toString());
         }
     }
 
-    private void getBook() throws IOException {
-        out.println("gb");
+    private void getBook() throws IOException, JMSException {
+        producer.send(session.createTextMessage("gb"));
         String ID = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                 "Enter book ID : ");
-        out.println(ID);
+        producer.send(session.createTextMessage(ID));
         Book bookTmp = MyJsonParser.parseBook(((TextMessage) consumer.receive()).getText());
         if (bookTmp != null) {
             System.out.println(bookTmp.toString());
         }
     }
 
-    private void updateAuthor() throws IOException {
-        out.println("ua");
+    private void updateAuthor() throws IOException, JMSException {
+        producer.send(session.createTextMessage("ua"));
         String ID = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                 "Enter author Id : ");
-        out.println(ID);
+        producer.send(session.createTextMessage(ID));
         String temp = ((TextMessage) consumer.receive()).getText();
         if (temp != "") {
             Author authorTmp = MyJsonParser.parseAuthor(temp);
-            out.println(MyJsonParser.toJsonAuthor(modifyAuthor(authorTmp)));
+            producer.send(session.createTextMessage(MyJsonParser.toJsonAuthor(modifyAuthor(authorTmp))));
         } else {
             System.out.println("This id is already reserved by other client!");
         }
     }
 
-    private void updateBook() throws IOException {
-        out.println("ub");
+    private void updateBook() throws IOException, JMSException {
+        producer.send(session.createTextMessage("ub"));
         String ID = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                 "Enter book Id : ");
-        out.println(ID);
+        producer.send(session.createTextMessage(ID));
         String temp = ((TextMessage) consumer.receive()).getText();
         if (temp != "") {
             Book bookTmp = MyJsonParser.parseBook(temp);
-            out.println(MyJsonParser.toJsonBook(modifyBook(bookTmp)));
+            producer.send(session.createTextMessage(MyJsonParser.toJsonBook(modifyBook(bookTmp))));
         } else {
             System.out.println("This id is already reserved by other client!");
         }
     }
 
-    private void changeAuthor() throws IOException {
-        out.println("ca");
+    private void changeAuthor() throws IOException, JMSException {
+        producer.send(session.createTextMessage("ca"));
         String ID = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                 "Enter book Id : ");
-        out.println(ID);
+        producer.send(session.createTextMessage(ID));
         String temp = ((TextMessage) consumer.receive()).getText();
         if (temp != "") {
             Book bookTmp = MyJsonParser.parseBook(temp);
             String newAuthorId = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                     "Enter author Id : ");
-            out.println(newAuthorId);
+            producer.send(session.createTextMessage(newAuthorId));
             newAuthorId = ((TextMessage) consumer.receive()).getText();
             if (newAuthorId != "") {
                 bookTmp.setAuthor(newAuthorId);
-                out.println(MyJsonParser.toJsonBook(bookTmp));
+                producer.send(session.createTextMessage(MyJsonParser.toJsonBook(bookTmp)));
             } else {
                 System.out.println("The author is already reserved by other client!");
             }
@@ -338,8 +338,8 @@ public class Client {
         }
     }
 
-    private void getAuthorsByParams() throws IOException {
-        out.println("gap");
+    private void getAuthorsByParams() throws IOException, JMSException {
+        producer.send(session.createTextMessage("gap"));
         sendAuthorsRequest();
         String tmp = ((TextMessage) consumer.receive()).getText();
         if (tmp.equals("")) {
@@ -351,8 +351,8 @@ public class Client {
         }
     }
 
-    private void getBooksByParams() throws IOException {
-        out.println("gbp");
+    private void getBooksByParams() throws IOException, JMSException {
+        producer.send(session.createTextMessage("gbp"));
         sendBooksRequest();
         String tmp = ((TextMessage) consumer.receive()).getText();
         if (tmp.equals("")) {
@@ -364,11 +364,11 @@ public class Client {
         }
     }
 
-    private void getBooksOfAuthor() throws IOException {
-        out.println("gba");
+    private void getBooksOfAuthor() throws IOException, JMSException {
+        producer.send(session.createTextMessage("gba"));
         String tmp = manager.getID(MyJsonParser.parseIds(((TextMessage) consumer.receive()).getText()),
                 "Enter author id : ");
-        out.println(tmp);
+        producer.send(session.createTextMessage(tmp));
         tmp = ((TextMessage) consumer.receive()).getText();
         if (tmp.equals("")) {
             System.out.println("Unable to reach the author ot his books (either deleted or corrupted data)");
@@ -380,30 +380,30 @@ public class Client {
         }
     }
 
-    private void loadToXml() throws IOException {
+    private void loadToXml() throws IOException, JMSException {
         // D:\\Java\\DS_Labs\\Lab8\\demo\\src\\main\\java\\com\\example\\XMLs\\Example.xml
         String path = manager.getString("Enter path to XML file : ");
         if (!parser.tryOpen(path)) {
             System.out.println(" Unable to open file");
             return;
         }
-        out.println("lx");
+        producer.send(session.createTextMessage("lx"));
         List<Author> authors = MyJsonParser.parseAuthors(((TextMessage) consumer.receive()).getText());
         parser.writeXML(path, authors);
     }
 
-    private void uploadFromXml() {
+    private void uploadFromXml() throws JMSException {
         String path = manager.getString("Enter path to XML file : ");
         if (!parser.tryOpen(path)) {
             System.out.println(" Unable to open file");
             return;
         }
-        out.println("ux");
+        producer.send(session.createTextMessage("ux"));
         List<Author> authors = parser.parseSAX(path);
-        out.println(MyJsonParser.toJsonAuthors(authors));
+        producer.send(session.createTextMessage(MyJsonParser.toJsonAuthors(authors)));
     }
 
-    private void mainLoop() throws IOException {
+    private void mainLoop() throws IOException, JMSException {
         String input;
         input = manager.getString("Enter command : ");
         switch (input) {
@@ -460,7 +460,7 @@ public class Client {
                 break;
             case "e":
                 System.out.println("\nYou stopped working with DB\n");
-                out.println("e");
+                producer.send(session.createTextMessage("e"));
                 working = false;
                 return;
             default:
