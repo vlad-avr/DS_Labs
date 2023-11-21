@@ -8,7 +8,7 @@ public class Server {
     public Server(){
         try {
             // Create a connection factory
-            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:8161");
+            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
             // Create a connection
             Connection connection = connectionFactory.createConnection();
@@ -18,10 +18,10 @@ public class Server {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             // Create a topic
-            Topic topic = session.createTopic("myTopic");
+            Queue destination = session.createQueue("myQueue");
 
             // Create a producer
-            MessageProducer producer = session.createProducer(topic);
+            MessageProducer producer = session.createProducer(destination);
 
             // Create a message
             TextMessage message = session.createTextMessage("Hello, Clients!");
