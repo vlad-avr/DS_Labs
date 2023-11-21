@@ -1,6 +1,5 @@
 package com.example.ActiveMQ.Server;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -20,7 +19,6 @@ public class Server {
     private ReadWriteLock dbLock = new ReentrantReadWriteLock();
     private ReadWriteLock bookLock = new ReentrantReadWriteLock();
     private ReadWriteLock authorLock = new ReentrantReadWriteLock();
-    private List<String> clientNames = new ArrayList<>();
     private Connection connection;
     private Session session;
 
@@ -84,11 +82,11 @@ public class Server {
         lock.readLock().unlock();
     }
 
-    private void listenForClients() throws JMSException {
+    public void listenForClients() throws JMSException {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
-        Connection connection = connectionFactory.createConnection();
+        connection = connectionFactory.createConnection();
         connection.start();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue destination = session.createQueue("main");
         MessageConsumer consumer = session.createConsumer(destination);
         int clientCounter = 0;
