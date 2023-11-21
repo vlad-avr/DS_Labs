@@ -31,13 +31,11 @@ public class Client {
             connection = connectionFactory.createConnection();
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = session.createQueue("main");
+            Queue destination = session.createQueue("main");
             MessageConsumer consumer = session.createConsumer(destination);
             MessageProducer producer = session.createProducer(destination);
             producer.send(session.createTextMessage("c"));
-            // Receive the message
             Message message = consumer.receive();
-
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 run("Client" + textMessage.getText());
@@ -46,6 +44,7 @@ public class Client {
             }
             producer.close();
             consumer.close();
+            session.close();
         } catch (JMSException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -54,11 +53,9 @@ public class Client {
 
     private void run(String qName) {
         try {
-            System.out.println("A");
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Queue q = session.createQueue(qName);
-            System.out.println("A");
             producer = session.createProducer(q);
-            System.out.println("A");
             consumer = session.createConsumer(q);
             helpActions();
             while (working) {

@@ -87,7 +87,7 @@ public class Server {
         connection = connectionFactory.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createQueue("main");
+        Queue destination = session.createQueue("main");
         MessageConsumer consumer = session.createConsumer(destination);
         MessageProducer producer = session.createProducer(destination);
         int clientCounter = 0;
