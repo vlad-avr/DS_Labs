@@ -44,4 +44,5 @@ func main() {
 	for _, num := range slice {
 		fmt.Print(num, ", ")
 	}
+
 }
