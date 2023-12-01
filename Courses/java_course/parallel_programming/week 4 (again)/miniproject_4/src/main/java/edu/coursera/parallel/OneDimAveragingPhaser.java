@@ -63,13 +63,10 @@ public final class OneDimAveragingPhaser {
                 double[] threadPrivateMyVal = myVal;
                 double[] threadPrivateMyNew = myNew;
 
-                final int chunkSize = (n + tasks - 1) / tasks;
-                final int left = (i * chunkSize) + 1;
-                int right = (left + chunkSize) - 1;
-                if (right > n)
-                    right = n;
-
                 for (int iter = 0; iter < iterations; iter++) {
+                    final int left = i * (n / tasks) + 1;
+                    final int right = (i + 1) * (n / tasks);
+
                     for (int j = left; j <= right; j++) {
                         threadPrivateMyNew[j] = (threadPrivateMyVal[j - 1]
                                 + threadPrivateMyVal[j + 1]) / 2.0;
@@ -98,6 +95,8 @@ public final class OneDimAveragingPhaser {
      * uses the Phaser.arrive and Phaser.awaitAdvance APIs to overlap
      * computation with barrier completion.
      *
+     * TODO Complete this method based on the provided runSequential and
+     * runParallelBarrier methods.
      *
      * @param iterations The number of iterations to run
      * @param myNew      A double array that starts as the output array
@@ -109,9 +108,9 @@ public final class OneDimAveragingPhaser {
     public static void runParallelFuzzyBarrier(final int iterations,
             final double[] myNew, final double[] myVal, final int n,
             final int tasks) {
-        Phaser[] phaserArray = new Phaser[tasks];
-        for (int i = 0; i < phaserArray.length; i++) {
-            phaserArray[i] = new Phaser(1);
+        Phaser[] phs = new Phaser[tasks];
+        for (int i = 0; i < phs.length; i++) {
+            phs[i] = new Phaser(1);
         }
 
         Thread[] threads = new Thread[tasks];
@@ -131,12 +130,12 @@ public final class OneDimAveragingPhaser {
                         threadPrivateMyNew[j] = (threadPrivateMyVal[j - 1]
                                 + threadPrivateMyVal[j + 1]) / 2.0;
                     }
-                    phaserArray[i].arrive();
+                    phs[i].arrive();
                     if (i - 1 >= 0) {
-                        phaserArray[i - 1].awaitAdvance(iter);
+                        phs[i - 1].awaitAdvance(iter);
                     }
                     if (i + 1 < tasks) {
-                        phaserArray[i + 1].awaitAdvance(iter);
+                        phs[i + 1].awaitAdvance(iter);
                     }
 
                     double[] temp = threadPrivateMyNew;
@@ -154,6 +153,5 @@ public final class OneDimAveragingPhaser {
                 e.printStackTrace();
             }
         }
-
     }
 }
