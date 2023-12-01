@@ -1,13 +1,12 @@
 package edu.coursera.concurrent;
 
-import edu.coursera.concurrent.AbstractBoruvka;
-import edu.coursera.concurrent.SolutionToBoruvka;
-import edu.coursera.concurrent.boruvka.Edge;
 import edu.coursera.concurrent.boruvka.Component;
+import edu.coursera.concurrent.boruvka.Edge;
 
-import java.util.Queue;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -29,46 +28,44 @@ public final class ParBoruvka extends AbstractBoruvka<ParBoruvka.ParComponent> {
     @Override
     public void computeBoruvka(final Queue<ParComponent> nodesLoaded,
                                final SolutionToBoruvka<ParComponent> solution) {
-
-        ParComponent current = null;
-        while (!nodesLoaded.isEmpty()) {
-            current = nodesLoaded.poll();
-
-            // Empty queue or the component is acquired by another thread.
-            if (current == null || !current.lock.tryLock()) {
+        ParComponent n;
+        while ((n = nodesLoaded.poll()) != null) {
+            if (n.isDead) {
+                //already merged/processed
                 continue;
             }
 
-            // Already processed.
-            if (current.isDead) {
-                current.lock.unlock();
+            if (!n.lock.tryLock()) {
+                //another thread is working with n
                 continue;
             }
 
-            // Maybe the graph is processed, set the solution.
-            Edge<ParComponent> minEdge = current.getMinEdge();
-            if (minEdge == null) {
-                current.lock.unlock();
-
-//                solutionLock.lock();
-                solution.setSolution(current);
+            final Edge<ParComponent> e = n.getMinEdge();
+            if (e == null) {
+                solution.setSolution(n);
                 break;
             }
 
-            // Process current component.
-            final ParComponent other = minEdge.getOther(current);
+            final ParComponent other = e.getOther(n);
+            if (other.isDead) {
+                n.lock.unlock();
+                nodesLoaded.add(n);
+                continue;
+            }
+
             if (!other.lock.tryLock()) {
-                current.lock.unlock();
-                nodesLoaded.add(current);
+                n.lock.unlock();
+                nodesLoaded.add(n);
                 continue;
             }
 
             other.isDead = true;
-            current.merge(other, minEdge.weight());
-            current.lock.unlock();
+            n.merge(other, e.weight());
+
+            n.lock.unlock();
             other.lock.unlock();
 
-            nodesLoaded.add(current);
+            nodesLoaded.add(n);
         }
     }
 
@@ -78,12 +75,14 @@ public final class ParBoruvka extends AbstractBoruvka<ParBoruvka.ParComponent> {
      * result of collapsing edges to form a component from multiple nodes.
      */
     public static final class ParComponent extends Component<ParComponent> {
+
+        private final Lock lock = new ReentrantLock(true);
+
         /**
          *  A unique identifier for this component in the graph that contains
          *  it.
          */
         public final int nodeId;
-        public final ReentrantLock lock = new ReentrantLock();
 
         /**
          * List of edges attached to this component, sorted by weight from least
@@ -117,6 +116,9 @@ public final class ParBoruvka extends AbstractBoruvka<ParBoruvka.ParComponent> {
         public ParComponent(final int setNodeId) {
             super();
             this.nodeId = setNodeId;
+            if (setNodeId == 1) {
+                Runtime.getRuntime().gc();
+            }
         }
 
         /**
