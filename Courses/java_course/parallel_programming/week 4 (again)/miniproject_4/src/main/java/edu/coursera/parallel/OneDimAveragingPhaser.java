@@ -116,10 +116,10 @@ public final class OneDimAveragingPhaser {
 
         Thread[] threads = new Thread[tasks];
 
-        for (int counter = 0; counter < tasks; counter++) {
-            final int i = counter;
+        for (int ii = 0; ii < tasks; ii++) {
+            final int i = ii;
 
-            threads[counter] = new Thread(() -> {
+            threads[ii] = new Thread(() -> {
                 double[] threadPrivateMyVal = myVal;
                 double[] threadPrivateMyNew = myNew;
 
@@ -144,12 +144,12 @@ public final class OneDimAveragingPhaser {
                     threadPrivateMyVal = temp;
                 }
             });
-            threads[counter].start();
+            threads[ii].start();
         }
 
-        for (int counter = 0; counter < tasks; counter++) {
+        for (int ii = 0; ii < tasks; ii++) {
             try {
-                threads[counter].join();
+                threads[ii].join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
