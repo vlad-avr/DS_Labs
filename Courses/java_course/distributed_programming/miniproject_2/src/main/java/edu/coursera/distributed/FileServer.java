@@ -52,7 +52,8 @@ public final class FileServer {
                             }
                             writer.close();
                             // Flush out and close the stream
-                        } catch (IOException e) {}
+                        } catch (IOException e) {
+                        }
                     }
             );
             thread.start();
