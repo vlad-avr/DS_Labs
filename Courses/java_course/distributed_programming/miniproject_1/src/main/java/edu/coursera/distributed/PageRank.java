@@ -2,6 +2,7 @@ package edu.coursera.distributed;
 
 import org.apache.spark.api.java.JavaRDD;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
