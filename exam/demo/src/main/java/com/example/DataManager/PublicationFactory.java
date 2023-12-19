@@ -14,14 +14,16 @@ public class PublicationFactory {
 
     public final static List<String> faculties = new ArrayList<>(Arrays.asList("FCSC", "FIT"));
 
-    public static Publication makePublication(InputManager inputManager, String ID) {
+    public static Publication makePublication(InputManager inputManager, String ID, List<String> sources) {
         System.out.println("\nYou are in 'Make your Publication!' menu, now make your student:\n");
         Publication publication = new Publication(ID);
         publication.setAuthor(inputManager.getString("Enter author: "));
         publication.setName(inputManager.getString("Enter name: "));
         publication.setPublishingDate(inputManager.getDate("Enter publishing date: ").toString());
         publication.setNumberOfPages(inputManager.getInt("Enter number of pages: ", 0, Integer.MAX_VALUE));
-
+        while(sources != null &&  inputManager.getBool("Add source? (+/-): ")){
+            publication.addSource(inputManager.getOption(sources, "Enter source: "));
+        }
         return publication;
     }
 

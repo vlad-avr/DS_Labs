@@ -1,6 +1,7 @@
 package com.example.Entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Publication implements Serializable{
     private String ID;
@@ -8,6 +9,7 @@ public class Publication implements Serializable{
     private String publishingDate;
     private int numberOfPages;
     private String name;
+    private List<String> sources;
 
     public Publication() {
     }
@@ -22,6 +24,10 @@ public class Publication implements Serializable{
         this.name = name;
         this.publishingDate = publishingDate.toString();
         this.numberOfPages = numberOfPages;
+    }
+
+    public void setSources(List<String> strings){
+        this.sources = strings;
     }
 
     public void setID(String val) {
@@ -62,6 +68,16 @@ public class Publication implements Serializable{
 
     public String getName() {
         return name;
+    }
+
+    public List<String> getSources(){
+        return sources;
+    }
+
+    public void addSource(String string){
+        if(!sources.contains(string)){
+            sources.add(string);
+        }
     }
 
     public String toString() {

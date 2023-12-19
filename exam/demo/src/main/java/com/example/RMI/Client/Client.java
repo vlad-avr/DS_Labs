@@ -79,7 +79,7 @@ public class Client {
     }
 
     private void addPublication() throws RemoteException {
-        dbRemote.addPublication(PublicationFactory.makePublication(inputManager, dbRemote.generateId()));
+        dbRemote.addPublication(PublicationFactory.makePublication(inputManager, dbRemote.generateId(), dbRemote.getIds()));
     }
 
     private void deletePublication() throws RemoteException {

@@ -94,7 +94,7 @@ public class Client {
 
     private void addPublication() throws IOException {
         out.println("aa");
-        Publication p = PublicationFactory.makePublication(inputManager, in.readLine());
+        Publication p = PublicationFactory.makePublication(inputManager, in.readLine(), null);
         out.println(MyJsonParser.toJsonPublication(p));
     }
 
